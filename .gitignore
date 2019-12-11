@@ -1,0 +1,11 @@
+# Directories section
+__pycache__/
+
+# Files section
+*.o
+*.out
+*.a
+
+*.pyc
+
+*.sw[op]
