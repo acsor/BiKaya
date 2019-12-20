@@ -1,16 +1,15 @@
 # Project include, source and library dirs for umips-related files
-# TODO Add BKA prefix to project-local variables
-set(UMPS_INC ${PROJECT_SOURCE_DIR}/${INC}/umps)
-set(UMPS_SRC ${PROJECT_SOURCE_DIR}/${SRC}/umps)
+set(BKA_UMPS_INC ${PROJECT_SOURCE_DIR}/${BKA_INC}/umps)
+set(BKA_UMPS_SRC ${PROJECT_SOURCE_DIR}/${BKA_SRC}/umps)
 
 set(CFLAGS_MIPS -mips1 -mabi=32 -mno-gpopt -G 0 -mno-abicalls -fno-pic -mfp32)
-set(LDFLAGS_MIPS -G 0 -nostdlib -T ${UMPS_SRC}/umpscore.ldscript)
+set(LDFLAGS_MIPS -G 0 -nostdlib -T ${BKA_UMPS_SRC}/umpscore.ldscript)
 
 add_compile_options(${CFLAGS_MIPS})
 
 
-add_library(libumps OBJECT ${UMPS_SRC}/libumps.S)
-add_library(crtso OBJECT ${UMPS_SRC}/crtso.S)
+add_library(libumps OBJECT ${BKA_UMPS_SRC}/libumps.S)
+add_library(crtso OBJECT ${BKA_UMPS_SRC}/crtso.S)
 
 add_custom_command(
 	OUTPUT kernel
