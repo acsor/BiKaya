@@ -1,11 +1,11 @@
 # BiKaya
 BiKaya is a reduced operating system running on two distinct computer
 architectures, micro-ARM and micro-MIPS2. Designed for educational purposes,
-this project was commissioned as part of the Operating System course from the
+this project was commissioned as part of the Operating Systems course from the
 University of Bologna, 2019-2020 a.y.
 
 ## Installation
-BiKaya features several executable targets, each one described in their own
+BiKaya features several executable targets, each one described in its own
 section. In general the CMake build-system is utilized.
 
 ### Building phase 0 targets
