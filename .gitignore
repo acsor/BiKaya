@@ -1,11 +1,14 @@
 # Directories section
 __pycache__/
+*build*/
 
 # Files section
+Session.vim
 *.o
 *.out
 *.a
 
 *.pyc
+*.pdf
 
 *.sw[op]
