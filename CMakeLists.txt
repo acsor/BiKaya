@@ -40,3 +40,25 @@ configure_file(${BKA_INC}/system.h.in ${PROJECT_BINARY_DIR}/${BKA_INC}/system.h)
 
 add_library(termprint OBJECT ${BKA_SRC}/termprint.c)
 add_library(phase0 OBJECT ${BKA_SRC}/phase0.c)
+
+
+# CPack configuration -- useful for packaging the project in various formats
+# (e.g. .tar, .zip, .deb etc.)
+include(InstallRequiredSystemLibraries)
+
+set(CPACK_PACKAGE_NAME bikaya)
+set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md)
+set(CPACK_PACKAGE_VERSION_MAJOR ${CMAKE_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${CMAKE_VERSION_MINOR})
+set(CPACK_PACKAGE_DESCRIPTION ${PROJECT_DESCRIPTION})
+set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION})
+set(CPACK_RESOURCE_FILE_README ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
+
+# Exclude unwanted files and directories when generating a source package
+list(APPEND CPACK_SOURCE_IGNORE_FILES ".*build.*/")
+list(APPEND CPACK_SOURCE_IGNORE_FILES ".git/")
+list(APPEND CPACK_SOURCE_IGNORE_FILES ".idea/")
+list(APPEND CPACK_SOURCE_IGNORE_FILES "sw[op]$")
+
+
+include(CPack)

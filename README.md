@@ -30,3 +30,20 @@ In order to build the cross-compiled executables, do the following
 
 	# Launch the uarm emulator
 	```
+
+## Packaging
+This option is mostly intended for people working on the project.
+
+### Packaging a source archive
+To produce a source archive, use CPack likeso
+
+```bash
+# A build for the micro ARM architecture would be fine too
+cmake -B build-umps -S . -D CMAKE_TOOLCHAIN_FILE=toolchains/umps.cmake
+cd build-umps/
+# You can pass other values to -G as well, like ZIP, DEB and more
+cpack -G TGZ --config CPackSourceConfig.cmake
+# Your source archive should be easily identifiable in ./
+```
+
+Packaging features should also be easily accessible from most IDEs.
