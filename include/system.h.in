@@ -6,6 +6,17 @@
 #cmakedefine BKA_ARCH_UARM
 
 
+/**
+ * A "generic" kind of error, for primitives that do not want to further
+ * specify the kind of error occurred.
+ */
+#define BKA_E_GEN -1
+/**
+ * No error occurred.
+ */
+#define BKA_E_OK  0
+
+
 #ifdef BKA_ARCH_UMPS
 #include "umps/libumps.h"
 #include "umps/arch.h"
