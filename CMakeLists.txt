@@ -36,9 +36,9 @@ else()
 endif()
 
 
-configure_file(${BKA_INC}/system.h.in ${PROJECT_BINARY_DIR}/${BKA_INC}/system.h)
+configure_file(${BKA_INC}/sys.h.in ${PROJECT_BINARY_DIR}/${BKA_INC}/sys.h)
 
-add_library(termprint OBJECT ${BKA_SRC}/termprint.c)
+add_library(io OBJECT ${BKA_SRC}/io.c)
 add_library(phase0 OBJECT ${BKA_SRC}/phase0.c)
 
 

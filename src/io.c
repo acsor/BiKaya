@@ -1,4 +1,4 @@
-#include "system.h"
+#include "sys.h"
 
 #define ST_READY           1
 #define ST_BUSY            3

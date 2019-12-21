@@ -1,5 +1,5 @@
-#include "system.h"
-#include "termprint.h"
+#include "sys.h"
+#include "io.h"
 
 
 int main(void) {
