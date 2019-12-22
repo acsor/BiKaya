@@ -7,14 +7,18 @@
 
 
 /**
+ * No error occurred.
+ */
+#define BKA_E_OK		0
+/**
  * A "generic" kind of error, for primitives that do not want to further
  * specify the kind of error occurred.
  */
-#define BKA_E_GEN -1
+#define BKA_E_GEN		-1
 /**
- * No error occurred.
+ * A null-pointer error, relating for example to function arguments.
  */
-#define BKA_E_OK  0
+#define BKA_E_NULLPTR	-2
 
 
 #ifdef BKA_ARCH_UMPS
