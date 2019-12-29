@@ -35,7 +35,7 @@ In order to build the cross-compiled executables, do the following
 This option is mostly intended for people working on the project.
 
 ### Packaging a source archive
-To produce a source archive, use CPack likeso
+To produce a source archive, use CPack as follows
 
 ```bash
 # A build for the micro ARM architecture would be fine too
