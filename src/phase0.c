@@ -5,7 +5,7 @@
 int main(void) {
     term_puts("hello, world\n");
 
-    /* Go to sleep indefinetely */
+    /* Go to sleep indefinitely */
     while (1) 
         WAIT();
 
