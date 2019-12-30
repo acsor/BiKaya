@@ -13,10 +13,10 @@ add_library(crtso OBJECT ${BKA_UMPS_SRC}/crtso.S)
 
 add_custom_command(
 	OUTPUT kernel
-	DEPENDS crtso libumps termprint phase0
+	DEPENDS crtso libumps io phase0
 	COMMAND ${CMAKE_C_LINKER} ${LDFLAGS_MIPS}
 	$<TARGET_OBJECTS:crtso> $<TARGET_OBJECTS:libumps>
-	$<TARGET_OBJECTS:termprint> $<TARGET_OBJECTS:phase0>
+	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:phase0>
 	-o kernel
 )
 # Run the `umps2-elf2umps -k kernel' command after building `kernel'

@@ -15,9 +15,9 @@ target_include_directories(libuarm PRIVATE ${BKA_UARM_INC})
 
 add_custom_target(
 	kernel.uarm
-	DEPENDS crtso libuarm termprint phase0
+	DEPENDS crtso libuarm io phase0
 	COMMAND ${CMAKE_C_LINKER} ${LDFLAGS_UARM}
 	$<TARGET_OBJECTS:crtso> $<TARGET_OBJECTS:libuarm>
-	$<TARGET_OBJECTS:termprint> $<TARGET_OBJECTS:phase0>
+	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:phase0>
 	-o kernel.uarm
 )
