@@ -3,7 +3,7 @@
 
 
 int main () {
-	unsigned const buffsize = 5;
+	unsigned const buffsize = 256;
 	char buff[buffsize];
 
 	termreg_t *term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
