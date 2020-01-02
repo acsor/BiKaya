@@ -7,13 +7,14 @@
 /**
  * @param src String representation of integer number
  * @param base Base in which the output should be translated
- * @return The integer value of @c src in base @base
+ * @return The integer value of @c src in base @base, or @c BKA_E_INVARG
+ * if either @c src contained invalid digits or @c base was < 2.
  */
-int bka_atoi(char const *src, unsigned base);
+long int bka_atoi(char const *src, unsigned base);
 /**
  * Like bka_atoi(), but in base 10.
  */
-int bka_atoi10(char const *src);
+long int bka_atoi10(char const *src);
 /**
  * Converts @n in string format, storing it into @c dest for a maximum of @c
  * length characters written.

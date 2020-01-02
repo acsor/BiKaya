@@ -19,6 +19,10 @@
  * A null-pointer error, relating for example to function arguments.
  */
 #define BKA_E_NULLPTR	-2
+/**
+ * An invalid argument error.
+ */
+#define BKA_E_INVARG	-3
 
 
 #ifdef BKA_ARCH_UMPS
