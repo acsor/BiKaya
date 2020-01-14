@@ -83,14 +83,14 @@ int bka_itoa (int n, char *dest, unsigned length) {
 }
 
 int bka_strlen (char const *str) {
- 	int cont = 0;
- 	
-	while (*str != '\0') {
-		cont++;
-		str++;
-	}
+ 	int count;
 
-	return cont;
+	if (str == NULL)
+		return BKA_E_NULLPTR;
+
+	for (count = 0; *str != '\0'; str++, count++);
+
+	return count;
 }
 
 int bka_strncpy(char *dest, char const *src, unsigned length) {

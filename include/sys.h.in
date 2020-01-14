@@ -5,7 +5,6 @@
 #cmakedefine BKA_ARCH_UMPS
 #cmakedefine BKA_ARCH_UARM
 
-
 /**
  * No error occurred.
  */
@@ -33,6 +32,11 @@
 #include "uarm/libuarm.h"
 #include "uarm/arch.h"
 #include "uarm/uARMtypes.h"
+#endif
+
+
+#ifndef NULL
+#define NULL	((void*)0)
 #endif
 
 
