@@ -30,6 +30,11 @@ In order to build the cross-compiled executables, do the following
 
 	# Launch the uarm emulator
 	```
+ 
+### Building phase 1 targets
+Follow the steps exactly as in building targets for the phase0 phase, except
+for substituting `kernel.core.umps` with `kernel1.core.umps`, and `kernel.uarm`
+with `kernel1.uarm`.
 
 ## Packaging
 This option is mostly intended for people working on the project.
