@@ -14,12 +14,12 @@ add_library(crtso OBJECT ${BKA_UARM_SRC}/crtso.s)
 target_include_directories(libuarm PRIVATE ${BKA_UARM_INC})
 
 add_custom_target(
-	kernel.uarm
+	kernel0.uarm
 	DEPENDS crtso libuarm io phase0
 	COMMAND ${CMAKE_C_LINKER} ${LDFLAGS_UARM}
 	$<TARGET_OBJECTS:crtso> $<TARGET_OBJECTS:libuarm>
 	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:phase0>
-	-o kernel.uarm
+	-o kernel0.uarm
 )
 add_custom_target(
 	kernel1.uarm
