@@ -1,10 +1,12 @@
-#ifndef SYSTEM_H
-#define SYSTEM_H
+#ifndef BKA_SYS_H
+#define BKA_SYS_H
 
 
 #cmakedefine BKA_ARCH_UMPS
 #cmakedefine BKA_ARCH_UARM
 
+
+/* ERROR CONSTANTS. */
 /**
  * No error occurred.
  */
@@ -24,6 +26,36 @@
 #define BKA_E_INVARG	-3
 
 
+/* OTHER CONSTANTS. */
+#ifndef NULL
+#define NULL	((void*)0)
+#endif
+
+
+/* CODE INHERITED FROM CONST.H, PROVIDED BY UNIVERSITY TUTOR AND PROFESSOR. */
+
+/* Maximum number of processes concurrently active in the system. */
+#define BKA_MAX_PROC 20
+#define MAXPROC BKA_MAX_PROC
+
+/* Num. of usermode processes (not including master proc) and system daemons */
+#define UPROCMAX 3
+
+#define	HIDDEN  static
+#define	TRUE 	1
+#define	FALSE	0
+#define ON 	    1
+#define OFF 	0
+#define EOS     '\0'
+
+/* Maximum number of devices per interrupt line */
+#define BKA_DEV_PER_INT 8
+#define DEV_PER_INT BKA_DEV_PER_INT
+
+#define BKA_CR 0x0a   /* carriage return as returned by the terminal */
+#define CR BKA_CR   /* carriage return as returned by the terminal */
+
+
 #ifdef BKA_ARCH_UMPS
 #include "umps/libumps.h"
 #include "umps/arch.h"
@@ -32,11 +64,6 @@
 #include "uarm/libuarm.h"
 #include "uarm/arch.h"
 #include "uarm/uARMtypes.h"
-#endif
-
-
-#ifndef NULL
-#define NULL	((void*)0)
 #endif
 
 

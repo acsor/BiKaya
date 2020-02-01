@@ -25,3 +25,19 @@ add_custom_target(
 	COMMAND umps2-elf2umps -k ${PROJECT_BINARY_DIR}/kernel
 	DEPENDS kernel
 )
+
+
+# TODO Set the test build instructions in a more idiomatic way
+add_custom_command(
+	OUTPUT kernel1
+	DEPENDS crtso libumps io phase1
+	COMMAND ${CMAKE_C_LINKER} ${LDFLAGS_MIPS}
+	$<TARGET_OBJECTS:crtso> $<TARGET_OBJECTS:libumps>
+	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:phase1>
+	-o kernel1
+)
+add_custom_target(
+	kernel1.core.umps
+	COMMAND umps2-elf2umps -k ${PROJECT_BINARY_DIR}/test1
+	DEPENDS kernel1
+)

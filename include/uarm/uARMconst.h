@@ -201,7 +201,10 @@
 #define	FALSE	0
 #define	TRUE 1
 
+#ifndef NULL
 #define NULL ((void *)0)
+#endif
+
 #endif
 
 #define CR 0x0a   /* carriage return as returned by the terminal */
