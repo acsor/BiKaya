@@ -1,0 +1,41 @@
+# TODO
+This file is for contributors only and features the work that has to be carried
+out in order to complete the project.
+
+## Phase 1
+The following is a list of primitive functions that have to be implemented to
+complete the phase1 stage. Each entry has two fields: a "done/not done" marker,
+and an author name. An example is
+
+```
+[x][Oscar] void print()
+```
+
+### `pcb.h`
+#### Basic PCB functions
+1. [ ] **[???]** `void initPcbs(void)`
+1. [ ] **[???]** `void freePcb(pcb_t *p)`
+1. [ ] **[Oscar]** `pcb_t *allocPcb(void)`
+
+#### Process queues functions
+1. [ ] **[???]** `void mkEmptyProcQ(struct list_head *head)`
+1. [ ] **[???]** `int emptyProcQ(struct list_head *head)`
+1. [ ] **[Oscar]** `void insertProcQ(struct list_head *head, pcb_t *p)`
+1. [ ] **[???]** `pcb_t *headProcQ(struct list_head *head)`
+1. [ ] **[Oscar]** `pcb_t *removeProcQ(struct list_head *head)`
+1. [ ] **[???]** `pcb_t *outProcQ(struct list_head *head, pcb_t *p)`
+
+#### Process tree functions
+1. [ ] **[???]** `int emptyChild(pcb_t *this)`
+1. [ ] **[Oscar]** `void insertChild(pcb_t *prnt, pcb_t *p)`
+1. [ ] **[???]** `pcb_t *removeChild(pcb_t *p)`
+1. [ ] **[Oscar]** `pcb_t *outChild(pcb_t *p)`
+
+### `asl.h`
+1. [ ] **[???]** `semd_t* getSemd(int *key)`
+1. [ ] **[???]** `void initASL()`
+1. [ ] **[???]** `int insertBlocked(int *key, pcb_t* p)`
+1. [ ] **[???]** `pcb_t* removeBlocked(int *key)`
+1. [ ] **[???]** `pcb_t* outBlocked(pcb_t *p)`
+1. [ ] **[???]** `pcb_t* headBlocked(int *key)`
+1. [ ] **[???]** `void outChildBlocked(pcb_t *p)`
