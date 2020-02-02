@@ -1,7 +1,7 @@
 #ifndef BKA_TYPES_H
 #define BKA_TYPES_H
 
-#include <listx.h>
+#include <list.h>
 
 #ifdef BKA_ARCH_UMPS
 #include "umps/types.h"

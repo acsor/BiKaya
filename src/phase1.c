@@ -25,7 +25,7 @@
  *	``okbuf[]''. Error messages will also appear on terminal 0 in addition to
  *	the array ``errbuf[]''. Aborts as soon as an error is detected.
  */
-#include "listx.h"
+#include "list.h"
 
 #ifdef BKA_ARCH_UMPS
 #include "umps/libumps.h"
