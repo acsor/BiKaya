@@ -23,9 +23,10 @@ add_custom_target(
 )
 add_custom_target(
 	kernel1.uarm
-	DEPENDS crtso libuarm io phase1
+	DEPENDS crtso libuarm io pcb asl phase1
 	COMMAND ${CMAKE_C_LINKER} ${LDFLAGS_UARM}
 	$<TARGET_OBJECTS:crtso> $<TARGET_OBJECTS:libuarm>
 	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:phase1>
+	$<TARGET_OBJECTS:pcb> $<TARGET_OBJECTS:asl>
 	-o kernel1.uarm
 )
