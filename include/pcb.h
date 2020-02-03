@@ -4,12 +4,24 @@
 #include "types.h"
 
 
-/* PCB free list handling functions */
+/* Free PCB list handling functions. */
+/**
+ * Initializes the free PCB list such that it contains all the available
+ * processes.
+ */
 void initPcbs(void);
+/**
+ * @param p Pointer to a PCB to be inserted into the free PCB list.
+ */
 void freePcb(pcb_t *p);
+/**
+ * @return @c NULL if the free PCB list is empty, a newly-allocated PCB
+ * otherwise. The returned element is extracted from the free PCB list.
+ */
 pcb_t *allocPcb(void);
 
 
+/* PCB queue functions. */
 /**
  * Initialize the PCB list.
  * @param head

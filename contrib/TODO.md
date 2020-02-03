@@ -13,11 +13,11 @@ and a list of author names. An example is
 
 ### `pcb.h`
 #### Basic PCB functions
-1. [ ] `void initPcbs(void)`: Oscar
-1. [ ] `void freePcb(pcb_t *p)`: Oscar
-1. [ ] `pcb_t *allocPcb(void)`: Oscar
+1. [x] `void initPcbs(void)`: Oscar
+1. [x] `void freePcb(pcb_t *p)`: Oscar
+1. [x] `pcb_t *allocPcb(void)`: Oscar
 
-#### Process queues functions
+#### Process queue functions
 1. [ ] `void mkEmptyProcQ(struct list_head *head)`: ???
 1. [ ] `int emptyProcQ(struct list_head *head)`: ???
 1. [ ] `void insertProcQ(struct list_head *head, pcb_t *p)`: Oscar
