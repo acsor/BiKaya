@@ -39,3 +39,7 @@ and a list of author names. An example is
 1. [ ] `pcb_t* outBlocked(pcb_t *p)`: ???
 1. [ ] `pcb_t* headBlocked(int *key)`: ???
 1. [ ] `void outChildBlocked(pcb_t *p)`: ???
+
+### Extra
+1. `list_del(l)` of `list.h` does **not** reset the list fields of `l` upon
+ removal, shall we perform an edit?
