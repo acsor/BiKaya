@@ -59,4 +59,63 @@ pcb_t* allocPcb(void) {
 }
 
 
+void mkEmptyProcQ(struct list_head *head) {
+	INIT_LIST_HEAD(head);
+}
+
+int emptyProcQ(struct list_head *head) {
+	return head->next == head && head->prev == head;
+}
+
+void insertProcQ(struct list_head *head, pcb_t *p) {
+	struct list_head *curr_list = head->next;
+	// TODO If the list is completely empty, what value is curr_proc going to
+	//  assume the first time?
+	pcb_t *curr_proc = container_of(curr_list, pcb_t, next);
+
+	// Iterate until we either end the list or find a matching process with
+	// priority less than p
+	while (curr_list != head && p->priority < curr_proc->priority) {
+		curr_list = head->next;
+		curr_proc = container_of(curr_list, pcb_t, next);
+	}
+
+	__list_add(&p->next, curr_list->prev, curr_list);
+}
+
+pcb_t* headProcQ(struct list_head *head) {
+	return list_empty(head) ? NULL: container_of(head->next, pcb_t, next);
+}
+
+pcb_t* removeProcQ(struct list_head *head) {
+	pcb_t *p = NULL;
+
+	if (!list_empty(head)) {
+		p = container_of(head->next, pcb_t, next);
+		list_del(head->next);
+	}
+
+	return p;
+}
+
+pcb_t* outProcQ(struct list_head *head, pcb_t *p) {
+	struct list_head *curr_list = head;
+	pcb_t *curr_proc;
+
+	do {
+		curr_list = curr_list->next;
+		curr_proc = container_of(curr_list, pcb_t, next);
+	} while (curr_list != head && curr_proc != p);
+
+	// If we exited the loop due to finding the corresponding entry
+	if (curr_proc == p) {
+		list_del(curr_list);
+
+		return p;
+	}
+
+	return NULL;
+}
+
+
 #endif
