@@ -26,10 +26,10 @@ and a list of author names. An example is
 1. [x] `pcb_t *outProcQ(struct list_head *head, pcb_t *p)`: ???
 
 #### Process tree functions
-1. [ ] `int emptyChild(pcb_t *this)`: ???
-1. [ ] `void insertChild(pcb_t *prnt, pcb_t *p)`: Oscar
-1. [ ] `pcb_t *removeChild(pcb_t *p)`: ???
-1. [ ] `pcb_t *outChild(pcb_t *p)`: Oscar
+1. [x] `int emptyChild(pcb_t *this)`: ???
+1. [x] `void insertChild(pcb_t *prnt, pcb_t *p)`: Oscar
+1. [x] `pcb_t *removeChild(pcb_t *p)`: ???
+1. [x] `pcb_t *outChild(pcb_t *p)`: Oscar
 
 ### `asl.h`
 1. [ ] `semd_t* getSemd(int *key)`: ???

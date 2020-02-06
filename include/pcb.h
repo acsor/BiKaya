@@ -63,9 +63,26 @@ pcb_t* outProcQ(struct list_head *head, pcb_t *p);
 
 
 /* Tree view functions */
+/**
+ * @return @c 1 if @c this has no children, @c 0 if it has.
+ */
 int emptyChild(pcb_t *this);
-void insertChild(pcb_t *prnt, pcb_t *p);
+/**
+ * Inserts @c child to the end of the children list of @c parent.
+ */
+void insertChild(pcb_t *parent, pcb_t *child);
+/**
+ * @param p PCB node to remove the first child from.
+ * @return The first element of the children list of @c p, or @c NULL if @c p
+ * has no child nodes in its tree view.
+ */
 pcb_t* removeChild(pcb_t *p);
+/**
+ * Removes @c p from the children list of its parent.
+ *
+ * @return @c p itself if it was successfully removed, @c NULL if something
+ * goes wrong, e.g. @c p had no parent.
+ */
 pcb_t* outChild(pcb_t *p);
 
 

@@ -45,7 +45,7 @@ pcb_t* allocPcb(void) {
 	if (i < BKA_MAX_PROC) {
 		out = pcb_table + i;
 
-		// TODO Do we need to reset the next, child and siblings fields? Are
+		// TODO Do we need to reset the next, first_child and siblings fields? Are
 		//  the others ok?
 		out->parent = NULL;
 		// TODO Urgent! Properly set out->state
@@ -117,5 +117,43 @@ pcb_t* outProcQ(struct list_head *head, pcb_t *p) {
 	return NULL;
 }
 
+
+int emptyChild(pcb_t *this) {
+	return list_empty(&this->first_child);
+}
+
+void insertChild(pcb_t *parent, pcb_t *child) {
+	list_add_tail(&child->siblings, &parent->first_child);
+	child->parent = parent;
+}
+
+pcb_t* removeChild(pcb_t *p) {
+	struct list_head *to_remove;
+
+	if (list_empty(&p->first_child)) {
+		return NULL;
+	} else {
+		to_remove = p->first_child.next;
+		list_del(to_remove);
+	}
+
+	return container_of(to_remove, pcb_t, siblings);
+}
+
+pcb_t* outChild(pcb_t *p) {
+	struct list_head *to_remove = NULL;
+	pcb_t *curr_proc = NULL;
+
+	if (p->parent != NULL) {
+		list_for_each(to_remove, &p->parent->first_child) {
+			curr_proc = container_of(to_remove, pcb_t, siblings);
+
+			if (curr_proc == p)
+				break;
+		}
+	}
+
+	return curr_proc == p ? curr_proc: NULL;
+}
 
 #endif

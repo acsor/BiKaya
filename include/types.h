@@ -24,7 +24,7 @@ typedef struct pcb_t {
 
     /* Process tree fields */
     struct pcb_t *parent;
-    struct list_head child, siblings;
+    struct list_head first_child, siblings;
 
     state_t state;
     int priority;
