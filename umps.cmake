@@ -39,6 +39,6 @@ add_custom_command(
 )
 add_custom_target(
 	kernel1.core.umps
-	COMMAND umps2-elf2umps -k ${PROJECT_BINARY_DIR}/test1
+	COMMAND umps2-elf2umps -k ${PROJECT_BINARY_DIR}/kernel1
 	DEPENDS kernel1
 )
