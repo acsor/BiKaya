@@ -18,17 +18,17 @@ and a list of author names. An example is
 1. [x] `pcb_t *allocPcb(void)`: Oscar
 
 #### Process queue functions
-1. [x] `void mkEmptyProcQ(struct list_head *head)`: ???
-1. [x] `int emptyProcQ(struct list_head *head)`: ???
+1. [x] `void mkEmptyProcQ(struct list_head *head)`: Oscar
+1. [x] `int emptyProcQ(struct list_head *head)`: Oscar
 1. [x] `void insertProcQ(struct list_head *head, pcb_t *p)`: Oscar
-1. [x] `pcb_t *headProcQ(struct list_head *head)`: ???
+1. [x] `pcb_t *headProcQ(struct list_head *head)`: Oscar
 1. [x] `pcb_t *removeProcQ(struct list_head *head)`: Oscar
-1. [x] `pcb_t *outProcQ(struct list_head *head, pcb_t *p)`: ???
+1. [x] `pcb_t *outProcQ(struct list_head *head, pcb_t *p)`: Oscar
 
 #### Process tree functions
-1. [x] `int emptyChild(pcb_t *this)`: ???
+1. [x] `int emptyChild(pcb_t *this)`: Oscar
 1. [x] `void insertChild(pcb_t *prnt, pcb_t *p)`: Oscar
-1. [x] `pcb_t *removeChild(pcb_t *p)`: ???
+1. [x] `pcb_t *removeChild(pcb_t *p)`: Oscar
 1. [x] `pcb_t *outChild(pcb_t *p)`: Oscar
 
 ### `asl.h`

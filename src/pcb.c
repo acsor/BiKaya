@@ -21,21 +21,18 @@ static unsigned free_pcb_table[BKA_MAX_PROC];
 
 /* TODO Implement missing functions. */
 void initPcbs(void) {
-	unsigned i;
+	int i;
 
 	for (i = 0; i < BKA_MAX_PROC; i++)
 		free_pcb_table[i] = 1;
 }
 
 void freePcb(pcb_t *p) {
-	// TODO Is index computed correctly?
-	unsigned index = (pcb_table - p) / sizeof(pcb_t *);
-
-	free_pcb_table[index] = 1;
+	free_pcb_table[p - pcb_table] = 1;
 }
 
 pcb_t* allocPcb(void) {
-	unsigned i;
+	int i;
 	pcb_t *out = NULL;
 
 	// Cycle either until i is in range or a free PCB is not found
@@ -45,9 +42,11 @@ pcb_t* allocPcb(void) {
 	if (i < BKA_MAX_PROC) {
 		out = pcb_table + i;
 
-		// TODO Do we need to reset the next, first_child and siblings fields? Are
-		//  the others ok?
+		// TODO Are the other fields properly initialized?
+		INIT_LIST_HEAD(&out->next);
 		out->parent = NULL;
+		INIT_LIST_HEAD(&out->first_child);
+		INIT_LIST_HEAD(&out->siblings);
 		// TODO Urgent! Properly set out->state
 		out->priority = 0;
 		out->semkey = NULL;
@@ -76,7 +75,7 @@ void insertProcQ(struct list_head *head, pcb_t *p) {
 	// Iterate until we either end the list or find a matching process with
 	// priority less than p
 	while (curr_list != head && p->priority < curr_proc->priority) {
-		curr_list = head->next;
+		curr_list = curr_list->next;
 		curr_proc = container_of(curr_list, pcb_t, next);
 	}
 
@@ -148,12 +147,16 @@ pcb_t* outChild(pcb_t *p) {
 		list_for_each(to_remove, &p->parent->first_child) {
 			curr_proc = container_of(to_remove, pcb_t, siblings);
 
-			if (curr_proc == p)
-				break;
+			if (curr_proc == p) {
+				list_del(to_remove);
+
+				return p;
+			}
 		}
 	}
 
-	return curr_proc == p ? curr_proc: NULL;
+	return NULL;
 }
+
 
 #endif
