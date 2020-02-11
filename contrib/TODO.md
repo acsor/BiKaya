@@ -32,8 +32,8 @@ and a list of author names. An example is
 1. [x] `pcb_t *outChild(pcb_t *p)`: Oscar
 
 ### `asl.h`
-1. [ ] `semd_t* getSemd(int *key)`: ???
-1. [ ] `void initASL()`: ???
+1. [ ] `void initASL()`: Daniele
+1. [ ] `semd_t* getSemd(int *key)`: Daniele
 1. [ ] `int insertBlocked(int *key, pcb_t* p)`: ???
 1. [ ] `pcb_t* removeBlocked(int *key)`: ???
 1. [ ] `pcb_t* outBlocked(pcb_t *p)`: ???

@@ -5,8 +5,12 @@
 
 
 /* ASL handling functions */
-semd_t* getSemd(int *key);
 void initASL();
+/**
+ * @return A pointer to the semaphore whose key equals @c key, or @c NULL if
+ * no such semaphore exists.
+ */
+semd_t* getSemd(int *key);
 
 int insertBlocked(int *key, pcb_t* p);
 pcb_t* removeBlocked(int *key);
