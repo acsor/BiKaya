@@ -29,8 +29,18 @@ void initASL() {
 		free_semd_table[i] = 1;
 }
 
-/* TODO Implement */
+/*TODO verificare il funzionamento*/
+
 semd_t* getSemd(int *key) {
+	int i;
+	semd_t *result;
+
+	for (i = 0; i < BKA_MAX_PROC && semd_table[i]->s_key != *key; i++);
+
+	if (i < BKA_MAX_PROC) {
+		result = &semd_table[i]; //passa l'indirizzo del semd cercato
+		return result;
+	}
 	return NULL;
 }
 
@@ -57,7 +67,7 @@ pcb_t* headBlocked(int *key) {
 	for (i = 0; i < BKA_MAX_PROC && semd_table[i]->s_key != *key; i++);
 
 	if (i < BKA_MAX_PROC) {
-		result = container_of(semd_table[i]-,semd_t,s_procQ);
+		result = container_of(semd_table[i],semd_t,s_procQ);
 
 		return list_empty(result) ? NULL: result;
 	}
