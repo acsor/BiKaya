@@ -35,7 +35,7 @@ and a list of author names. An example is
 1. [ ] `void initASL()`: Daniele
 1. [ ] `semd_t* getSemd(int *key)`: Daniele
 1. [ ] `int insertBlocked(int *key, pcb_t* p)`: ???
-1. [ ] `pcb_t* removeBlocked(int *key)`: ???
+1. [ ] `pcb_t* removeBlocked(int *key)`: Daniele
 1. [ ] `pcb_t* outBlocked(pcb_t *p)`: ???
 1. [ ] `pcb_t* headBlocked(int *key)`: Daniele
 1. [ ] `void outChildBlocked(pcb_t *p)`: ???

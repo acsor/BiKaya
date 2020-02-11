@@ -49,8 +49,20 @@ int insertBlocked (int *key,pcb_t* p) {
 	return 0;
 }
 
-/* TODO Implement */
+/* TODO Verificare funzionamento */
 pcb_t* removeBlocked(int *key) {
+	int i;
+	pcb_t *out;
+	
+	for (i = 0; i < BKA_MAX_PROC && semd_table[i]->s_key != *key; i++);
+	if (i < BKA_MAX_PROC) {
+		out = container_of(semd_table[i],semd_t,s_procQ);
+		list_del(out);	
+		if(list_empty(semd_table[i]->s_procQ)){	//se coda dei processi bloccati è diventata vuota
+			semd_table[i] = 1;
+		}
+		return out;
+	}
 	return NULL;
 }
 
