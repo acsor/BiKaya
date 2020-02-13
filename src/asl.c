@@ -15,7 +15,6 @@ static semd_t semd_table[BKA_MAX_PROC];
  */
 static unsigned free_semd_table[BKA_MAX_PROC];
 
-
 /**
  * TODO bisogna inizializzare questi campi?
  * struct list_head s_next;
@@ -35,7 +34,7 @@ semd_t* getSemd(int *key) {
 	int i;
 	semd_t *result;
 
-	for (i = 0; i < BKA_MAX_PROC && semd_table[i]->s_key != *key; i++);
+	for (i = 0; i < BKA_MAX_PROC && (*(semd_table[i].key) != *key); i++);
 
 	if (i < BKA_MAX_PROC) {
 		result = &semd_table[i]; //passa l'indirizzo del semd cercato
@@ -54,12 +53,12 @@ pcb_t* removeBlocked(int *key) {
 	int i;
 	pcb_t *out;
 	
-	for (i = 0; i < BKA_MAX_PROC && semd_table[i]->s_key != *key; i++);
+	for (i = 0; i < BKA_MAX_PROC && (*(semd_table[i].key) != *key); i++);
 	if (i < BKA_MAX_PROC) {
-		out = container_of(semd_table[i],semd_t,s_procQ);
+		out = container_of(semd_table[i],semd_t,proc_queue);
 		list_del(out);	
-		if(list_empty(semd_table[i]->s_procQ)){	//se coda dei processi bloccati è diventata vuota
-			semd_table[i] = 1;
+		if(list_empty(semd_table[i].proc_queue)){	//se coda dei processi bloccati è diventata vuota
+			free_semd_table[i] = 1;
 		}
 		return out;
 	}
@@ -76,10 +75,10 @@ pcb_t* headBlocked(int *key) {
 	int i;
 	pcb_t *result;
 
-	for (i = 0; i < BKA_MAX_PROC && semd_table[i]->s_key != *key; i++);
+	for (i = 0; i < BKA_MAX_PROC && (*(semd_table[i].key) != *key); i++);
 
 	if (i < BKA_MAX_PROC) {
-		result = container_of(semd_table[i],semd_t,s_procQ);
+		result = container_of(semd_table[i],semd_t,proc_queue);
 
 		return list_empty(result) ? NULL: result;
 	}
