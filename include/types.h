@@ -1,16 +1,8 @@
 #ifndef BKA_TYPES_H
 #define BKA_TYPES_H
 
+#include "sys.h"
 #include <list.h>
-
-#ifdef BKA_ARCH_UMPS
-#include "umps/types.h"
-#endif
-
-#ifdef BKA_ARCH_UARM
-#define UARM_MACHINE_COMPILING
-#include "uarm/uARMtypes.h"
-#endif
 
 
 typedef unsigned int memaddr_t;
