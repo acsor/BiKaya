@@ -5,17 +5,22 @@
 
 
 /**
- * Initializes the semaphore table(s). To be called before issuing any other
- * call to a semaphore function.
+ * Initializes the Active and Free Semaphore Lists (ASL and FSL). To be
+ * called before issuing any other call to semaphore functions.
  */
 void initASL();
+/**
+ * @return A newly allocated semaphore whose key is initialized to @c key, or
+ * @c NULL if the FSL is empty.
+ */
+semd_t* bka_sem_alloc(int *key);
 /**
  * @param s Pointer to a semaphore to return to the free list.
  */
 void bka_sem_free(semd_t *s);
 /**
- * @return A pointer to the semaphore whose key equals @c key, or @c NULL if
- * no such semaphore exists.
+ * @return A pointer to the semaphore in the ASL whose key equals @c key, or @c
+ * NULL if no such element exists.
  */
 semd_t* getSemd(int *key);
 /**

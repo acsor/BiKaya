@@ -35,11 +35,11 @@ and a list of author names. An example is
 1. [x] `void initASL()`: Daniele, Oscar
 1. [x] `void bka_sem_free()`: Oscar
 1. [x] `semd_t* getSemd(int *key)`: Daniele, Oscar
-1. [ ] `int insertBlocked(int *key, pcb_t* p)`: ???
+1. [x] `int insertBlocked(int *key, pcb_t* p)`: Oscar
 1. [x] `pcb_t* removeBlocked(int *key)`: Daniele, Oscar
-1. [ ] `pcb_t* outBlocked(pcb_t *p)`: ???
+1. [x] `pcb_t* outBlocked(pcb_t *p)`: Oscar
 1. [x] `pcb_t* headBlocked(int *key)`: Daniele, Oscar
-1. [ ] `void outChildBlocked(pcb_t *p)`: ???
+1. [x] `void outChildBlocked(pcb_t *p)`: Oscar
 
 ### Extra
 1. `list_del(l)` of `list.h` does **not** reset the list fields of `l` upon
