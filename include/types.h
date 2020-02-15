@@ -2,7 +2,7 @@
 #define BKA_TYPES_H
 
 #include "sys.h"
-#include <list.h>
+#include "list.h"
 
 
 typedef unsigned int memaddr_t;
