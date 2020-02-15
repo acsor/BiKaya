@@ -10,6 +10,10 @@
  */
 void initASL();
 /**
+ * @param s Pointer to a semaphore to return to the free list.
+ */
+void bka_sem_free(semd_t *s);
+/**
  * @return A pointer to the semaphore whose key equals @c key, or @c NULL if
  * no such semaphore exists.
  */

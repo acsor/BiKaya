@@ -1,26 +1,21 @@
 #include "asl.h"
 #include "sys.h"
+#include "pcb.h"
 
 
 /**
- * Array di SEMD con dimensione massima BKA_MAX_PROC?
- * TODO O una dimensione diversa?.
+ * The semaphore table.
  */
 static semd_t semd_table[BKA_MAX_PROC];
 
 /**
- * Array di SEMD liberi tale che 
- * 		* free_semd_table[i] = 0 se processo non libero
- * 		* free_semd_table[i] = 1 se libero
+ * Free semaphore table such that
+ * 		* free_semd_table[i] = 0 if semaphore i NOT free
+ * 		* free_semd_table[i] = 1 if semaphore i free
  */
 static unsigned free_semd_table[BKA_MAX_PROC];
 
-/**
- * TODO bisogna inizializzare questi campi?
- * struct list_head s_next;
- * int *s_key;
- * struct list_head s_procQ;
-*/
+
 void initASL() {
 	int i;
 
@@ -28,19 +23,23 @@ void initASL() {
 		free_semd_table[i] = 1;
 }
 
-/*TODO verificare il funzionamento*/
+void bka_sem_free(semd_t *s) {
+	free_semd_table[s - semd_table] = 1;
+}
 
 semd_t* getSemd(int *key) {
+	semd_t *result = NULL;
 	int i;
-	semd_t *result;
 
-	for (i = 0; i < BKA_MAX_PROC && (*(semd_table[i].key) != *key); i++);
-
-	if (i < BKA_MAX_PROC) {
-		result = &semd_table[i]; //passa l'indirizzo del semd cercato
-		return result;
+	for (i = 0; i < BKA_MAX_PROC; i++) {
+		if (*semd_table[i].key == *key && free_semd_table[i] == 0)
+			break;
 	}
-	return NULL;
+
+	if (i < BKA_MAX_PROC)
+		result = semd_table + i;
+
+	return result;
 }
 
 /* TODO Implement */
@@ -48,21 +47,17 @@ int insertBlocked (int *key,pcb_t* p) {
 	return 0;
 }
 
-/* TODO Verificare funzionamento */
 pcb_t* removeBlocked(int *key) {
-	int i;
-	pcb_t *out;
-	
-	for (i = 0; i < BKA_MAX_PROC && (*(semd_table[i].key) != *key); i++);
-	if (i < BKA_MAX_PROC) {
-		out = container_of(semd_table[i],semd_t,proc_queue);
-		list_del(out);	
-		if(list_empty(semd_table[i].proc_queue)){	//se coda dei processi bloccati è diventata vuota
-			free_semd_table[i] = 1;
-		}
-		return out;
-	}
-	return NULL;
+	semd_t *s = getSemd(key);
+	pcb_t *p = NULL;
+
+	if (s)
+		p = removeProcQ(&s->proc_queue);
+
+	if (emptyProcQ(&s->proc_queue))
+		bka_sem_free(s);
+
+	return p;
 }
 
 /* TODO Implement */
@@ -70,22 +65,13 @@ pcb_t* outBlocked(pcb_t *p) {
 	return NULL;
 }
 
-/* TODO Is this semantically correct? */
 pcb_t* headBlocked(int *key) {
-	int i;
-	pcb_t *result;
+	semd_t *s = getSemd(key);
 
-	for (i = 0; i < BKA_MAX_PROC && (*(semd_table[i].key) != *key); i++);
-
-	if (i < BKA_MAX_PROC) {
-		result = container_of(semd_table[i],semd_t,proc_queue);
-
-		return list_empty(result) ? NULL: result;
-	}
-
-	return NULL;
+	return s != NULL ? headProcQ(&s->proc_queue): NULL;
 }
 
+/* TODO Implement. */
 void outChildBlocked(pcb_t *p) {
 
 }
