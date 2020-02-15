@@ -19,7 +19,7 @@ void bka_sem_free(semd_t *s);
  */
 semd_t* getSemd(int *key);
 /**
- * Inserts the @c p PCB to the queue of the semaphore whose key equals @c key
+ * Inserts @c p to the queue of the semaphore whose key equals @c key
  * @param key Key of the semaphore in which to insert @c p. If no semaphore
  * with such key exists, a new one, if possible, is allocated.
  * @param p PCB to insert into the queue

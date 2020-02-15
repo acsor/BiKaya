@@ -4,42 +4,51 @@
 
 
 /**
- * The semaphore table.
+ * The semaphore table, allocating data for each one of them.
  */
 static semd_t semd_table[BKA_MAX_PROC];
-
 /**
- * Free semaphore table such that
- * 		* free_semd_table[i] = 0 if semaphore i NOT free
- * 		* free_semd_table[i] = 1 if semaphore i free
+ * Head of the Active Semaphore List (ASL).
  */
-static unsigned free_semd_table[BKA_MAX_PROC];
+static struct list_head asl_head;
+/**
+ * Head of the Free Semaphore List (FSL).
+ * Note: this name does not appear in public slides, but belongs only to this
+ * project.
+ */
+static struct list_head fsl_head;
 
 
 void initASL() {
 	int i;
 
+	INIT_LIST_HEAD(&asl_head);
+	INIT_LIST_HEAD(&fsl_head);
+
+	// Add all semaphores to the FSL
 	for (i = 0; i < BKA_MAX_PROC; i++)
-		free_semd_table[i] = 1;
+		list_add_tail(&semd_table[i].next, &fsl_head);
+}
+
 }
 
 void bka_sem_free(semd_t *s) {
-	free_semd_table[s - semd_table] = 1;
+	list_del(&s->next);
+	list_add_tail(&s->next, &fsl_head);
 }
 
 semd_t* getSemd(int *key) {
-	semd_t *result = NULL;
-	int i;
+	struct list_head *curr;
+	semd_t *s;
 
-	for (i = 0; i < BKA_MAX_PROC; i++) {
-		if (*semd_table[i].key == *key && free_semd_table[i] == 0)
-			break;
+	list_for_each(curr, &asl_head) {
+		s = container_of(curr, semd_t, next);
+
+		if (*s->key == *key)
+			return s;
 	}
 
-	if (i < BKA_MAX_PROC)
-		result = semd_table + i;
-
-	return result;
+	return NULL;
 }
 
 /* TODO Implement */
