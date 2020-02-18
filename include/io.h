@@ -4,12 +4,12 @@
 #include "sys.h"
 
 /**
+ * Print to the terminal device @c term until a @c NULL is met in the
+ * variable-argument list of strings.
  * @param term Terminal register to write to
- * @param str  Null-terminated string to write into @c term
- * @return @c BKA_E_GEN if errors occurred, count of written characters
- * otherwise.
+ * @return @c BKA_E_GEN if errors occurred, count of written strings otherwise.
  */
-int bka_term_puts(termreg_t *term, char const *str);
+int bka_term_puts(termreg_t *term, ...);
 /**
  * Reads a single character from @c term.
  * @return @c BKA_E_GEN if errors occurred, number of read characters
@@ -30,12 +30,12 @@ int bka_term_recvs(termreg_t *term, char *dest, unsigned length);
 
 
 /**
- *
  * @param dev
  * @param str Null-terminated string to write into @c dev
  * @return @c BKA_E_GEN if errors occurred, count of written characters
  * otherwise.
  */
+ /* TODO Turn this function into variadic. */
 int bka_print_puts(dtpreg_t *dev, char const *str);
 
 

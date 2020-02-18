@@ -1,4 +1,5 @@
 #include "sys.h"
+#include "stdarg.h"
 
 #define TERM_ST_NOTINST		0
 #define TERM_ST_READY       1
@@ -47,6 +48,13 @@
 
 
 /**
+ * Auxiliary function for @c bka_term_puts.
+ * @return Number of characters from @c str written to @c term.
+ * @see bka_term_puts
+ */
+int bka_term_puts_aux(termreg_t *term, char const *str);
+
+/**
  * Issues a write of character @c c to terminal @c term.
  * @return @c BKA_E_GEN in case of errors, @c BKA_E_OK otherwise.
  */
@@ -59,13 +67,19 @@ static int bka_term_putchar(termreg_t *term, char c);
 static int bka_print_putchar(dtpreg_t *p, char c);
 
 
-int bka_term_puts(termreg_t *term, char const *str) {
-	int written;
+int bka_term_puts(termreg_t *term, ...) {
+	int written = 0;
+	char *to_print = NULL;
+	va_list ap;
 
-	for (written = 0; *str; written++, str++) {
-		if (bka_term_putchar(term, *str) != BKA_E_OK)
-			return BKA_E_GEN;
+	va_start(ap, term);
+
+	while ((to_print = va_arg(ap, char*)) != NULL) {
+		bka_term_puts_aux(term, to_print);
+		written++;
 	}
+
+	va_end(ap);
 
 	return written;
 }
@@ -117,6 +131,17 @@ int bka_print_puts(dtpreg_t *dev, char const *str) {
 	return written;
 }
 
+
+int bka_term_puts_aux(termreg_t *term, char const *str) {
+	int written;
+
+	for (written = 0; *str; written++, str++) {
+		if (bka_term_putchar(term, *str) != BKA_E_OK)
+			return BKA_E_GEN;
+	}
+
+	return written;
+}
 
 static int bka_term_putchar(termreg_t *term, char c) {
     unsigned stat = TERM_TRANSM_STATUS(term);
