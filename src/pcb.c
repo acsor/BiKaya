@@ -13,13 +13,10 @@ static pcb_t pcb_table[BKA_MAX_PROC];
  * The free PCB table such that
  * 		* free_pcb_table[i] = 0 if process i is NOT free
  * 		* free_pcb_table[i] = 1 otherwise, i.e. process i IS free
- *
- * 	TODO Couldn't we just leverage on a pcb_t inner field for marking free PCBs?
  */
 static unsigned free_pcb_table[BKA_MAX_PROC];
 
 
-/* TODO Implement missing functions. */
 void initPcbs(void) {
 	int i;
 
@@ -42,7 +39,6 @@ pcb_t* allocPcb(void) {
 	if (i < BKA_MAX_PROC) {
 		out = pcb_table + i;
 
-		// TODO Are the other fields properly initialized?
 		INIT_LIST_HEAD(&out->next);
 		out->parent = NULL;
 		INIT_LIST_HEAD(&out->first_child);
@@ -68,8 +64,6 @@ int emptyProcQ(struct list_head *head) {
 
 void insertProcQ(struct list_head *head, pcb_t *p) {
 	struct list_head *curr_list = head->next;
-	// TODO If the list is completely empty, what value is curr_proc going to
-	//  assume the first time?
 	pcb_t *curr_proc = container_of(curr_list, pcb_t, next);
 
 	// Iterate until we either end the list or find a matching process with

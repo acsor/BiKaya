@@ -72,8 +72,6 @@ int insertBlocked (int *key, pcb_t *p) {
 
 	// If the semaphore is finally available
 	if (s) {
-		// TODO Do we need to insert into the queue in a PCB priority order, or
-		//  in a FIFO fashion?
 		list_add_tail(&p->next, &s->proc_queue);
 		p->semkey = key;
 
