@@ -141,5 +141,5 @@ int bka_strcmp(char *s, char *t) {
 		t++;
 	}
 
-	return 0;
+	return *s - *t;
 }

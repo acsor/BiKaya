@@ -23,9 +23,18 @@ add_executable(
 	${BKA_UARM_SRC}/libuarm.s ${BKA_UARM_SRC}/crtso.s ${BKA_SRC}/io.c
 	${BKA_SRC}/pcb.c ${BKA_SRC}/asl.c
 )
+add_executable(
+	test.uarm ${BKA_SRC}/test.c
+	# Libraries the current target depends on
+	${BKA_UARM_SRC}/libuarm.s ${BKA_UARM_SRC}/crtso.s ${BKA_SRC}/io.c
+	${BKA_SRC}/string.c ${BKA_SRC}/pcb.c ${BKA_SRC}/asl.c
+)
 
 set_property(TARGET kernel0.uarm PROPERTY COMPILE_OPTIONS ${CFLAGS_UARM})
 set_property(TARGET kernel0.uarm PROPERTY LINK_FLAGS ${LDFLAGS_UARM})
 
 set_property(TARGET kernel1.uarm PROPERTY COMPILE_OPTIONS ${CFLAGS_UARM})
 set_property(TARGET kernel1.uarm PROPERTY LINK_FLAGS ${LDFLAGS_UARM})
+
+set_property(TARGET test.uarm PROPERTY COMPILE_OPTIONS ${CFLAGS_UARM})
+set_property(TARGET test.uarm PROPERTY LINK_FLAGS ${LDFLAGS_UARM})
