@@ -16,7 +16,7 @@ In order to build the cross-compiled executables, do the following
 	```bash
 	cmake -B build-umps -S . -D CMAKE_TOOLCHAIN_FILE=toolchains/umps.cmake
 	cd build-umps
-	make kernel.core.umps
+	make kernel0.core.umps
 
 	# Launch the umps2 emulator
 	```
@@ -26,10 +26,15 @@ In order to build the cross-compiled executables, do the following
 	```bash
 	cmake -B build-uarm -S . -D CMAKE_TOOLCHAIN_FILE=toolchains/uarm.cmake
 	cd build-uarm
-	make kernel.uarm
+	make kernel0.uarm
 
 	# Launch the uarm emulator
 	```
+ 
+### Building phase 1 targets
+Follow the steps exactly as in building targets for the phase0 phase, except
+for substituting `kernel0.core.umps` with `kernel1.core.umps`, and `kernel0.uarm`
+with `kernel1.uarm`.
 
 ## Packaging
 This option is mostly intended for people working on the project.
