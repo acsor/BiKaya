@@ -23,8 +23,8 @@ long int bka_atoi10(char const *src);
 int bka_itoa(int n, char *dest, unsigned length);
 
 /**
- * @return Number of characters in @c str, or an appropriate @c BKA_E_X error
- * if something goes wrong.
+ * @return Number of characters in @c str, or @c BKA_E_NULLPTR if @c str is a
+ * null pointer.
  */
 int bka_strlen(char const *str);
 /**

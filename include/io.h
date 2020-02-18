@@ -1,6 +1,7 @@
 #ifndef BKA_IO
 #define BKA_IO
 
+#include "sys.h"
 
 /**
  * @param term Terminal register to write to

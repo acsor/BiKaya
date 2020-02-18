@@ -40,7 +40,10 @@ configure_file(${BKA_INC}/sys.h.in ${PROJECT_BINARY_DIR}/${BKA_INC}/sys.h)
 
 add_library(io OBJECT ${BKA_SRC}/io.c)
 add_library(string OBJECT ${BKA_SRC}/string.c)
+add_library(pcb OBJECT ${BKA_SRC}/pcb.c)
+add_library(asl OBJECT ${BKA_SRC}/asl.c)
 add_library(phase0 OBJECT ${BKA_SRC}/phase0.c)
+add_library(phase1 OBJECT ${BKA_SRC}/phase1.c)
 
 
 # CPack configuration -- useful for packaging the project in various formats
