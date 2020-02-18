@@ -41,6 +41,15 @@ int bka_strncpy(char *dest, char const *src, unsigned length);
  * character, or a @c BKA_E_X error otherwise.
  */
 int bka_strcpy(char *dest, char const *src);
+/**
+ * Compares the two strings @c s and @c t until a terminating character is
+ * met in one of them. No null-pointer errors are detected.
+ * @param s First string to compare
+ * @param t Second string to compare
+ * @return @c 0 if the two strings are equal, a value <tt>v < 0</tt> if @c s
+ * comes before @c t, or a value <tt>v > 0</tt> if @c s comes after @c t.
+ */
+int bka_strcmp(char *s, char *t);
 
 
 #endif

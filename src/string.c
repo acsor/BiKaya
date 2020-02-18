@@ -127,3 +127,19 @@ int bka_strcpy(char *dest, char const *src) {
 	// Ritorna il num. di caratteri copiati incluso '\0'
 	return count + 1;
 }
+
+int bka_strcmp(char *s, char *t) {
+	int v;
+
+	while (*s != '\0' && *t != '\0') {
+		v = *s - *t;
+
+		if (v)
+			return v;
+
+		s++;
+		t++;
+	}
+
+	return 0;
+}
