@@ -44,7 +44,7 @@ add_library(pcb OBJECT ${BKA_SRC}/pcb.c)
 add_library(asl OBJECT ${BKA_SRC}/asl.c)
 add_library(phase0 OBJECT ${BKA_SRC}/phase0.c)
 add_library(phase1 OBJECT ${BKA_SRC}/phase1.c)
-add_library(bka_test OBJECT ${BKA_SRC}/test.c)
+add_library(bka_test OBJECT ${BKA_SRC}/bka_test.c)
 
 
 # CPack configuration -- useful for packaging the project in various formats
