@@ -1,5 +1,11 @@
-cmake_minimum_required(VERSION 3.0)
-project(BiKaya VERSION 0.1.0 LANGUAGES C ASM)
+cmake_minimum_required(VERSION 3.16)
+project(
+	BiKaya
+	VERSION 0.1.0
+	DESCRIPTION "Double-architecture operating system"
+	HOMEPAGE_URL https://github.com/newnone/BiKaya
+	LANGUAGES C ASM
+)
 
 
 # All the variables defined in this project start with a BKA_ prefix
@@ -38,6 +44,7 @@ add_library(pcb OBJECT ${BKA_SRC}/pcb.c)
 add_library(asl OBJECT ${BKA_SRC}/asl.c)
 add_library(phase0 OBJECT ${BKA_SRC}/phase0.c)
 add_library(phase1 OBJECT ${BKA_SRC}/phase1.c)
+add_library(bka_test OBJECT ${BKA_SRC}/test.c)
 
 
 # CPack configuration -- useful for packaging the project in various formats

@@ -7,6 +7,7 @@ set(LDFLAGS_MIPS -G 0 -nostdlib -T ${BKA_UMPS_SRC}/umpscore.ldscript)
 
 add_compile_options(${CFLAGS_MIPS})
 
+
 add_library(libumps OBJECT ${BKA_UMPS_SRC}/libumps.S)
 add_library(crtso OBJECT ${BKA_UMPS_SRC}/crtso.S)
 
