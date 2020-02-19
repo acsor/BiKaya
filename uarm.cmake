@@ -31,11 +31,11 @@ add_custom_target(
 	-o kernel1.uarm
 )
 add_custom_target(
-	test.uarm
-	DEPENDS crtso libuarm io string bka_test
+	bka_test.uarm
+	DEPENDS crtso libuarm io string _bka_test
 	COMMAND ${CMAKE_C_LINKER} ${LDFLAGS_UARM}
 	$<TARGET_OBJECTS:crtso> $<TARGET_OBJECTS:libuarm>
 	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:string>
-	$<TARGET_OBJECTS:bka_test>
-	-o test.uarm
+	$<TARGET_OBJECTS:_bka_test>
+	-o bka_test.uarm
 )

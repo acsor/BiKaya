@@ -15,7 +15,6 @@ typedef struct {
 	test_function f;
 } test_t;
 
-
 int test_bka_atoi(void *data, char* errmsg, int errdim);
 int test_bka_itoa(void *data, char* errmsg, int errdim);
 int test_bka_strlen(void *data, char* errmsg, int errdim);
@@ -27,7 +26,12 @@ int test_bka_strcmp(void *data, char* errmsg, int errdim);
 int main (int argc, char *argv[]) {
 	termreg_t * const term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
 
-	test_t tests[] = {
+	/* It appears that when a local-function array is too large to contain, the
+	 * compiler implicitly invokes memcpy() to store it somewhere. Alas, in our
+	 * cross-compiling setup that call isn't available, and prefixing the
+	 * variable with the static storage modifier can do the trick.
+	 */
+	static test_t tests[] = {
 		{"test_bka_atoi", test_bka_atoi},
 		{"test_bka_itoa", test_bka_itoa},
 		{"test_bka_strlen", test_bka_strlen},
@@ -150,7 +154,7 @@ int test_bka_strcpy(void *data, char* errmsg, int errdim) {
 }
 
 int test_bka_strcmp(void *data, char* errmsg, int errdim) {
-	char *inputs[] = {
+	static char *inputs[] = {
 		// Equal strings
 		"", "",
 		"1234567890", "1234567890",
@@ -163,7 +167,7 @@ int test_bka_strcmp(void *data, char* errmsg, int errdim) {
 		"fortytwx", "fortytwo",
 		"XAABBBCCCDDDEEEFFF","AAABBBCCCDDDEEEFFF",
 	};
-	int expected[] = {0, 0, 0, 0, -32, -22, 9, 23};
+	static int expected[] = {0, 0, 0, 0, -32, -22, 9, 23};
 	int i;
 
 	for (i = 0; i < BKA_LENGTH(inputs, char*); i += 2) {
