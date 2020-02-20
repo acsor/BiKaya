@@ -39,6 +39,7 @@ endif()
 configure_file(${BKA_INC}/sys.h.in ${PROJECT_BINARY_DIR}/${BKA_INC}/sys.h)
 
 add_library(io OBJECT ${BKA_SRC}/io.c)
+add_library(math OBJECT ${BKA_SRC}/math.c)
 add_library(string OBJECT ${BKA_SRC}/string.c)
 add_library(pcb OBJECT ${BKA_SRC}/pcb.c)
 add_library(asl OBJECT ${BKA_SRC}/asl.c)
