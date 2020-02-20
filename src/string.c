@@ -1,3 +1,4 @@
+#include "math.h"
 #include "string.h"
 #include "sys.h"
 
@@ -34,59 +35,23 @@ long int bka_atoi10 (char const *src) {
 }
 
 int bka_itoa (int n, char *dest, unsigned length) {
-	int i = 0, dim =  0, n_tmp = n; 
-	int tronc = 0;
+	int digits = bka_log(10, n) + 1;
 
-	if (n < 0) {
-		return BKA_E_GEN;
-	} else if (n == 0) {
-		dest[i] = '0';
-		dest[i + 1] = '\0';
-		return BKA_E_OK;
-	} else {
-		while (n_tmp != 0) {			//calcolo la dimensione del n° in input
-			n_tmp = n_tmp / 10;
-			dim++;
-		}
+	dest[bka_min(digits, length - 1)] = '\0';
+
+	while (digits > 0) {
+		if (digits < length)
+			dest[digits - 1] = '0' + n % 10;
+
+		n /= 10;
+		digits--;
 	}
 
-	while (n != 0) { 
-		int r = n % 10; 
-		dest[i++] = r + '0'; 
-		n = n / 10; 
-
-		if (i > length) {
-			tronc = 1;
-		}
-	} 
-
-	int j = 0;
-	char copy[dim+1]; 		//array per invertire la stringa alla fine
-	copy[dim] = '\0';
-	i = dim-1;
-
-	while (i >= 0 && j < dim) {
-		copy[j] = dest[i];
-		i--;
-		j++;
-	}
-
-	i = 0;
-	while (i < dim) {
-		dest[i] = copy[i];
-		i++;
-	}
-
-	dest[length] = '\0';       //così viene troncato il numero alla lunghezza richiesta
-
-	return tronc ? BKA_E_GEN: BKA_E_OK;
+	return BKA_E_OK;
 }
 
 int bka_strlen (char const *str) {
  	int count;
-
-	if (str == NULL)
-		return BKA_E_NULLPTR;
 
 	for (count = 0; *str != '\0'; str++, count++);
 
@@ -94,38 +59,25 @@ int bka_strlen (char const *str) {
 }
 
 int bka_strncpy(char *dest, char const *src, unsigned length) {
-	if (length == 0 || *src == '\0')
-		return 0;
+	int c;
 
-	int count = 0, i = 0;		
+	/* Copy as far as you can */
+	for (c = 0; *src != '\0' && length > 0; dest++, src++, length--, c++)
+		*dest = *src;
 
-	while (src[i] != '\0' && count < length) {
-		dest[i] = src[i];
-		i++;
-		count++;
-	}
+	*dest = '\0';
 
-	dest[i] = '\0';
-
-	return count;
+	return c;
 }
 
 int bka_strcpy(char *dest, char const *src) {
-	int count = 0, i = 0;		
+	int c;
 
-	if (*src == '\0')
-		return 0;
+	/* Copy as far as you can */
+	for (c = 0; *src != '\0'; dest++, src++, c++)
+		*dest = *src;
 
-	while (src[i] != '\0') {
-		dest[i] = src[i];
-		i++;
-		count++;
-	}
-
-	dest[i] = '\0';
-
-	// Ritorna il num. di caratteri copiati incluso '\0'
-	return count + 1;
+	return c;
 }
 
 int bka_strcmp(char *s, char *t) {

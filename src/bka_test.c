@@ -104,8 +104,11 @@ int test_bka_itoa(void *data, char *errmsg, int errdim) {
 	for (i = 0; i < n; i++) {
 		bka_itoa(inputs[i], buff, buffsize);
 
-		if (bka_strcmp(expected[i], buff))
+		if (bka_strcmp(expected[i], buff)) {
+			bka_strncpy(errmsg, buff, errdim);
+
 			return 1;
+		}
 	}
 
 	return 0;

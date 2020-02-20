@@ -16,16 +16,18 @@ long int bka_atoi(char const *src, unsigned base);
  */
 long int bka_atoi10(char const *src);
 /**
- * Converts @n in string format, storing it into @c dest for a maximum of @c
- * length characters written.
+ * Converts @n in string format, storing it into @c dest. If the needed
+ * dimension to store the string exceeds @c length, then the remaining trailing
+ * characters are discarded, storing a terminating <tt>\0</tt> character at
+ * <tt>length - 1</tt>. Otherwise, the string is filled as needed.
+ * @param n A base 10 number
  * @return @c BKA_E_GEN if an error occurred, @c BKA_E_OK otherwise.
  */
 int bka_itoa(int n, char *dest, unsigned length);
 
 /**
- * @return Number of characters in @c str, or @c BKA_E_NULLPTR if @c str is a
- * null pointer.
- */
+ * @return Number of characters in @c str. No null-pointer checks are
+ * performed.  */
 int bka_strlen(char const *str);
 /**
  * Copies at most @length characters from @c src to @c dest, stopping early if
