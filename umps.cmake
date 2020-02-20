@@ -44,10 +44,10 @@ add_custom_target(
 
 add_custom_command(
 	OUTPUT bka_test
-	DEPENDS crtso libumps io string _bka_test
+	DEPENDS crtso libumps io math string _bka_test
 	COMMAND ${CMAKE_C_LINKER} ${LDFLAGS_MIPS}
 	$<TARGET_OBJECTS:crtso> $<TARGET_OBJECTS:libumps>
-	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:string>
+	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:math> $<TARGET_OBJECTS:string>
 	$<TARGET_OBJECTS:_bka_test>
 	-o bka_test
 )

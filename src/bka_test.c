@@ -1,5 +1,6 @@
 #include "io.h"
 #include "sys.h"
+#include "math.h"
 #include "string.h"
 #include "utils.h"
 
@@ -22,6 +23,8 @@ int test_bka_strncpy(void *data, char* errmsg, int errdim);
 int test_bka_strcpy(void *data, char* errmsg, int errdim);
 int test_bka_strcmp(void *data, char* errmsg, int errdim);
 
+int test_bka_log(void *data, char* errmsg, int errdim);
+
 int main (int argc, char *argv[]) {
 	termreg_t * const term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
 
@@ -31,12 +34,13 @@ int main (int argc, char *argv[]) {
 	 * variable with the static storage modifier can do the trick.
 	 */
 	static test_t tests[] = {
-		{"test_bka_atoi", test_bka_atoi},
-		{"test_bka_itoa", test_bka_itoa},
+		{"test_bka_atoi", test_bka_atoi}, {"test_bka_itoa", test_bka_itoa},
 		{"test_bka_strlen", test_bka_strlen},
 		{"test_bka_strncpy", test_bka_strncpy},
 		{"test_bka_strcpy", test_bka_strcpy},
 		{"test_bka_strcmp", test_bka_strcmp},
+
+		{"test_bka_log", test_bka_log},
 	};
 	test_function f;
 
@@ -172,6 +176,33 @@ int test_bka_strcmp(void *data, char* errmsg, int errdim) {
 	for (i = 0; i < BKA_LENGTH(inputs, char*); i += 2) {
 		if (bka_strcmp(inputs[i], inputs[i + 1]) != expected[i / 2])
 			return 1;
+	}
+
+	return 0;
+}
+
+
+int test_bka_log(void *data, char* errmsg, int errdim) {
+	static unsigned powers[] = {
+			1, 2, 3, 4, 5, 6, 7, 8,
+			1, 9, 10, 50, 100, 500, 999, 1000, 1500
+	};
+	static unsigned bases[] = {
+			2, 2, 2, 2, 2, 2, 2, 2,
+			10, 10, 10, 10, 10, 10, 10, 10, 10
+	};
+	static int expected[] = {
+			0, 1, 1, 2, 2, 2, 2, 3,
+			0, 0, 1, 1, 2, 2, 2, 3, 3
+	};
+	int i;
+
+	for (i = 0; i < BKA_LENGTH(powers, unsigned); i++) {
+		if (expected[i] != bka_log(bases[i], powers[i])) {
+			errmsg[0] = '0' + i;
+			errmsg[1] = '\0';
+			return 1;
+		}
 	}
 
 	return 0;

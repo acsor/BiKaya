@@ -32,10 +32,10 @@ add_custom_target(
 )
 add_custom_target(
 	bka_test.uarm
-	DEPENDS crtso libuarm io string _bka_test
+	DEPENDS crtso libuarm io math string _bka_test
 	COMMAND ${CMAKE_C_LINKER} ${LDFLAGS_UARM}
 	$<TARGET_OBJECTS:crtso> $<TARGET_OBJECTS:libuarm>
-	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:string>
+	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:math> $<TARGET_OBJECTS:string>
 	$<TARGET_OBJECTS:_bka_test>
 	-o bka_test.uarm
 )
