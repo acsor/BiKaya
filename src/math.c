@@ -13,8 +13,11 @@ int bka_max(int a, int b) {
 	return a >= b ? a: b;
 }
 
-int bka_log(int base, int x) {
+int bka_log(int base, unsigned x) {
 	int exp = 0;
+
+	if (x == 0)
+		return BKA_NINFTY;
 
 	while (x >= base) {
 		x /= base;

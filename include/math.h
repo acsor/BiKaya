@@ -1,6 +1,9 @@
 #ifndef BKA_MATH_H
 #define BKA_MATH_H
 
+/* TODO Redefine as the least possible negative number. */
+#define BKA_NINFTY -1
+
 
 int bka_abs(int x);
 /**
@@ -12,9 +15,10 @@ int bka_min(int a, int b);
  */
 int bka_max(int a, int b);
 /**
- * @return Biggest integer @c n such that <tt>base ^ n &lt;= x</tt>.
+ * @return Biggest integer @c n such that <tt>base ^ n &lt;= x</tt>. As a
+ * special case, if <tt>x == 0</tt>, @c BKA_NINFTY is returned.
  */
-int bka_log(int base, int x);
+int bka_log(int base, unsigned x);
 
 
 #endif
