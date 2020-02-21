@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
 project(
 	BiKaya
 	VERSION 0.1.0
@@ -39,8 +39,14 @@ endif()
 configure_file(${BKA_INC}/sys.h.in ${PROJECT_BINARY_DIR}/${BKA_INC}/sys.h)
 
 add_library(io OBJECT ${BKA_SRC}/io.c)
+add_library(math OBJECT ${BKA_SRC}/math.c)
 add_library(string OBJECT ${BKA_SRC}/string.c)
+add_library(utils OBJECT ${BKA_SRC}/utils.c)
+add_library(pcb OBJECT ${BKA_SRC}/pcb.c)
+add_library(asl OBJECT ${BKA_SRC}/asl.c)
 add_library(phase0 OBJECT ${BKA_SRC}/phase0.c)
+add_library(phase1 OBJECT ${BKA_SRC}/phase1.c)
+add_library(_bka_test OBJECT ${BKA_SRC}/bka_test.c)
 
 
 # CPack configuration -- useful for packaging the project in various formats
