@@ -1,12 +1,12 @@
 # BiKaya
-BiKaya is a reduced operating system running on two distinct computer
-architectures, micro-ARM and micro-MIPS2. Designed for educational purposes,
+BiKaya is an operating system running on two emulated, micro computer
+ architectures, uARM and uMIPS2. Designed for educational purposes,
 this project was commissioned as part of the Operating Systems course from the
 University of Bologna, 2019-2020 a.y.
 
 ## Installation
 BiKaya features several executable targets, each one described in its own
-section. In general the CMake build-system is utilized.
+section.
 
 ### Building phase 0 targets
 In order to build the cross-compiled executables, do the following
@@ -35,6 +35,13 @@ In order to build the cross-compiled executables, do the following
 Follow the steps exactly as in building targets for the phase0 phase, except
 for substituting `kernel0.core.umps` with `kernel1.core.umps`, and `kernel0.uarm`
 with `kernel1.uarm`.
+
+## Testing
+BiKaya features a moderably-sized unit-testing suite. In order to run it,
+build the `bka_test.umps` (or `bka_test.uarm`) exeutable and launch it as the
+others.
+
+**Note**: currently available for uMIPS only.
 
 ## Packaging
 This option is mostly intended for people working on the project.
