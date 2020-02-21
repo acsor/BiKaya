@@ -93,11 +93,11 @@ int test_bka_atoi(void *data, char *errmsg, int errdim) {
 }
 
 int test_bka_itoa(void *data, char *errmsg, int errdim) {
-	unsigned const buffsize = 32;
+	unsigned const buffsize = 6;
 	char buff[buffsize];
 
-	int inputs[] = {0, 1, 10, 42, 129};
-	char *expected[] = {"0", "1", "10", "42", "129"};
+	int inputs[] = {-12, -1, 0, 1, 10, 42, 129, 123456};
+	char *expected[] = {"-12", "-1", "0", "1", "10", "42", "129", "12345"};
 	unsigned const n = BKA_LENGTH(inputs, int);
 	int i;
 

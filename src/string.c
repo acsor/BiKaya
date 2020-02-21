@@ -1,6 +1,7 @@
 #include "math.h"
-#include "string.h"
 #include "sys.h"
+#include "string.h"
+#include "utils.h"
 
 
 long int bka_atoi (char const *src, unsigned base) {
@@ -35,7 +36,18 @@ long int bka_atoi10 (char const *src) {
 }
 
 int bka_itoa (int n, char *dest, unsigned length) {
-	int digits = bka_log(10, n) + 1;
+	int digits = bka_digits(n);
+
+	/* If the number is negative, attempt to store a minus sign in front. */
+	if (n < 0) {
+		if (length > 1) {
+			*dest = '-';
+			dest++;
+			length--;
+		}
+
+		n *= -1;
+	}
 
 	dest[bka_min(digits, length - 1)] = '\0';
 

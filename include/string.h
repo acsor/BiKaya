@@ -20,7 +20,7 @@ long int bka_atoi10(char const *src);
  * dimension to store the string exceeds @c length, then the remaining trailing
  * characters are discarded, storing a terminating <tt>\0</tt> character at
  * <tt>length - 1</tt>. Otherwise, the string is filled as needed.
- * @param n A base 10 number
+ * @param n A base 10 number, possibly negative.
  * @return @c BKA_E_GEN if an error occurred, @c BKA_E_OK otherwise.
  */
 int bka_itoa(int n, char *dest, unsigned length);
