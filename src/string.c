@@ -107,3 +107,31 @@ int bka_strcmp(char *s, char *t) {
 
 	return *s - *t;
 }
+
+
+void* bka_memset(void *dest, char d, unsigned n) {
+	int i;
+
+	for (i = 0; i < n; i++)
+		*(((char*) dest) + i) = d;
+
+	return dest;
+}
+
+void* bka_memcpy(void *dest, void const *src, unsigned n) {
+	void *res = dest;
+
+	while (n > 0) {
+		*((char*) dest) = *((char*) src);
+
+		dest++;
+		src++;
+		n--;
+	}
+
+	return res;
+}
+
+void* memcpy(void *dest, void const *src, unsigned n) {
+	return bka_memcpy(dest, src, n);
+}

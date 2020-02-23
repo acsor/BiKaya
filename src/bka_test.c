@@ -25,6 +25,7 @@ int test_bka_strcmp(void *data, char* errmsg, int errdim);
 
 int test_bka_log(void *data, char* errmsg, int errdim);
 
+
 int main (int argc, char *argv[]) {
 	termreg_t * const term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
 
