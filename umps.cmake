@@ -29,11 +29,12 @@ add_custom_target(
 # TODO Set the test build instructions in a more idiomatic way
 add_custom_command(
 	OUTPUT kernel1
-	DEPENDS crtso libumps io pcb asl phase1
+	DEPENDS crtso libumps io math string utils pcb asl phase1
 	COMMAND ${CMAKE_C_LINKER} ${LDFLAGS_MIPS}
 	$<TARGET_OBJECTS:crtso> $<TARGET_OBJECTS:libumps>
-	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:phase1>
-	$<TARGET_OBJECTS:pcb> $<TARGET_OBJECTS:asl>
+	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:math> $<TARGET_OBJECTS:string>
+	$<TARGET_OBJECTS:utils>
+	$<TARGET_OBJECTS:phase1> $<TARGET_OBJECTS:pcb> $<TARGET_OBJECTS:asl>
 	-o kernel1
 )
 add_custom_target(

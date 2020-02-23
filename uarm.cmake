@@ -9,6 +9,7 @@ add_compile_options(${CFLAGS_UARM})
 
 
 add_library(libuarm OBJECT ${BKA_UARM_SRC}/libuarm.s)
+add_library(libdiv OBJECT ${BKA_UARM_SRC}/libdiv.s)
 add_library(crtso OBJECT ${BKA_UARM_SRC}/crtso.s)
 
 target_include_directories(libuarm PRIVATE ${BKA_UARM_INC})
@@ -23,18 +24,19 @@ add_custom_target(
 )
 add_custom_target(
 	kernel1.uarm
-	DEPENDS crtso libuarm pcb asl io phase1 
+	DEPENDS crtso libuarm libdiv pcb asl io math string utils phase1
 	COMMAND ${CMAKE_C_LINKER} ${LDFLAGS_UARM}
-	$<TARGET_OBJECTS:crtso> $<TARGET_OBJECTS:libuarm>
+	$<TARGET_OBJECTS:crtso> $<TARGET_OBJECTS:libuarm> $<TARGET_OBJECTS:libdiv>
 	$<TARGET_OBJECTS:pcb> $<TARGET_OBJECTS:asl>
-	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:phase1>
+	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:math> $<TARGET_OBJECTS:string>
+	$<TARGET_OBJECTS:utils> $<TARGET_OBJECTS:phase1>
 	-o kernel1.uarm
 )
 add_custom_target(
 	bka_test.uarm
-	DEPENDS crtso libuarm io math string utils _bka_test
+	DEPENDS crtso libuarm libdiv io math string utils _bka_test
 	COMMAND ${CMAKE_C_LINKER} ${LDFLAGS_UARM}
-	$<TARGET_OBJECTS:crtso> $<TARGET_OBJECTS:libuarm>
+	$<TARGET_OBJECTS:crtso> $<TARGET_OBJECTS:libuarm> $<TARGET_OBJECTS:libdiv>
 	$<TARGET_OBJECTS:io> $<TARGET_OBJECTS:math> $<TARGET_OBJECTS:string>
 	$<TARGET_OBJECTS:utils> $<TARGET_OBJECTS:_bka_test>
 	-o bka_test.uarm
