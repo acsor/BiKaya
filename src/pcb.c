@@ -1,6 +1,7 @@
 #ifndef BKA_PCB_H
 #define BKA_PCB_H
 
+#include "string.h"
 #include "sys.h"
 #include "pcb.h"
 
@@ -43,7 +44,8 @@ pcb_t* allocPcb(void) {
 		out->parent = NULL;
 		INIT_LIST_HEAD(&out->first_child);
 		INIT_LIST_HEAD(&out->siblings);
-		//Inizializzare il campo out->state
+		// Initialize the out->state field to all 0s
+		bka_memset(&out->state, 0, sizeof(state_t));
 		out->priority = 0;
 		out->semkey = NULL;
 
