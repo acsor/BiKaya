@@ -43,7 +43,7 @@ pcb_t* allocPcb(void) {
 		out->parent = NULL;
 		INIT_LIST_HEAD(&out->first_child);
 		INIT_LIST_HEAD(&out->siblings);
-		// TODO Urgent! Properly set out->state
+		out->state = 0;
 		out->priority = 0;
 		out->semkey = NULL;
 
