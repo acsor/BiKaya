@@ -43,7 +43,7 @@ pcb_t* allocPcb(void) {
 		out->parent = NULL;
 		INIT_LIST_HEAD(&out->first_child);
 		INIT_LIST_HEAD(&out->siblings);
-		out->state = 0;
+		//Inizializzare il campo out->state
 		out->priority = 0;
 		out->semkey = NULL;
 
