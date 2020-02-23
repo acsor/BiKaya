@@ -22,6 +22,7 @@ int test_bka_strlen(void *data, char* errmsg, int errdim);
 int test_bka_strncpy(void *data, char* errmsg, int errdim);
 int test_bka_strcpy(void *data, char* errmsg, int errdim);
 int test_bka_strcmp(void *data, char* errmsg, int errdim);
+int test_bka_memset(void *data, char* errmsg, int errdim);
 
 int test_bka_log(void *data, char* errmsg, int errdim);
 
@@ -29,17 +30,13 @@ int test_bka_log(void *data, char* errmsg, int errdim);
 int main (int argc, char *argv[]) {
 	termreg_t * const term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
 
-	/* It appears that when a local-function array is too large to contain, the
-	 * compiler implicitly invokes memcpy() to store it somewhere. Alas, in our
-	 * cross-compiling setup that call isn't available, and prefixing the
-	 * variable with the static storage modifier can do the trick.
-	 */
-	static test_t tests[] = {
+	test_t tests[] = {
 		{"test_bka_atoi", test_bka_atoi}, {"test_bka_itoa", test_bka_itoa},
 		{"test_bka_strlen", test_bka_strlen},
 		{"test_bka_strncpy", test_bka_strncpy},
 		{"test_bka_strcpy", test_bka_strcpy},
 		{"test_bka_strcmp", test_bka_strcmp},
+		{"test_bka_memset", test_bka_memset},
 
 		{"test_bka_log", test_bka_log},
 	};
@@ -161,7 +158,7 @@ int test_bka_strcpy(void *data, char* errmsg, int errdim) {
 }
 
 int test_bka_strcmp(void *data, char* errmsg, int errdim) {
-	static char *inputs[] = {
+	char *inputs[] = {
 		// Equal strings
 		"", "",
 		"1234567890", "1234567890",
@@ -174,7 +171,7 @@ int test_bka_strcmp(void *data, char* errmsg, int errdim) {
 		"fortytwx", "fortytwo",
 		"XAABBBCCCDDDEEEFFF","AAABBBCCCDDDEEEFFF",
 	};
-	static int expected[] = {0, 0, 0, 0, -32, -22, 9, 23};
+	int expected[] = {0, 0, 0, 0, -32, -22, 9, 23};
 	int i;
 
 	for (i = 0; i < BKA_LENGTH(inputs, char*); i += 2) {
@@ -185,17 +182,34 @@ int test_bka_strcmp(void *data, char* errmsg, int errdim) {
 	return 0;
 }
 
+int test_bka_memset(void *data, char* errmsg, int errdim) {
+	char expected[] = "heellloooo";
+	int const len = bka_strlen(expected) + 1;
+	char input[len];
+
+	bka_memset(input, 'h', 1);
+	bka_memset(input + 1, 'e', 2);
+	bka_memset(input + 3, 'l', 3);
+	bka_memset(input + 6, 'o', 4);
+	input[len - 1] = '\0';
+
+	if (bka_strcmp(expected, input))
+		return 1;
+
+	return 0;
+}
+
 
 int test_bka_log(void *data, char* errmsg, int errdim) {
-	static unsigned powers[] = {
+	unsigned powers[] = {
 			1, 2, 3, 4, 5, 6, 7, 8,
 			1, 9, 10, 50, 100, 500, 999, 1000, 1500
 	};
-	static unsigned bases[] = {
+	unsigned bases[] = {
 			2, 2, 2, 2, 2, 2, 2, 2,
 			10, 10, 10, 10, 10, 10, 10, 10, 10
 	};
-	static int expected[] = {
+	int expected[] = {
 			0, 1, 1, 2, 2, 2, 2, 3,
 			0, 0, 1, 1, 2, 2, 2, 3, 3
 	};
