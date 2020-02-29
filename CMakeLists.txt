@@ -1,11 +1,5 @@
-cmake_minimum_required(VERSION 3.16)
-project(
-	BiKaya
-	VERSION 0.1.0
-	DESCRIPTION "Double-architecture operating system"
-	HOMEPAGE_URL https://github.com/newnone/BiKaya
-	LANGUAGES C ASM
-)
+cmake_minimum_required(VERSION 3.3)
+project(BiKaya VERSION 0.1.0 LANGUAGES C ASM)
 
 
 # All the variables defined in this project start with a BKA_ prefix
@@ -20,6 +14,8 @@ include_directories(${PROJECT_SOURCE_DIR}/${BKA_INC})
 include_directories(${PROJECT_BINARY_DIR}/${BKA_INC})
 
 add_compile_options(${BKA_CFLAGS_LANG})
+set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+# set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
 
 # Include targets according to the cross-compiling setup
