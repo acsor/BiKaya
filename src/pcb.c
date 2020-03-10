@@ -11,7 +11,7 @@
  */
 static pcb_t pcb_table[BKA_MAX_PROC];
 /**
- * The free PCB list 	
+ * The free PCB list.
  */
 static struct list_head free_pcb_list;
 
@@ -20,6 +20,7 @@ void initPcbs(void) {
 	int i;
 	
 	INIT_LIST_HEAD(&free_pcb_list);
+
 	for (i = 0; i < BKA_MAX_PROC; i++)
 		list_add_tail(&pcb_table[i].next, &free_pcb_list);
 }
@@ -29,15 +30,17 @@ void freePcb(pcb_t *p) {
 }
 
 pcb_t* allocPcb(void) {
-
 	pcb_t *out;
 
 	if (list_empty(&free_pcb_list))
 		return NULL;
 
+	// Acquire the PCB from the free PCB list
 	out = container_of(free_pcb_list.next, pcb_t, next);
-	// If we found an eligible free PCB, have out point to it and initialize it
 	list_del(&out->next);
+
+	// Initialize the new PCB
+	INIT_LIST_HEAD(&out->next);
 	out->parent = NULL;
 	INIT_LIST_HEAD(&out->first_child);
 	INIT_LIST_HEAD(&out->siblings);

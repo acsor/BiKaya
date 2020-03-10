@@ -4,7 +4,7 @@
 #include "types.h"
 
 
-/* Free PCB list handling functions. */
+/* Free PCB list functions. */
 /**
  * Initializes the free PCB list such that it contains all the available
  * processes.
