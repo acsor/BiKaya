@@ -11,46 +11,40 @@
  */
 static pcb_t pcb_table[BKA_MAX_PROC];
 /**
- * The free PCB table such that
- * 		* free_pcb_table[i] = 0 if process i is NOT free
- * 		* free_pcb_table[i] = 1 otherwise, i.e. process i IS free
+ * The free PCB list 	
  */
-static unsigned free_pcb_table[BKA_MAX_PROC];
+static struct list_head free_pcb_list;
 
 
 void initPcbs(void) {
 	int i;
-
+	
+	INIT_LIST_HEAD(&free_pcb_list);
 	for (i = 0; i < BKA_MAX_PROC; i++)
-		free_pcb_table[i] = 1;
+		list_add_tail(&pcb_table[i].next, &free_pcb_list);
 }
 
 void freePcb(pcb_t *p) {
-	free_pcb_table[p - pcb_table] = 1;
+	list_add_tail(&p->next, &free_pcb_list);
 }
 
 pcb_t* allocPcb(void) {
-	int i;
-	pcb_t *out = NULL;
 
-	// Cycle either until i is in range or a free PCB is not found
-	for (i = 0; i < BKA_MAX_PROC && free_pcb_table[i] == 0; i++);
+	pcb_t *out;
 
+	if (list_empty(&free_pcb_list))
+		return NULL;
+
+	out = container_of(free_pcb_list.next, pcb_t, next);
 	// If we found an eligible free PCB, have out point to it and initialize it
-	if (i < BKA_MAX_PROC) {
-		out = pcb_table + i;
-
-		INIT_LIST_HEAD(&out->next);
-		out->parent = NULL;
-		INIT_LIST_HEAD(&out->first_child);
-		INIT_LIST_HEAD(&out->siblings);
-		// Initialize the out->state field to all 0s
-		bka_memset(&out->state, 0, sizeof(state_t));
-		out->priority = 0;
-		out->semkey = NULL;
-
-		free_pcb_table[i] = 0;
-	}
+	list_del(&out->next);
+	out->parent = NULL;
+	INIT_LIST_HEAD(&out->first_child);
+	INIT_LIST_HEAD(&out->siblings);
+	// Initialize the out->state field to all 0s
+	bka_memset(&out->state, 0, sizeof(state_t));
+	out->priority = 0;
+	out->semkey = NULL;
 
 	return out;
 }
