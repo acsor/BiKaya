@@ -1,8 +1,6 @@
 #ifndef BKA_STRING_H
 #define BKA_STRING_H
 
-#include "sys.h"
-
 
 /**
  * @param src String representation of integer number
@@ -52,6 +50,26 @@ int bka_strcpy(char *dest, char const *src);
  * comes before @c t, or a value <tt>v &gt; 0</tt> if @c s comes after @c t.
  */
 int bka_strcmp(char *s, char *t);
+
+/**
+ * Fills the first @c n bytes of the memory area pointed to by @c dest with
+ * @c d.
+ * @return A pointer to @c dest
+ */
+void* bka_memset(void *dest, char d, unsigned n);
+/**
+ * Copies the first @c n bytes of the memory area pointed to by @c src to @c
+ * dest.
+ * @return A pointer to @c dest.
+ */
+void* bka_memcpy(void *dest, void const *src, unsigned n);
+/**
+ * @c bka_memcpy() alias.
+ * @see bka_memcpy
+ */
+void* memcpy(void *dest, void const *src, unsigned n);
+// TODO Can we define memcpy as a function pointer?
+// void* (*memcpy)(void*, const void *, unsigned);
 
 
 #endif
