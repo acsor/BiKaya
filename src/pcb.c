@@ -47,6 +47,8 @@ pcb_t* allocPcb(void) {
 	// Initialize the out->state field to all 0s
 	bka_memset(&out->state, 0, sizeof(state_t));
 	out->priority = 0;
+	//TODO:per ora a 0,ma bisognerà poi settarla al valore appropriato
+	out->original_priority = 0;
 	out->semkey = NULL;
 
 	return out;
