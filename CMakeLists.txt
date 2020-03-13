@@ -34,16 +34,18 @@ endif()
 
 configure_file(${BKA_INC}/sys.h.in ${PROJECT_BINARY_DIR}/${BKA_INC}/sys.h)
 
-add_library(io OBJECT ${BKA_SRC}/io.c)
-add_library(math OBJECT ${BKA_SRC}/math.c)
-add_library(string OBJECT ${BKA_SRC}/string.c)
-add_library(utils OBJECT ${BKA_SRC}/utils.c)
-add_library(pcb OBJECT ${BKA_SRC}/pcb.c)
-add_library(asl OBJECT ${BKA_SRC}/asl.c)
-add_library(phase0 OBJECT ${BKA_SRC}/phase0.c)
-add_library(phase1 OBJECT ${BKA_SRC}/phase1.c)
-add_library(_bka_test OBJECT ${BKA_SRC}/bka_test.c)
+# Project libraries, with alphanumerical ordering
+add_library(_bka_test ${BKA_SRC}/bka_test.c)
+add_library(asl ${BKA_SRC}/asl.c)
+add_library(io ${BKA_SRC}/io.c)
+add_library(math ${BKA_SRC}/math.c)
+add_library(string ${BKA_SRC}/string.c)
+add_library(pcb ${BKA_SRC}/pcb.c)
+add_library(phase0 ${BKA_SRC}/phase0.c)
+add_library(phase1 ${BKA_SRC}/phase1.c)
+add_library(utils ${BKA_SRC}/utils.c)
 
+target_link_libraries(string math)
 
 # CPack configuration -- useful for packaging the project in various formats
 # (e.g. .tar, .zip, .deb etc.)
@@ -62,6 +64,5 @@ list(APPEND CPACK_SOURCE_IGNORE_FILES ".*build.*/")
 list(APPEND CPACK_SOURCE_IGNORE_FILES ".git/")
 list(APPEND CPACK_SOURCE_IGNORE_FILES ".idea/")
 list(APPEND CPACK_SOURCE_IGNORE_FILES "sw[op]$")
-
 
 include(CPack)

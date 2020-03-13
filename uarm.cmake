@@ -14,21 +14,17 @@ add_compile_options(${CFLAGS_UARM})
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LDFLAGS_UARM}")
 include_directories(${BKA_UARM_INC})
 
-# Dependencies are not passed as libraries, but directly as source files
-set(libuarm ${BKA_UARM_SRC}/libuarm.s)
-set(libdiv ${BKA_UARM_SRC}/libdiv.s)
-set(crtso ${BKA_UARM_SRC}/crtso.s)
+# uARM-dependent libraries
+add_library(libuarm ${BKA_UARM_SRC}/libuarm.s)
+add_library(libdiv ${BKA_UARM_SRC}/libdiv.s)
+add_library(crtso ${BKA_UARM_SRC}/crtso.s)
 
-add_executable(
-    kernel0.uarm ${BKA_SRC}/phase0.c ${crtso} ${libuarm} ${BKA_SRC}/io.c
-)
-add_executable(
-    kernel1.uarm ${BKA_SRC}/phase1.c ${crtso} ${libuarm}
-    ${libdiv} ${BKA_SRC}/pcb.c ${BKA_SRC}/asl.c
-    ${BKA_SRC}/io.c ${BKA_SRC}/math.c ${BKA_SRC}/string.c ${BKA_SRC}/utils.c
-)
-add_executable(
-    bka_test.uarm ${BKA_SRC}/bka_test.c ${crtso} ${libuarm}
-    ${libdiv} ${BKA_SRC}/pcb.c ${BKA_SRC}/asl.c
-    ${BKA_SRC}/io.c ${BKA_SRC}/math.c ${BKA_SRC}/string.c ${BKA_SRC}/utils.c
-)
+# uARM executables
+add_executable(kernel0.uarm ${BKA_SRC}/phase0.c)
+target_link_libraries(kernel0.uarm crtso libuarm io)
+
+add_executable(kernel1.uarm ${BKA_SRC}/phase1.c)
+target_link_libraries(kernel1.uarm crtso libuarm libdiv pcb asl io math string utils)
+
+add_executable(bka_test.uarm ${BKA_SRC}/bka_test.c)
+target_link_libraries(bka_test.uarm crtso libuarm libdiv pcb asl io math string utils)
