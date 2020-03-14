@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.3)
 project(BiKaya VERSION 0.1.0 LANGUAGES C ASM)
 
-
 # All the variables defined in this project start with a BKA_ prefix
 set(BKA_INC include)
 set(BKA_SRC src)
@@ -9,14 +8,12 @@ set(BKA_SRC src)
 set(CMAKE_C_STANDARD 90)
 set(BKA_CFLAGS_LANG -ffreestanding -ansi -Wall)
 
-# TODO Are we better off using target_include_directories()?
+# TODO Should we rather use target_include_directories()?
 include_directories(${PROJECT_SOURCE_DIR}/${BKA_INC})
 include_directories(${PROJECT_BINARY_DIR}/${BKA_INC})
 
 add_compile_options(${BKA_CFLAGS_LANG})
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
-# set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
-
 
 # Include targets according to the cross-compiling setup
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL mips)
@@ -31,21 +28,21 @@ else()
 	CMAKE_TOOLCHAIN_FILE=toolchains/uarm.cmake")
 endif()
 
-
 configure_file(${BKA_INC}/sys.h.in ${PROJECT_BINARY_DIR}/${BKA_INC}/sys.h)
 
-# Project libraries, with alphanumerical ordering
-add_library(_bka_test ${BKA_SRC}/bka_test.c)
+# Architecture-independent libraries
 add_library(asl ${BKA_SRC}/asl.c)
 add_library(io ${BKA_SRC}/io.c)
 add_library(math ${BKA_SRC}/math.c)
-add_library(string ${BKA_SRC}/string.c)
 add_library(pcb ${BKA_SRC}/pcb.c)
-add_library(phase0 ${BKA_SRC}/phase0.c)
-add_library(phase1 ${BKA_SRC}/phase1.c)
+add_library(string ${BKA_SRC}/string.c)
 add_library(utils ${BKA_SRC}/utils.c)
 
-target_link_libraries(string math)
+# Libraries dependecies
+target_link_libraries(asl PRIVATE pcb)
+target_link_libraries(pcb PRIVATE string utils)
+target_link_libraries(string PRIVATE math)
+target_link_libraries(utils PRIVATE math)
 
 # CPack configuration -- useful for packaging the project in various formats
 # (e.g. .tar, .zip, .deb etc.)
