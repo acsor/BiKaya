@@ -2,8 +2,11 @@
 __pycache__/
 *build*/
 
-# Files section
+# Specific files section
 Session.vim
+toolchains/umps-local.cmake
+
+# Generic files section
 *.o
 *.out
 *.a
