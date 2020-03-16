@@ -18,14 +18,14 @@ set(UMPS_SRC ${PROJECT_SOURCE_DIR}/${BKA_SRC}/umps)
 # Flags to be passed to gcc
 set(
 	CFLAGS_UMPS
-	-ffreestanding -ansi -mips1 -mabi=32 -mno-gpopt -G 0 -mabicalls -fPIC
+	-ffreestanding -ansi -mips1 -mabi=32 -mno-gpopt -G 0 # -mno-abicalls -fno-pic
 	-mfp32 -Wall -O0
 )
 set(LINK_SCRIPT ${UMPS_SRC}/umpscore.ldscript)
 # Flags to be passed to ld
 set(LDFLAGS_UMPS "-nostdlib -Wl,-G,0,-nostdlib,-T,${LINK_SCRIPT}")
 
-add_compile_options(${CFLAGS_MIPS})
+add_compile_options(${CFLAGS_UMPS})
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LDFLAGS_UMPS}")
 # set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
