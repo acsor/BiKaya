@@ -38,6 +38,7 @@ add_library(io ${BKA_SRC}/io.c)
 add_library(math ${BKA_SRC}/math.c)
 add_library(pcb ${BKA_SRC}/pcb.c)
 add_library(string ${BKA_SRC}/string.c)
+add_library(test2_aux ${BKA_SRC}/test2_aux.c)
 add_library(utils ${BKA_SRC}/utils.c)
 
 # Libraries dependecies

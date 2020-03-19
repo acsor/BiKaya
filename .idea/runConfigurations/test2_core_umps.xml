@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="test2.core.umps" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="${HOME}/.config/umps2/bikaya/test2.core.umps.cfg" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BiKaya" TARGET_NAME="test2.core.umps" CONFIG_NAME="uMPS" RUN_PATH="/usr/local/bin/umps2">
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>

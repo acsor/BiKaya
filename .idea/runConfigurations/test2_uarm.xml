@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="test2.uarm" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-c ${HOME}/.config/uarm/bikaya/test2.uarm.cfg -e" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BiKaya" TARGET_NAME="test2.uarm" CONFIG_NAME="uARM" RUN_PATH="/usr/bin/uarm">
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>
