@@ -2,15 +2,17 @@ cmake_minimum_required(VERSION 3.3)
 project(BiKaya VERSION 0.1.0 LANGUAGES C ASM)
 
 # All the variables defined in this project start with a BKA_ prefix
-set(BKA_INC include)
-set(BKA_SRC src)
+set(BKA_INC ${PROJECT_SOURCE_DIR}/include)
+set(BKA_BIN_INC ${PROJECT_BINARY_DIR}/include)
+set(BKA_SRC ${PROJECT_SOURCE_DIR}/src)
+set(BKA_TEST ${PROJECT_SOURCE_DIR}/test)
 
 set(CMAKE_C_STANDARD 90)
 set(BKA_CFLAGS_LANG -ffreestanding -ansi -Wall)
 
 # TODO Should we rather use target_include_directories()?
-include_directories(${PROJECT_SOURCE_DIR}/${BKA_INC})
-include_directories(${PROJECT_BINARY_DIR}/${BKA_INC})
+include_directories(${BKA_INC})
+include_directories(${BKA_BIN_INC})
 
 add_compile_options(${BKA_CFLAGS_LANG})
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
@@ -28,7 +30,7 @@ else()
 	CMAKE_TOOLCHAIN_FILE=toolchains/uarm.cmake")
 endif()
 
-configure_file(${BKA_INC}/sys.h.in ${PROJECT_BINARY_DIR}/${BKA_INC}/sys.h)
+configure_file(${BKA_INC}/sys.h.in ${BKA_BIN_INC}/sys.h)
 
 # Architecture-independent libraries
 add_library(asl ${BKA_SRC}/asl.c)

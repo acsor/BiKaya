@@ -1,47 +1,44 @@
 # BiKaya
-BiKaya is an operating system running on two emulated, micro computer
- architectures, uARM and uMIPS2. Designed for educational purposes,
-this project was commissioned as part of the Operating Systems course from the
-University of Bologna, 2019-2020 a.y.
+BiKaya is an educational-purpose, cross-architecture operating system
+compatible with uARM and uM(I)PS2, two micro ISAs derived from ARM and MIPS,
+respectively.
 
-## Installation
-BiKaya features several executable targets, each one described in its own
-section.
+## Running
+BiKaya (meta) build system is CMake. The list of available executables is
 
-### Building phase 0 targets
-In order to build the cross-compiled executables, do the following
-
-1. For the micro MIPS architecture
-
-	```bash
-	cmake -B build-umps -S . -D CMAKE_TOOLCHAIN_FILE=toolchains/umps.cmake
-	cd build-umps
-	make kernel0.core.umps
-
-	# Launch the umps2 emulator
-	```
-
-1. Equivalently, for the micro ARM architecture
-
-	```bash
-	cmake -B build-uarm -S . -D CMAKE_TOOLCHAIN_FILE=toolchains/uarm.cmake
-	cd build-uarm
-	make kernel0.uarm
-
-	# Launch the uarm emulator
-	```
+* For uMPS: `test0.core.umps`, `test1.core.umps`, `test2.core.umps `, `unit_test.core.umps`
+* For uARM: `test0.uarm`, `test1.uarm`, `test2.uarm`, `unit_test.uarm`
  
-### Building phase 1 targets
-Follow the steps exactly as in building targets for the phase0 phase, except
-for substituting `kernel0.core.umps` with `kernel1.core.umps`, and `kernel0.uarm`
-with `kernel1.uarm`.
+ ### Instructor note
+ If you are an istructor willing to grade our project, note that the "phase 1.5"
+ program can be launched by compiling and running `test2.core.umps`
+ and `test2.uarm` executables.
 
-## Testing
-BiKaya features a moderably-sized unit-testing suite. In order to run it,
-build the `bka_test.umps` (or `bka_test.uarm`) exeutable and launch it as the
-others.
+### Build example
+As an example, assume you want to compile and then run `test2.core.umps`
+and `test2.uarm`. Your terminal steps should then be
 
-**Note**: currently available for uMIPS only.
+1. For the uMPS architecture
+
+	```bash
+    mkdir build-umps
+    cd build-umps
+    cmake -D CMAKE_TOOLCHAIN_FILE=../toolchains/umps.cmake ..
+    make test2.core.umps
+
+    # Launch the umps2 emulator
+	```
+
+1. For the uARM architecture
+
+	```bash
+    mkdir build-uarm
+    cd build-uarm
+    cmake -D CMAKE_TOOLCHAIN_FILE=../toolchains/uarm.cmake ..
+    make test2.uarm
+
+    # Launch the uarm emulator
+	```
 
 ## Packaging
 This option is mostly intended for people working on the project.

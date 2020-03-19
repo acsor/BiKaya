@@ -1,6 +1,6 @@
 # Project include, source and library dirs for uarm-related files
-set(BKA_UARM_INC ${PROJECT_SOURCE_DIR}/${BKA_INC}/uarm)
-set(BKA_UARM_SRC ${PROJECT_SOURCE_DIR}/${BKA_SRC}/uarm)
+set(BKA_UARM_INC ${BKA_INC}/uarm)
+set(BKA_UARM_SRC ${BKA_SRC}/uarm)
 
 # Flags to be passed to the compiler
 set(CFLAGS_UARM -mcpu=arm7tdmi -O0)
@@ -20,11 +20,11 @@ add_library(libdiv ${BKA_UARM_SRC}/libdiv.s)
 add_library(crtso ${BKA_UARM_SRC}/crtso.s)
 
 # uARM executables
-add_executable(kernel0.uarm ${BKA_SRC}/phase0.c)
-target_link_libraries(kernel0.uarm crtso libuarm io)
+add_executable(test0.uarm ${BKA_TEST}/test0.c)
+target_link_libraries(test0.uarm crtso libuarm io)
 
-add_executable(kernel1.uarm ${BKA_SRC}/phase1.c)
-target_link_libraries(kernel1.uarm crtso libuarm libdiv pcb asl io math string utils)
+add_executable(test1.uarm ${BKA_TEST}/test1.c)
+target_link_libraries(test1.uarm crtso libuarm libdiv asl io string)
 
-add_executable(bka_test.uarm ${BKA_SRC}/bka_test.c)
-target_link_libraries(bka_test.uarm crtso libuarm libdiv pcb asl io math string utils)
+add_executable(unit_test.uarm ${BKA_TEST}/unit_test.c)
+target_link_libraries(unit_test.uarm crtso libuarm libdiv asl io string)

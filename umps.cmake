@@ -11,9 +11,9 @@ function(apply_elf2umps)
 	endforeach()
 endfunction()
 
-# Project include, source and library dirs for umips-related files
-set(UMPS_INC ${PROJECT_SOURCE_DIR}/${BKA_INC}/umps)
-set(UMPS_SRC ${PROJECT_SOURCE_DIR}/${BKA_SRC}/umps)
+# Project include and source dirs for umps-related files
+set(UMPS_INC ${BKA_INC}/umps)
+set(UMPS_SRC ${BKA_SRC}/umps)
 
 # Flags to be passed to gcc
 set(
@@ -32,17 +32,17 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LDFLAGS_UMPS}")
 add_library(libumps ${UMPS_SRC}/libumps.S)
 add_library(crtso ${UMPS_SRC}/crtso.S)
 
-# Add kernel0.core.umps executable
-add_executable(kernel0 ${BKA_SRC}/phase0.c)
-target_link_libraries(kernel0 crtso libumps io)
+# Add test0 executable
+add_executable(test0 ${BKA_TEST}/test0.c)
+target_link_libraries(test0 crtso libumps io)
 
-# Add kernel1.core.umps executable
-add_executable(kernel1 ${BKA_SRC}/phase1.c)
-target_link_libraries(kernel1 crtso libumps io string utils asl)
+# Add test1 executable
+add_executable(test1 ${BKA_TEST}/test1.c)
+target_link_libraries(test1 crtso libumps io string utils asl)
 
-# Add bka_test.core.umps executable
-add_executable(bka_test ${BKA_SRC}/bka_test.c)
-target_link_libraries(bka_test crtso io libumps string utils)
+# Add unit_test executable
+add_executable(unit_test ${BKA_TEST}/unit_test.c)
+target_link_libraries(unit_test crtso io libumps string utils)
 
 # To each target listed, apply the umps2-elf2umps final step to it
-apply_elf2umps(kernel0 kernel1 bka_test)
+apply_elf2umps(test0 test1 unit_test)
