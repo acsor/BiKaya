@@ -44,7 +44,7 @@ add_library(utils ${BKA_SRC}/utils.c)
 # Libraries dependecies
 target_link_libraries(asl PRIVATE pcb)
 target_link_libraries(pcb PRIVATE string utils)
-target_link_libraries(string PRIVATE math)
+target_link_libraries(string PRIVATE math utils)
 target_link_libraries(utils PRIVATE math)
 
 # CPack configuration -- useful for packaging the project in various formats
