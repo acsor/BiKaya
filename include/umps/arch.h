@@ -43,14 +43,14 @@
 #define RRF_FS			0x8C
 
 /* ROM Reserved Frame area addresses. */
-#define INT_OLDAREA		RRF_BASE + 0 * RRF_FS
-#define INT_NEWAREA		RRF_BASE + 1 * RRF_FS
-#define TLB_OLDAREA		RRF_BASE + 2 * RRF_FS
-#define TLB_NEWAREA		RRF_BASE + 3 * RRF_FS
-#define PGMTRAP_OLDAREA	RRF_BASE + 4 * RRF_FS
-#define PGMTRAP_NEWAREA	RRF_BASE + 5 * RRF_FS
-#define SYSBK_OLDAREA	RRF_BASE + 6 * RRF_FS
-#define SYSBK_NEWAREA	RRF_BASE + 7 * RRF_FS
+#define INT_OLDAREA		(RRF_BASE + 0 * RRF_FS)
+#define INT_NEWAREA		(RRF_BASE + 1 * RRF_FS)
+#define TLB_OLDAREA		(RRF_BASE + 2 * RRF_FS)
+#define TLB_NEWAREA		(RRF_BASE + 3 * RRF_FS)
+#define PGMTRAP_OLDAREA	(RRF_BASE + 4 * RRF_FS)
+#define PGMTRAP_NEWAREA	(RRF_BASE + 5 * RRF_FS)
+#define SYSBK_OLDAREA	(RRF_BASE + 6 * RRF_FS)
+#define SYSBK_NEWAREA	(RRF_BASE + 7 * RRF_FS)
 
 /* Segment-related constants */
 #define KSEGOS_BASE        0x00000000

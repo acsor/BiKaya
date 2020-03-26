@@ -11,25 +11,25 @@
 #define RAMTOP     (RAMBASE + RAMSIZE)
 
 
-static char to_print[129] = "?\n";
+static char message[129] = "?\n";
+static termreg_t * const term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
 
 /**
  * Initializes the ROM Reserved Frame new area processor state before receiving
  * an interrupt.
  */
 void init_state(state_t *const s);
-void hello();
+static void sys_callback();
 
 
 int main () {
 	state_t *s = (state_t *) SYSBK_NEWAREA;
-	termreg_t * const term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
 
-	bka_memset(s, 0, sizeof(state_t));
 	init_state(s);
 
+	bka_term_puts(term0, "Invoking SYSCALL()...\n", NULL);
 	SYSCALL(0, 0, 0, 0);
-	bka_term_puts(term0, "to_print = ", to_print, NULL);
+	bka_term_puts(term0, "message = ", message, NULL);
 
 	return 0;
 }
@@ -37,20 +37,30 @@ int main () {
 
 #ifdef BKA_ARCH_UMPS
 void init_state(state_t *const s) {
-	s->pc_epc = (unsigned) hello;
+	bka_memset(s, 0, sizeof(state_t));
+	s->pc_epc = (unsigned) sys_callback;
 	s->reg_sp = RAMTOP;
-	s->status = 0;
 }
 #elif defined(BKA_ARCH_UARM)
-	void init_state(state_t *const s) {
+void init_state(state_t *const s) {
+	bka_memset(s, 0, sizeof(state_t));
+
 	s->sp = RAMTOP;
-	s->pc = (unsigned) hello;
+	s->pc = (unsigned) sys_callback;
 	s->cpsr = STATUS_SYS_MODE;
 	s->cpsr = STATUS_DISABLE_INT(s->cpsr);
 	s->CP15_Control = CP15_DISABLE_VM(s->CP15_Control);
 }
 #endif
 
-void hello() {
-	bka_strcpy(to_print, "Hello! I'm hello().\n");
+void sys_callback() {
+	state_t *to_restore = (state_t*) SYSBK_OLDAREA;
+
+	bka_strncpy(message, "Hello! This is sys_callback()!.\n", 129);
+
+#ifdef BKA_ARCH_UMPS
+	to_restore->pc_epc += WS;
+#endif
+
+	LDST(to_restore);
 }
