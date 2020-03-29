@@ -3,11 +3,11 @@ set(BKA_UARM_INC ${BKA_INC}/uarm)
 set(BKA_UARM_SRC ${BKA_SRC}/uarm)
 
 # Flags to be passed to the compiler
-set(CFLAGS_UARM -mcpu=arm7tdmi -O0)
+set(CFLAGS_UARM -nostdlib -mcpu=arm7tdmi -O0)
 set(LINK_SCRIPT ${BKA_UARM_SRC}/elf32ltsarm.h.uarmcore.x)
 # Flags to be passed to the linker. NOTE: the linker is not invoked directly,
 # flags are passed to it via the -Wl compiler flag
-set(LDFLAGS_UARM "-Wl,-nostdlib,-G,0,-T,${LINK_SCRIPT}")
+set(LDFLAGS_UARM "-nostdlib -Wl,-nostdlib,-G,0,-T,${LINK_SCRIPT}")
 
 # Set compiler and linker options
 add_compile_options(${CFLAGS_UARM})

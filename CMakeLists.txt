@@ -47,6 +47,10 @@ target_link_libraries(pcb PRIVATE string utils)
 target_link_libraries(string PRIVATE math utils)
 target_link_libraries(utils PRIVATE math)
 
+if (CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
+	target_link_libraries(math PRIVATE libdiv)
+endif()
+
 # CPack configuration -- useful for packaging the project in various formats
 # (e.g. .tar, .zip, .deb etc.)
 include(InstallRequiredSystemLibraries)
