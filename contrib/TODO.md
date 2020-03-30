@@ -44,3 +44,16 @@ and a list of author names. An example is
 ### Extra
 1. `list_del(l)` of `list.h` does **not** reset the list fields of `l` upon
  removal, shall we perform an edit?
+
+
+## Phase 1.5
+### `callback.h`
+1. [ ] `void bka_na_init(state_t *s, nac_t c)`: ?
+
+### `pcb.h`
+1. [ ] `void bka_pcb_init(pcb_t *p, pfun_t f)`: ?
+1. [ ] `int bka_pcb_to_pid(pcb_t const * const p)`: ?
+1. [ ] `pcb_t * bka_pid_to_pcb(unsigned pid)`: ?
+
+### `test2.c`
+1. [ ] `pcb_t* pcb_test_factory(unsigned test_no)`: ?
