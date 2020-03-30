@@ -5,6 +5,11 @@
 #include "list.h"
 
 
+/**
+ * A process function type, to be associated as the code executed by a given
+ * process.
+ */
+typedef void (*pfun_t)(void);
 typedef unsigned int memaddr_t;
 
 /**

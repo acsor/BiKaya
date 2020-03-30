@@ -51,9 +51,9 @@ typedef unsigned int size_tt;
     una lista bidirezionale. Per creare liste di strutture arbitrarie basta
     inserire al loro interno un campo di tipo list_head. 
 */
-struct list_head {
+typedef struct list_head {
 	struct list_head *next, *prev;
-};
+} list_t;
 
 /*
     Macro che definisce una lista vuota, inizializzando una list_head con 

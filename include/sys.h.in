@@ -42,6 +42,14 @@
 #endif
 
 
+/* CODE INHERITED FROM p1.5test_bikaya_v0.c. */
+#define BKA_TOD_LO     *((unsigned int *)BUS_REG_TOD_LO)
+#define BKA_TIME_SCALE *((unsigned int *)BUS_REG_TIME_SCALE)
+#define BKA_RAMBASE    *((unsigned int *)BUS_REG_RAM_BASE)
+#define BKA_RAMSIZE    *((unsigned int *)BUS_REG_RAM_SIZE)
+#define BKA_RAMTOP     (RAMBASE + RAMSIZE)
+
+
 /* CODE INHERITED FROM const.h, PROVIDED BY UNIVERSITY TUTOR AND PROFESSOR. */
 /* Maximum number of processes concurrently active in the system. */
 #define BKA_MAX_PROC 20

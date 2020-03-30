@@ -1,66 +1,85 @@
+#include "callback.h"
 #include "io.h"
+#include "pcb.h"
 #include "string.h"
 #include "sys.h"
 #include "test2_aux.h"
 #include "types.h"
+#include "utils.h"
 
-#define TOD_LO     *((unsigned int *)BUS_REG_TOD_LO)
-#define TIME_SCALE *((unsigned int *)BUS_REG_TIME_SCALE)
-#define RAMBASE    *((unsigned int *)BUS_REG_RAM_BASE)
-#define RAMSIZE    *((unsigned int *)BUS_REG_RAM_SIZE)
-#define RAMTOP     (RAMBASE + RAMSIZE)
-
-
-static char message[129] = "?\n";
-static termreg_t * const term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
 
 /**
- * Initializes the ROM Reserved Frame new area processor state before receiving
- * an interrupt.
+ * @return The boot-up initial process queue.
  */
-void init_state(state_t *const s);
-static void sys_callback();
+static list_t pcb_queue_factory();
+/**
+ * Returns a PCB set to execute one of the three functions among @c test1(),
+ * @c test2() and @c test3().
+ * @param test_no Test type to pick
+ * @return A properly initialized PCB.
+ * @see bka_pcb_init() on how to initialize the PCB.
+ */
+static pcb_t* pcb_test_factory(unsigned test_no);
+static void new_areas_init();
+
+static void nac_int ();
+static void nac_tlb ();
+static void nac_trap ();
+static void nac_sysbk ();
 
 
 int main () {
-	state_t *s = (state_t *) SYSBK_NEWAREA;
+	list_t proc_queue = pcb_queue_factory();
 
-	init_state(s);
-
-	bka_term_puts(term0, "Invoking SYSCALL()...\n", NULL);
-	SYSCALL(0, 0, 0, 0);
-	bka_term_puts(term0, "message = ", message, NULL);
+	new_areas_init();
 
 	return 0;
 }
 
 
-#ifdef BKA_ARCH_UMPS
-void init_state(state_t *const s) {
-	bka_memset(s, 0, sizeof(state_t));
-	s->pc_epc = (unsigned) sys_callback;
-	s->reg_sp = RAMTOP;
+list_t pcb_queue_factory() {
+	list_t head;
+
+	initPcbs();
+	emptyProcQ(&head);
+
+	insertProcQ(&head, pcb_test_factory(0));
+	insertProcQ(&head, pcb_test_factory(1));
+	insertProcQ(&head, pcb_test_factory(2));
+
+	return head;
 }
-#elif defined(BKA_ARCH_UARM)
-void init_state(state_t *const s) {
-	bka_memset(s, 0, sizeof(state_t));
 
-	s->sp = RAMTOP;
-	s->pc = (unsigned) sys_callback;
-	s->cpsr = STATUS_SYS_MODE;
-	s->cpsr = STATUS_DISABLE_INT(s->cpsr);
-	s->CP15_Control = CP15_DISABLE_VM(s->CP15_Control);
+pcb_t* pcb_test_factory(unsigned test_no) {
+	/* TOOD Implement. */
+	return NULL;
 }
-#endif
 
-void sys_callback() {
-	state_t *to_restore = (state_t*) SYSBK_OLDAREA;
+void new_areas_init() {
+	unsigned new_areas[] = {
+		INT_NEWAREA, TLB_NEWAREA, PGMTRAP_NEWAREA, SYSBK_NEWAREA
+	};
+	nac_t callbacks[] = {nac_int, nac_tlb, nac_trap, nac_sysbk};
+	unsigned i;
+	unsigned const n = BKA_LENGTH(new_areas, unsigned);
 
-	bka_strncpy(message, "Hello! This is sys_callback()!.\n", 129);
+	for (i = 0; i < n; i++) {
+		bka_na_init((state_t *) new_areas[i], callbacks[i]);
+	}
+}
 
-#ifdef BKA_ARCH_UMPS
-	to_restore->pc_epc += WS;
-#endif
+void nac_int () {
+	/* TODO Implement. */
+}
 
-	LDST(to_restore);
+void nac_tlb () {
+	/* TODO Implement. */
+}
+
+void nac_trap () {
+	/* TODO Implement. */
+}
+
+void nac_sysbk () {
+	/* TODO Implement. */
 }
