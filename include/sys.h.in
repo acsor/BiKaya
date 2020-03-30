@@ -2,6 +2,7 @@
 #define BKA_SYS_H
 
 
+// TODO Turn this file into an .h file
 #cmakedefine BKA_ARCH_UMPS
 #cmakedefine BKA_ARCH_UARM
 
@@ -47,7 +48,7 @@
 #define BKA_TIME_SCALE *((unsigned int *)BUS_REG_TIME_SCALE)
 #define BKA_RAMBASE    *((unsigned int *)BUS_REG_RAM_BASE)
 #define BKA_RAMSIZE    *((unsigned int *)BUS_REG_RAM_SIZE)
-#define BKA_RAMTOP     (RAMBASE + RAMSIZE)
+#define BKA_RAMTOP     (BKA_RAMBASE + BKA_RAMSIZE)
 
 
 /* CODE INHERITED FROM const.h, PROVIDED BY UNIVERSITY TUTOR AND PROFESSOR. */

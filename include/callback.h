@@ -15,7 +15,7 @@ typedef void (*nac_t)(void);
  * <ul>
  * 		<li>The new area program counter (PC) points to the code executed by
  * 		@c c</li>
- * 		<li>The SP (Stack Pointer) points to @c RAMTOP.<li>
+ * 		<li>The SP (Stack Pointer) points to @c BKA_RAMTOP.<li>
  * 		<li>The status register is initialized so that
  * 			<ul>
  * 				<li>Interrupts are masked/disabled</li>
