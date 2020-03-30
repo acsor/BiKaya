@@ -18,7 +18,7 @@ static struct list_head free_pcb_list;
 
 void initPcbs(void) {
 	int i;
-	
+
 	INIT_LIST_HEAD(&free_pcb_list);
 
 	for (i = 0; i < BKA_MAX_PROC; i++)
@@ -26,7 +26,34 @@ void initPcbs(void) {
 }
 
 void bka_pcb_init(pcb_t *p, pfun_t f) {
-	/* TODO Implement. */
+    INIT_LIST_HEAD(&p->next);
+    p->parent = NULL;
+    INIT_LIST_HEAD(&p->first_child);
+    INIT_LIST_HEAD(&p->siblings);
+
+    p->priority = 0;
+    p->original_priority = 0;
+    p->semkey = NULL;
+
+    #ifdef BKA_ARCH_UMPS
+
+    p->state.pc_epc = f;
+    bka_memset(p->state.status, 0, sizeof(unsigned int));
+    p->state.status |= 1 << 0;    // enable interrupts
+    p->state.status |= 1 << 27;    // enable processor local timer
+    p->state.reg_sp = RAMTOP - FRAMESIZE * bka_pcb_to_pid(p); // set stack pointer
+
+    #elif defined(BKA_ARCH_UARM)
+
+    p->state.pc = f;
+    bka_memset(p->state.cpsr, 0, sizeof(unsigned int));
+    bka_memset(p->state.CP15_Control, 0, sizeof(unsigned int));    // virtual memory off
+    p->state.cpsr |= 0x1F;    // enable kernel mode
+    p->state.cpsr |= 1 << 7;    // enable regular interrupt handling
+    p->state.status |= 1 << 27;    // enable processor local timer
+    p->state.sp = RAMTOP - FRAMESIZE * bka_pcb_to_pid(p);    // set stack pointer
+
+    #endif
 }
 
 void freePcb(pcb_t *p) {
