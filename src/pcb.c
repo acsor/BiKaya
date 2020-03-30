@@ -25,6 +25,10 @@ void initPcbs(void) {
 		list_add_tail(&pcb_table[i].next, &free_pcb_list);
 }
 
+void bka_pcb_init(pcb_t *p, pfun_t f) {
+	/* TODO Implement. */
+}
+
 void freePcb(pcb_t *p) {
 	list_add_tail(&p->next, &free_pcb_list);
 }
@@ -47,11 +51,20 @@ pcb_t* allocPcb(void) {
 	// Initialize the out->state field to all 0s
 	bka_memset(&out->state, 0, sizeof(state_t));
 	out->priority = 0;
-	//TODO:per ora a 0,ma bisognerà poi settarla al valore appropriato
 	out->original_priority = 0;
 	out->semkey = NULL;
 
 	return out;
+}
+
+int bka_pcb_to_pid (pcb_t const * const p) {
+	/* TODO Implement. */
+	return -1;
+}
+
+pcb_t * bka_pid_to_pcb (unsigned pid) {
+	/* TODO Implement. */
+	return NULL;
 }
 
 

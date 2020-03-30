@@ -11,6 +11,24 @@
  */
 void initPcbs();
 /**
+ * Initializes the given @pcb_t process descriptor for running. Specifically,
+ * the process status will be set in such a way that
+ *
+ * <ul>
+ * 		<li>Interrupts are enabled</li>
+ * 		<li>Virtual memory is off</li>
+ * 		<li>The process local timer is enabled</li>
+ * 		<li>Kernel mode is enabled</li>
+ * 		<li>The stack pointer equals <tt>RAMTOP - FRAMESIZE * pid</tt>, where @c
+ * 		pid is the Process ID of the given process</li>
+ * 		<li>Priority is set to @c 0</li>
+ * 		<li>The process program counter points to @c f address.</li>
+ * </ul>
+ * @param p @c pcb_t instance to be initialized.
+ * @param f Process code @c p will execute.
+ */
+void bka_pcb_init(pcb_t *p, pfun_t f);
+/**
  * @param p Pointer to a PCB to be inserted into the free PCB list.
  */
 void freePcb(pcb_t *p);
@@ -19,6 +37,16 @@ void freePcb(pcb_t *p);
  * otherwise. The returned element is extracted from the free PCB list.
  */
 pcb_t* allocPcb();
+/**
+ * @return The PID (Process ID) corresponding to the given process control
+ * block, or @c BKA_E_INVARG if @c p is not valid.
+ */
+int bka_pcb_to_pid(pcb_t const * const p);
+/**
+ * @return The PCB (Process Control Block) corresponding to the given process
+ * ID, or @c NULL if the @c pid argument is invalid.
+ */
+pcb_t * bka_pid_to_pcb(unsigned pid);
 
 
 /* PCB queue functions. */
@@ -32,7 +60,7 @@ void mkEmptyProcQ(struct list_head *head);
  */
 int emptyProcQ(struct list_head *head);
 /**
- * Inserts @c p into the PCB queue pointed to by @c head, such that the
+ * Inserts @c p into the PCB queue pointed to by @c head, so that the
  * process priority is preserved, i.e. the list is ordered in a descending
  * manner with respect to the processes' priority.
  * @param head Pointer to the sentinel of the list to insert to.

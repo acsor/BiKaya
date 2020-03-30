@@ -33,6 +33,12 @@
  */
 #define WORD_SIZE 4
 #define WS        WORD_SIZE
+/**
+ * Memory block area reserved for each process, in words.
+ *
+ * TODO Is this a right value? Shouldn't it be computed dynamically?
+ */
+#define FRAMESIZE 1024
 
 #define MMIO_BASE 0x10000000
 #define RAM_BASE  0x20000000
