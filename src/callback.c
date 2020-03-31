@@ -4,19 +4,20 @@
 
 void bka_na_init(state_t *s, nac_t c) {
 #ifdef BKA_ARCH_UMPS
+	// initialize all registers
+	bka_memset(&s->entry_hi, 0, sizeof((unsigned int)*37));//state_t fields initialized to 0
+	
 	s->pc_epc = (unsigned) c;
 	s->reg_sp = BKA_RAMTOP;
 	
-	// initialize the status register
-	bka_memset(&s->status, 0, sizeof(s->status));
+	
 #elif defined(BKA_ARCH_UARM)
+	// initialize all registers
+	bka_memset(&s -> a1, 0, (sizeof(unsigned int)*22));//state_t fields initialized to 0
+	
 	s->pc = (unsigned) c;
 	s->sp = BKA_RAMTOP;
-	
-	// initialize the status register
-	// TODO How do we know interrupts are disabled?
-	bka_memset(&s->cpsr, 0, sizeof(s->cpsr));
-	bka_memset(&s->CP15_Control, 0, sizeof(s->CP15_Control));
+	//interrupts disabilitati perchè l'ottavo bit è stato impostato a 0
 	s->cpsr |= STATUS_SYS_MODE;
 #endif
 }
