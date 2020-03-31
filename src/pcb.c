@@ -30,12 +30,11 @@ void initPcbs(void) {
 }
 
 void bka_pcb_init(pcb_t *p, pfun_t f) {
-
 	p->priority = 0;
 	p->original_priority = 0;
+	bka_memset(&p->state, 0, sizeof(p->state));
 
 #ifdef BKA_ARCH_UMPS
-    bka_memset(&p->state.entry_hi, 0, 37*sizeof(unsigned int));
     p->state.pc_epc = (unsigned) f;
 	// enable interrupts
     p->state.status |= STATUS_IEc;
@@ -45,13 +44,11 @@ void bka_pcb_init(pcb_t *p, pfun_t f) {
     p->state.reg_sp = BKA_RAMTOP - FRAMESIZE * bka_pcb_to_pid(p);
 #elif defined(BKA_ARCH_UARM)
 	// virtual memory off because the corresponding bit is set to 0
-	bka_memset(&p->state.a1, 0, 22*sizeof(unsigned int));
 	p->state.pc = (unsigned) f;
 	// enable kernel mode
 	p->state.cpsr |= STATUS_SYS_MODE;
 	// enable regular interrupt handling
-	// TODO Is it correct to enable the interrupt handling mode by unsetting
-	//  IRQ and FIQ?
+	// TODO Is it correct to enable the interrupt handling mode by unsetting IRQ and FIQ?
 	// set stack pointer
 	p->state.sp = BKA_RAMTOP - FRAMESIZE * bka_pcb_to_pid(p);
 #endif
