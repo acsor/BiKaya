@@ -28,6 +28,11 @@ typedef void (*nac_t)(void);
  * @param c Callback code to be executed upon reaching this new area.
  */
 void bka_na_init(state_t *s, nac_t c);
+/**
+ * Exits the new area "pointed to" by @c new_area, resuming the process
+ * execution stored at the corresponding old area.
+ */
+void bka_na_exit(unsigned new_area);
 
 
 #endif
