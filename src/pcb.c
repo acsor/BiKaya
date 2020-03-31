@@ -5,6 +5,10 @@
 #include "sys.h"
 #include "pcb.h"
 
+#ifdef BKA_ARCH_UMPS
+#include "umps/cp0.h"
+#endif
+
 
 /**
  * The PCB table, allocating memory for all the available PCBs.
@@ -26,34 +30,31 @@ void initPcbs(void) {
 }
 
 void bka_pcb_init(pcb_t *p, pfun_t f) {
-    INIT_LIST_HEAD(&p->next);
-    p->parent = NULL;
-    INIT_LIST_HEAD(&p->first_child);
-    INIT_LIST_HEAD(&p->siblings);
+	p->priority = 0;
+	p->original_priority = 0;
 
-    p->priority = 0;
-    p->original_priority = 0;
-    p->semkey = NULL;
-
-    #ifdef BKA_ARCH_UMPS
-
-    p->state.pc_epc = f;
-    bka_memset(p->state.status, 0, sizeof(unsigned int));
-    p->state.status |= 1 << 0;    // enable interrupts
-    p->state.status |= 1 << 27;    // enable processor local timer
-    p->state.reg_sp = RAMTOP - FRAMESIZE * bka_pcb_to_pid(p); // set stack pointer
-
-    #elif defined(BKA_ARCH_UARM)
-
-    p->state.pc = f;
-    bka_memset(p->state.cpsr, 0, sizeof(unsigned int));
-    bka_memset(p->state.CP15_Control, 0, sizeof(unsigned int));    // virtual memory off
-    p->state.cpsr |= 0x1F;    // enable kernel mode
-    p->state.cpsr |= 1 << 7;    // enable regular interrupt handling
-    p->state.status |= 1 << 27;    // enable processor local timer
-    p->state.sp = RAMTOP - FRAMESIZE * bka_pcb_to_pid(p);    // set stack pointer
-
-    #endif
+#ifdef BKA_ARCH_UMPS
+	p->state.pc_epc = (unsigned) f;
+    bka_memset(&p->state.status, 0, sizeof(p->state.status));
+	// enable interrupts
+    p->state.status |= STATUS_IEc;
+    // enable processor local timer
+    p->state.status |= STATUS_TE;
+    // set stack pointer
+    p->state.reg_sp = BKA_RAMTOP - FRAMESIZE * bka_pcb_to_pid(p);
+#elif defined(BKA_ARCH_UARM)
+	p->state.pc = (unsigned) f;
+	bka_memset(&p->state.cpsr, 0, sizeof(p->state.cpsr));
+	// virtual memory off
+	bka_memset(&p->state.CP15_Control, 0, sizeof(p->state.CP15_Control));
+	// enable kernel mode
+	p->state.cpsr |= STATUS_SYS_MODE;
+	// enable regular interrupt handling.
+	// TODO Is it correct to enable the interrupt handling mode by unsetting
+	//  IRQ and FIQ?
+	// set stack pointer
+	p->state.sp = BKA_RAMTOP - FRAMESIZE * bka_pcb_to_pid(p);
+#endif
 }
 
 void freePcb(pcb_t *p) {
