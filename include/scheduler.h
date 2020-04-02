@@ -5,9 +5,9 @@
 /**
  * Scheduling Time Units (STU) constants.
  */
-#define BKA_STU_MICRO	(1 / 1000000)
-#define BKA_STU_MILLI	(1 / 1000)
-#define BKA_STU_SEC		1
+#define BKA_STU_MICRO	1
+#define BKA_STU_MILLI	1000
+#define BKA_STU_SEC		1000000
 
 /**
  * Sets the system-wide interval timer.

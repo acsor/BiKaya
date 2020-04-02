@@ -19,11 +19,13 @@ void bka_na_init(state_t *s, nac_t c) {
 
 void bka_na_exit(unsigned new_area) {
 #ifdef BKA_ARCH_UMPS
-	state_t *old_state = (state_t *) (new_area - RRF_FS);
+	unsigned old_area = new_area - RRF_FS;
+	state_t *old_state = (state_t *) old_area;
 
 	old_state->pc_epc += WS;
 #elif defined(BKA_ARCH_UARM)
-	state_t *old_state = (state_t *) (new_area - STATE_T_SIZE);
+	unsigned old_area = new_area - STATE_T_SIZE;
+	state_t *old_state = (state_t *) old_area;
 #endif
 
 	LDST(old_state);

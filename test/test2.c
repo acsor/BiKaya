@@ -39,12 +39,12 @@ int main () {
 
 #ifdef BKA_ARCH_UMPS
 	setSTATUS(getSTATUS() | STATUS_IEc);
-	setSTATUS(getSTATUS() & !STATUS_KUc);
-	setSTATUS(getSTATUS() & !STATUS_VMc);
-	setSTATUS(getSTATUS() | 1 << 9);
+	setSTATUS(getSTATUS() & ~STATUS_KUc);
+	setSTATUS(getSTATUS() & ~STATUS_VMc);
+	setSTATUS(getSTATUS() | 1 << 10);
 #elif defined(BKA_ARCH_UARM)
-	setSTATUS(STATUS_INT_MODE);
-	setSTATUS(STATUS_DISABLE_INT(getSTATUS()));
+	setSTATUS(STATUS_SYS_MODE);
+	setSTATUS(STATUS_ENABLE_INT(getSTATUS()));
 	setCONTROL(CP15_DISABLE_VM(getCONTROL()));
 #endif
 
