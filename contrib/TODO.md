@@ -52,8 +52,8 @@ and a list of author names. An example is
 
 ### `pcb.h`
 1. [x] `void bka_pcb_init(pcb_t *p, pfun_t f)`: Andrea, Daniele, Nicolò
-1. [ ] `int bka_pcb_to_pid(pcb_t const * const p)`: ?
-1. [ ] `pcb_t * bka_pid_to_pcb(unsigned pid)`: ?
+1. [x] `int bka_pcb_to_pid(pcb_t const * const p)`: Oscar
+1. [x] `pcb_t * bka_pid_to_pcb(unsigned pid)`: Oscar
 
 ### `test2.c`
-1. [ ] `pcb_t* pcb_test_factory(unsigned test_no)`: ?
+1. [x] `pcb_t* pcb_test_factory(unsigned test_no)`: Oscar

@@ -17,7 +17,7 @@ void initPcbs();
  * <ul>
  * 		<li>Interrupts are enabled</li>
  * 		<li>Virtual memory is off</li>
- * 		<li>The process local timer is enabled</li>
+ * 		<li>The process local timer (if available) is enabled</li>
  * 		<li>Kernel mode is enabled</li>
  * 		<li>The stack pointer equals <tt>RAMTOP - FRAMESIZE * pid</tt>, where @c
  * 		pid is the Process ID of the given process</li>
@@ -39,14 +39,15 @@ void freePcb(pcb_t *p);
 pcb_t* allocPcb();
 /**
  * @return The PID (Process ID) corresponding to the given process control
- * block, or @c BKA_E_INVARG if @c p is not valid.
+ * block. Undefined behavior might occur if @c p is @c NULL or points to an
+ * invalid memory area.
  */
 int bka_pcb_to_pid(pcb_t const * const p);
 /**
  * @return The PCB (Process Control Block) corresponding to the given process
- * ID, or @c NULL if the @c pid argument is invalid.
+ * ID, or @c NULL if the @c pid argument is out of range.
  */
-pcb_t * bka_pid_to_pcb(unsigned pid);
+pcb_t* bka_pid_to_pcb(unsigned pid);
 
 
 /* PCB queue functions. */

@@ -48,8 +48,11 @@ target_link_libraries(pcb PRIVATE string utils)
 target_link_libraries(string PRIVATE math utils)
 target_link_libraries(utils PRIVATE math)
 
-if (CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
+if (CMAKE_SYSTEM_PROCESSOR STREQUAL mips)
+	target_link_libraries(test2_aux PRIVATE libumps)
+elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
 	target_link_libraries(math PRIVATE libdiv)
+	target_link_libraries(test2_aux PRIVATE libuarm)
 endif()
 
 # CPack configuration -- useful for packaging the project in various formats

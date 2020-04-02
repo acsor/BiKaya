@@ -51,7 +51,15 @@ list_t pcb_queue_factory() {
 }
 
 pcb_t* pcb_test_factory(unsigned test_no) {
-	/* TOOD Implement. */
+	pcb_t *p = allocPcb();
+	pfun_t tests[] = {test1, test2, test3};
+
+	if (p) {
+		bka_pcb_init(p, tests[test_no]);
+
+		return p;
+	}
+
 	return NULL;
 }
 

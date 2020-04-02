@@ -83,13 +83,11 @@ pcb_t* allocPcb(void) {
 }
 
 int bka_pcb_to_pid (pcb_t const * const p) {
-	/* TODO Implement. */
-	return -1;
+	return p - pcb_table;
 }
 
-pcb_t * bka_pid_to_pcb (unsigned pid) {
-	/* TODO Implement. */
-	return NULL;
+pcb_t* bka_pid_to_pcb (unsigned pid) {
+	return (0 <= pid && pid < BKA_MAX_PROC) ? pcb_table + pid: NULL;
 }
 
 
