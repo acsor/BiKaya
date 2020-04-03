@@ -38,5 +38,13 @@ int bka_term_recvs(termreg_t *term, char *dest, unsigned length);
  /* TODO Turn this function into variadic. */
 int bka_print_puts(dtpreg_t *dev, char const *str);
 
+/**
+ *
+ * @param term
+ * @param format d for integer, c for char, s for string
+ * @param ...
+ */
+ /*TODO This is a simple implementation */
+void bka_printf(termreg_t *term,const char* format, ...);
 
 #endif

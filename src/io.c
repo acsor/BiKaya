@@ -176,3 +176,27 @@ static int bka_print_putchar(dtpreg_t *p, char c) {
 
 	return status != PRINT_ST_READY ? BKA_E_GEN: BKA_E_OK;
 }
+
+
+void bka_printf(termreg_t *term, const char* type, ...)
+{
+    va_list args;
+    va_start(args, type);
+
+    while (*type != '\0') {
+        if (*type == 'd') {
+            int i = va_arg(args, int*);
+            char n;
+            bka_itoa(i,&n,10);
+            bka_term_puts_aux(term,&n);
+        } else if (*type == 'c') {
+            char c = va_arg(args, char*);
+            bka_term_puts_aux(term,&c);
+        } else if (*type == 's'){
+            char* s = va_arg(args, char**);
+            bka_term_puts_aux(term,&s);
+        }
+        ++type;
+    }
+    va_end(args);
+}
