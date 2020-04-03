@@ -9,7 +9,6 @@ int main () {
 	dtpreg_t *print0 = (dtpreg_t*) DEV_REG_ADDR(IL_PRINTER, 0);
 
 	*buff = '\0';
-	bka_printf(term0,"dc s",12,'c','lol');
 	bka_term_puts(
 		term0,
 		"Please, enter some text to redirect to the printer 0\n> ", NULL

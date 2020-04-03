@@ -50,9 +50,13 @@ target_link_libraries(
 add_executable(test3 ${BKA_TEST}/test3.c)
 target_link_libraries(test3 callback crtso io libumps pcb scheduler string)
 
+# Add test_fio executable
+add_executable(test_fio ${BKA_TEST}/test_fio.c)
+target_link_libraries(test_fio callback crtso io libumps string utils)
+
 # Add unit_test executable
 add_executable(unit_test ${BKA_TEST}/unit_test.c)
 target_link_libraries(unit_test crtso io libumps string utils)
 
 # To each target listed, apply the umps2-elf2umps final step to it
-apply_elf2umps(test0 test1 test2 test3 unit_test)
+apply_elf2umps(test0 test1 test2 test3 test_fio unit_test)
