@@ -6,7 +6,7 @@
 int main () {
 	termreg_t *term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
 
-	bka_printf(term0, "Hell%c, %c%drld", 'o', 'w', 0);
+	bka_printf(term0, "ds",12, "ciaone");
 	HALT();
 
     return 0;
