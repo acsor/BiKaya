@@ -180,31 +180,37 @@ static int bka_print_putchar(dtpreg_t *p, char c) {
 
 
 void bka_printf(termreg_t *term, const char* format, ...) {
-	va_list args;
-	va_start(args, format);
+	int *i;
+	char *c, n, **s;
 
-	while (*format != '\0') {
-        if (*format == '%') {
-            ++format;
-            if (*format == 'd') {
-                int *i = va_arg(args, int*);
-                char n;
-                bka_itoa((int) i, &n, 10);
-                bka_term_puts_aux(term, &n);
-            } else if (*format == 'c') {
-                char *c = va_arg(args, char*);
-                bka_term_putchar(term, *c);
-            } else if (*format == 's') {
-                char **s = va_arg(args, char**);
-                bka_term_puts_aux(term, (const char *) s);
-            }
-        }else if(*format == ' '){
-            bka_term_putchar(term,' ');
-        }else{
-            bka_term_putchar(term,*format);
-        }
-        ++format;
+	va_list args;
+
+	for (va_start(args, format); *format != '\0'; format++) {
+		if (*format == '%') {
+			format++;
+
+			if (*format == '\0') {
+				break;
+			} else if (*format == 'd') {
+				i = va_arg(args, int*);
+
+				bka_itoa((int) i, &n, 10);
+				bka_term_puts_aux(term, &n);
+			} else if (*format == 'c') {
+				c = va_arg(args, char*);
+
+				bka_term_putchar(term, *c);
+			} else if (*format == 's') {
+				s = va_arg(args, char**);
+
+				bka_term_puts_aux(term, (const char *) s);
+			}
+		} else if (*format == ' ') {
+			bka_term_putchar(term, ' ');
+		} else {
+			bka_term_putchar(term, *format);
+		}
 	}
-	bka_term_putchar(term,'\n');
+
 	va_end(args);
 }
