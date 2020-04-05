@@ -39,12 +39,14 @@ int bka_term_recvs(termreg_t *term, char *dest, unsigned length);
 int bka_print_puts(dtpreg_t *dev, char const *str);
 
 /**
- *
+ *If it's used %c, only the first letter will be printed(if a string appear).
+ * In the format string it can be inserted a space, a string or a format %c,%d,%s.
+ * At the end of the function it will be inserted a \n
  * @param term
  * @param format d for integer, c for char, s for string
  * @param ...
  */
- /*TODO This is a simple implementation */
+
 void bka_printf(termreg_t *term,const char* format, ...);
 
 #endif

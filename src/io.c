@@ -193,13 +193,18 @@ void bka_printf(termreg_t *term, const char* format, ...) {
                 bka_term_puts_aux(term, &n);
             } else if (*format == 'c') {
                 char *c = va_arg(args, char*);
-                bka_term_puts_aux(term, (const char *) c);
+                bka_term_putchar(term, *c);
             } else if (*format == 's') {
                 char **s = va_arg(args, char**);
                 bka_term_puts_aux(term, (const char *) s);
             }
+        }else if(*format == ' '){
+            bka_term_putchar(term,' ');
+        }else{
+            bka_term_putchar(term,*format);
         }
         ++format;
 	}
+	bka_term_putchar(term,'\n');
 	va_end(args);
 }
