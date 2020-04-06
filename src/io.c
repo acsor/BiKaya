@@ -120,6 +120,22 @@ int bka_term_recvs(termreg_t *term, char *dest, unsigned length) {
 	return BKA_E_OK;
 }
 
+int bka_term_recvs_aux(termreg_t *term, char *dest) {
+    int in = -1;
+
+    while ( in != '\n') {
+        if ((in = bka_term_recvc(term)) == BKA_E_GEN)
+            return BKA_E_GEN;
+
+        *dest = in;
+        dest++;
+    }
+
+    *dest = '\0';
+
+    return BKA_E_OK;
+}
+
 
 int bka_print_puts(dtpreg_t *dev, char const *str) {
 	int written;
@@ -178,7 +194,6 @@ static int bka_print_putchar(dtpreg_t *p, char c) {
 	return status != PRINT_ST_READY ? BKA_E_GEN: BKA_E_OK;
 }
 
-
 void bka_printf(termreg_t *term, const char* format, ...) {
 	int *i;
 	char *c, n, **s;
@@ -213,4 +228,42 @@ void bka_printf(termreg_t *term, const char* format, ...) {
 	}
 
 	va_end(args);
+}
+
+
+void bka_scanf(termreg_t *term,dtpreg_t *dev, const char* format, ...) {
+    int i ;
+    char c[2], s[30] ,tmp[10]; //tmp per salvarsi le cifre del numero in input(perchè bka_atoi legge cifra per cifra)
+    va_list args;
+
+    for (va_start(args, format); *format != '\0' ; format++) {
+        if (*format == '%') {
+            format++;
+
+            if (*format == '\0') {
+                break;
+            } else if (*format == 'd') {
+                bka_term_recvs_aux(term, tmp);
+                bka_print_puts(dev, tmp);
+                i = bka_atoi10(tmp);
+                *va_arg(args,int*) = i;
+                break;
+            } else if (*format == 'c') {
+                bka_term_recvs_aux(term, &c[0]);
+                bka_print_putchar(dev, c[0]);
+                *va_arg(args, char*) = c[0];
+                c[1]='\0';
+                break;
+            } else if (*format == 's') {
+                bka_term_recvs_aux(term, s);
+                bka_print_puts(dev, s);
+                bka_strcpy(va_arg(args,char*), s);
+                break;
+            }
+        } else if (*format == ' ') {
+            bka_print_putchar(dev, ' ');
+        }
+    }
+
+    va_end(args);
 }

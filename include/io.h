@@ -46,7 +46,15 @@ int bka_print_puts(dtpreg_t *dev, char const *str);
  * @param format d for integer, c for char, s for string
  * @param ...
  */
-
 void bka_printf(termreg_t *term,const char* format, ...);
+
+/**
+ *
+ * In the format string it can be inserted a space, a string or a format %c,%d,%s.
+ *  @param term
+ * @param format d for integer, c for char, s for string
+ * @param ...
+ */
+void bka_scanf(termreg_t *term,dtpreg_t *dev,const char* format, ...);
 
 #endif
