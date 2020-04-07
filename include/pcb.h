@@ -11,24 +11,6 @@
  */
 void initPcbs();
 /**
- * Initializes the given @pcb_t process descriptor for running. Specifically,
- * the process status will be set in such a way that
- *
- * <ul>
- * 		<li>Interrupts are enabled</li>
- * 		<li>Virtual memory is off</li>
- * 		<li>The process local timer (if available) is enabled</li>
- * 		<li>Kernel mode is enabled</li>
- * 		<li>The stack pointer equals <tt>RAMTOP - FRAMESIZE * pid</tt>, where @c
- * 		pid is the Process ID of the given process</li>
- * 		<li>Priority is set to @c 0</li>
- * 		<li>The process program counter points to @c f address.</li>
- * </ul>
- * @param p @c pcb_t instance to be initialized.
- * @param f Process code @c p will execute.
- */
-void bka_pcb_init(pcb_t *p, pfun_t f);
-/**
  * @param p Pointer to a PCB to be inserted into the free PCB list.
  */
 void freePcb(pcb_t *p);
@@ -37,6 +19,28 @@ void freePcb(pcb_t *p);
  * otherwise. The returned element is extracted from the free PCB list.
  */
 pcb_t* allocPcb();
+
+/* PCB management functions. */
+/**
+ * Initializes the given @pcb_t process descriptor for running. Specifically,
+ * the process status will be set in such a way that
+ *
+ * <ul>
+ * 		<li>Interrupts are enabled</li>
+ * 		<li>Virtual memory is off</li>
+ * 		<li>The interval timer is enabled, although not started</li>
+ * 		<li>Kernel mode is enabled</li>
+ * 		<li>The stack pointer equals <tt>RAMTOP - FRAMESIZE * pid</tt>, where @c
+ * 		pid is the Process ID of the given process</li>
+ * 		<li>Priority is set to @c 0</li>
+ * 		<li>The process program counter points to @c f address.</li>
+ * </ul>
+ * @param p @c pcb_t instance to be initialized.
+ * @param f Process code @c p will execute.
+ * @param original_priority The priority value to be assigned to the @c priority
+ * and @c original_priority PCB fields.
+ */
+void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority);
 /**
  * @return The PID (Process ID) corresponding to the given process control
  * block. Undefined behavior might occur if @c p is @c NULL or points to an
@@ -48,7 +52,6 @@ int bka_pcb_to_pid(pcb_t const * const p);
  * ID, or @c NULL if the @c pid argument is out of range.
  */
 pcb_t* bka_pid_to_pcb(unsigned pid);
-
 
 /* PCB queue functions. */
 /**
@@ -89,7 +92,6 @@ pcb_t* removeProcQ(struct list_head *head);
  * otherwise, i.e. @c p was not within @c head.
  */
 pcb_t* outProcQ(struct list_head *head, pcb_t *p);
-
 
 /* Tree view functions */
 /**

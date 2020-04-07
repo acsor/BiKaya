@@ -29,35 +29,10 @@ void initPcbs(void) {
 		list_add_tail(&pcb_table[i].next, &free_pcb_list);
 }
 
-void bka_pcb_init(pcb_t *p, pfun_t f) {
-	p->priority = 0;
-	p->original_priority = 0;
-	bka_memset(&p->state, 0, sizeof(p->state));
-
-#ifdef BKA_ARCH_UMPS
-    p->state.pc_epc = (unsigned) f;
-	// enable interrupts
-    p->state.status |= STATUS_IEc;
-    // enable processor local timer
-    p->state.status |= STATUS_TE;
-    // set stack pointer
-    p->state.reg_sp = BKA_RAMTOP - FRAMESIZE * bka_pcb_to_pid(p);
-#elif defined(BKA_ARCH_UARM)
-	// virtual memory off because the corresponding bit is set to 0
-	p->state.pc = (unsigned) f;
-	// enable kernel mode
-	p->state.cpsr |= STATUS_SYS_MODE;
-	// enable regular interrupt handling
-	// TODO Is it correct to enable the interrupt handling mode by unsetting IRQ and FIQ?
-	// set stack pointer
-	p->state.sp = BKA_RAMTOP - FRAMESIZE * bka_pcb_to_pid(p);
-#endif
-}
-
 void freePcb(pcb_t *p) {
 	list_add_tail(&p->next, &free_pcb_list);
 }
-	
+
 pcb_t* allocPcb(void) {
 	pcb_t *out;
 
@@ -80,6 +55,31 @@ pcb_t* allocPcb(void) {
 	out->semkey = NULL;
 
 	return out;
+}
+
+
+void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
+	p->priority = p->original_priority = original_priority;
+	bka_memset(&p->state, 0, sizeof(p->state));
+
+#ifdef BKA_ARCH_UMPS
+	p->state.pc_epc = (unsigned) f;
+	// Enable interrupts
+	p->state.status |= STATUS_IEp | STATUS_IEc;
+	// Enable interval timer
+	p->state.status |= STATUS_IM(2);
+	// Set stack pointer
+	p->state.reg_sp = BKA_RAMTOP - FRAMESIZE * bka_pcb_to_pid(p);
+#elif defined(BKA_ARCH_UARM)
+	// Virtual memory off because the corresponding bit is set to 0
+	p->state.pc = (unsigned) f;
+	// Enable kernel mode
+	p->state.cpsr |= STATUS_SYS_MODE;
+	// Enable regular interrupt handling
+	// TODO Is it correct to enable the interrupt handling mode by unsetting IRQ and FIQ?
+	// set stack pointer
+	p->state.sp = BKA_RAMTOP - FRAMESIZE * bka_pcb_to_pid(p);
+#endif
 }
 
 int bka_pcb_to_pid (pcb_t const * const p) {
