@@ -7,8 +7,9 @@
 #cmakedefine BKA_ARCH_UARM
 
 #ifdef BKA_ARCH_UMPS
-#include "umps/libumps.h"
 #include "umps/arch.h"
+#include "umps/cp0.h"
+#include "umps/libumps.h"
 #include "umps/types.h"
 #elif defined(BKA_ARCH_UARM)
 #include "uarm/libuarm.h"

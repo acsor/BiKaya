@@ -24,9 +24,8 @@ typedef struct pcb_t {
     struct list_head first_child, siblings;
 
     state_t state;
-    int priority;
-    /* initial process priority */
-    int original_priority;
+    int priority, original_priority;
+
     /* Key of the semaphore which the process is eventually blocked on */
     int *semkey;
 } pcb_t;
