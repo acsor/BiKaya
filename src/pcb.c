@@ -64,7 +64,7 @@ void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
 	// Enable interval timer
 	p->state.status |= STATUS_IM(2);
 	// Set stack pointer
-	p->state.reg_sp = BKA_RAMTOP - FRAMESIZE * bka_pcb_to_pid(p);
+	p->state.reg_sp = BKA_RAMTOP - FRAMESIZE * (bka_pcb_to_pid(p) + 1);
 #elif defined(BKA_ARCH_UARM)
 	// Virtual memory off because the corresponding bit is set to 0
 	p->state.pc = (unsigned) f;
@@ -73,7 +73,7 @@ void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
 	// Enable regular interrupt handling
 	// TODO Is it correct to enable the interrupt handling mode by unsetting IRQ and FIQ?
 	// set stack pointer
-	p->state.sp = BKA_RAMTOP - FRAMESIZE * bka_pcb_to_pid(p);
+	p->state.sp = BKA_RAMTOP - FRAMESIZE * (bka_pcb_to_pid(p) + 1);
 #endif
 }
 

@@ -28,8 +28,9 @@ void bka_pcb_free(pcb_t *p);
  * 		<li>Virtual memory is off</li>
  * 		<li>The interval timer is enabled, although not started</li>
  * 		<li>Kernel mode is enabled</li>
- * 		<li>The stack pointer equals <tt>RAMTOP - FRAMESIZE * pid</tt>, where @c
- * 		pid is the Process ID of the given process</li>
+ * 		<li>The stack pointer equals <tt>RAMTOP - FRAMESIZE * (pid + 1)</tt>,
+ * 		where @c pid is the Process ID of the given process (taking values
+ * 		in the <tt>0..BKA_MAXPROC - 1</tt> range)</li>
  * 		<li>Priority is set to @c 0</li>
  * 		<li>The process program counter points to @c f address.</li>
  * </ul>
