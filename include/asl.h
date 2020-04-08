@@ -1,7 +1,21 @@
 #ifndef BKA_ASL_H
 #define BKA_ASL_H
 
-#include "types.h"
+#include "list.h"
+#include "pcb.h"
+
+
+/**
+ * Semaphore Descriptor (SEMD) data structure.
+ */
+typedef struct semd_t {
+		struct list_head next;
+		/* Queue of PCBs blocked on the semaphore */
+		struct list_head proc_queue;
+
+		/* Semaphore key */
+		int *key;
+} semd_t;
 
 
 /**

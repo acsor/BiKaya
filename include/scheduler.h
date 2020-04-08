@@ -2,6 +2,7 @@
 #define BKA_SCHEDULER_H
 
 #include "list.h"
+#include "pcb.h"
 
 /**
  * Scheduling Time Units (STU) constants.

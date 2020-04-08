@@ -217,14 +217,18 @@ int main() {
 
     /* Removing an element from ProcQ */
     q = bka_pcb_queue_rm(&qa, proc);
-    if ((q == NULL) || (q != proc))
-        adderrbuf("ERROR: bka_pcb_queue_rm(&qa, proc) failed to remove the entry   ");
+
+    if ((q == NULL) || (q != proc)) {
+		adderrbuf("ERROR: bka_pcb_queue_rm(&qa, proc) failed to remove the entry   ");
+	}
+
 	bka_pcb_free(q);
 
     /* Removing the first element from ProcQ */
     q = bka_pcb_queue_pop(&qa);
-    if (q == NULL || q != maxproc)
-        adderrbuf("ERROR: bka_pcb_queue_pop(&qa, midproc) failed to remove the elements in the right order   ");
+    if (q == NULL || q != maxproc) {
+		adderrbuf("ERROR: bka_pcb_queue_pop(&qa, midproc) failed to remove the elements in the right order   ");
+	}
 	bka_pcb_free(q);
 
     /* Removing other 7 elements  */
@@ -237,8 +241,9 @@ int main() {
 
     // Removing the last element
     q = bka_pcb_queue_pop(&qa);
-    if (q != minproc)
-        adderrbuf("ERROR: bka_pcb_queue_pop(): failed on last entry   ");
+    if (q != minproc) {
+		adderrbuf("ERROR: bka_pcb_queue_pop(): failed on last entry   ");
+	}
 	bka_pcb_free(q);
 
     if (bka_pcb_queue_pop(&qa) != NULL)

@@ -1,7 +1,34 @@
 #ifndef PCB_H
 #define PCB_H
 
-#include "types.h"
+#include "sys.h"
+#include "list.h"
+
+
+/**
+ * A process function type, to be associated as the code executed by a given
+ * process.
+ */
+typedef void (*pfun_t)(void);
+typedef unsigned int memaddr_t;
+
+/**
+ * Process Control Block (PCB) data structure.
+ */
+typedef struct pcb_t {
+		/* Process queue fields */
+		struct list_head next;
+
+		/* Process tree fields */
+		struct pcb_t *parent;
+		struct list_head first_child, siblings;
+
+		state_t state;
+		int priority, original_priority;
+
+		/* Key of the semaphore which the process is eventually blocked on */
+		int *semkey;
+} pcb_t;
 
 
 /* PCB management functions. */

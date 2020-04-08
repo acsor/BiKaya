@@ -1,8 +1,6 @@
-#include "pcb.h"
 #include "scheduler.h"
 #include "string.h"
 #include "sys.h"
-#include "types.h"
 
 
 list_t	bka_sched_ready;
