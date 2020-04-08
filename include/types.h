@@ -3,6 +3,8 @@
 
 #include "sys.h"
 #include "list.h"
+/* TODO Collapse this header file into pcb.h and asl.h (it only contains type
+ * delcarations). */
 
 
 /**

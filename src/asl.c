@@ -86,9 +86,9 @@ pcb_t* removeBlocked(int *key) {
 	pcb_t *p = NULL;
 
 	if (s)
-		p = removeProcQ(&s->proc_queue);
+		p = bka_pcb_queue_pop(&s->proc_queue);
 
-	if (emptyProcQ(&s->proc_queue))
+	if (bka_pcb_queue_isempty(&s->proc_queue))
 		bka_sem_free(s);
 
 	return p;
@@ -117,7 +117,7 @@ pcb_t* outBlocked(pcb_t *p) {
 pcb_t* headBlocked(int *key) {
 	semd_t *s = getSemd(key);
 
-	return s != NULL ? headProcQ(&s->proc_queue): NULL;
+	return s != NULL ? bka_pcb_queue_head(&s->proc_queue) : NULL;
 }
 
 void outChildBlocked(pcb_t *p) {

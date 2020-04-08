@@ -154,38 +154,38 @@ void adderrbuf(char *strp) {
 int main() {
     int i;
 
-    initPcbs();
+	bka_pcbs_init();
     addokbuf("Initialized Process Control Blocks   \n");
 
-    /* Check allocPcb */
+    /* Check bka_pcb_alloc */
     for (i = 0; i < MAXPROC; i++) {
-        if ((procp[i] = allocPcb()) == NULL)
-            adderrbuf("allocPcb(): unexpected NULL   ");
+        if ((procp[i] = bka_pcb_alloc()) == NULL)
+            adderrbuf("bka_pcb_alloc(): unexpected NULL   ");
     }
 
-    if (allocPcb() != NULL) {
-        adderrbuf(" ERROR: allocPcb(): allocated more than MAXPROC entries   ");
+    if (bka_pcb_alloc() != NULL) {
+        adderrbuf(" ERROR: bka_pcb_alloc(): allocated more than MAXPROC entries   ");
     }
-    addokbuf(" allocPcb test OK   \n");
+    addokbuf(" bka_pcb_alloc test OK   \n");
 
 
     /* Return the last 10 entries back to free list */
     for (i = 10; i < MAXPROC; i++)
-        freePcb(procp[i]);
+		bka_pcb_free(procp[i]);
 
     addokbuf(" Added 10 entries to the free PCB list   \n");
 
     /* Create a 10-element process queue */
     INIT_LIST_HEAD(&qa);
 
-    if (!emptyProcQ(&qa))
-        adderrbuf("ERROR: emptyProcQ(qa): unexpected FALSE   ");
+    if (!bka_pcb_queue_isempty(&qa))
+        adderrbuf("ERROR: bka_pcb_queue_isempty(qa): unexpected FALSE   ");
 
-    addokbuf("Testing insertProcQ ...   \n");
+    addokbuf("Testing bka_pcb_queue_ins ...   \n");
 
     for (i = 0; i < 10; i++) {
-        if ((q = allocPcb()) == NULL)
-            adderrbuf("ERROR: allocPcb(): unexpected NULL while insert   ");
+        if ((q = bka_pcb_alloc()) == NULL)
+            adderrbuf("ERROR: bka_pcb_alloc(): unexpected NULL while insert   ");
         switch (i) {
             case 3:
                 q->priority = DEFAULT_PCB_PRIORITY;
@@ -203,124 +203,124 @@ int main() {
                 q->priority = DEFAULT_PCB_PRIORITY;
                 break;
         }
-        insertProcQ(&qa, q);
+		bka_pcb_queue_ins(&qa, q);
     }
 
-    addokbuf("Test insertProcQ: OK. Inserted 10 elements \n");
+    addokbuf("Test bka_pcb_queue_ins: OK. Inserted 10 elements \n");
 
-    if (emptyProcQ(&qa))
-        adderrbuf("ERROR: emptyProcQ(qa): unexpected TRUE");
+    if (bka_pcb_queue_isempty(&qa))
+        adderrbuf("ERROR: bka_pcb_queue_isempty(qa): unexpected TRUE");
 
-    /* Check outProcQ and headProcQ */
-    if (headProcQ(&qa) != maxproc)
-        adderrbuf("ERROR: headProcQ(qa) failed   ");
+    /* Check bka_pcb_queue_rm and bka_pcb_queue_head */
+    if (bka_pcb_queue_head(&qa) != maxproc)
+        adderrbuf("ERROR: bka_pcb_queue_head(qa) failed   ");
 
     /* Removing an element from ProcQ */
-    q = outProcQ(&qa, proc);
+    q = bka_pcb_queue_rm(&qa, proc);
     if ((q == NULL) || (q != proc))
-        adderrbuf("ERROR: outProcQ(&qa, proc) failed to remove the entry   ");
-    freePcb(q);
+        adderrbuf("ERROR: bka_pcb_queue_rm(&qa, proc) failed to remove the entry   ");
+	bka_pcb_free(q);
 
     /* Removing the first element from ProcQ */
-    q = removeProcQ(&qa);
+    q = bka_pcb_queue_pop(&qa);
     if (q == NULL || q != maxproc)
-        adderrbuf("ERROR: removeProcQ(&qa, midproc) failed to remove the elements in the right order   ");
-    freePcb(q);
+        adderrbuf("ERROR: bka_pcb_queue_pop(&qa, midproc) failed to remove the elements in the right order   ");
+	bka_pcb_free(q);
 
     /* Removing other 7 elements  */
-    addokbuf(" Testing removeProcQ ...   \n");
+    addokbuf(" Testing bka_pcb_queue_pop ...   \n");
     for (i = 0; i < 7; i++) {
-        if ((q = removeProcQ(&qa)) == NULL)
-            adderrbuf("removeProcQ(&qa): unexpected NULL   ");
-        freePcb(q);
+        if ((q = bka_pcb_queue_pop(&qa)) == NULL)
+            adderrbuf("bka_pcb_queue_pop(&qa): unexpected NULL   ");
+		bka_pcb_free(q);
     }
 
     // Removing the last element
-    q = removeProcQ(&qa);
+    q = bka_pcb_queue_pop(&qa);
     if (q != minproc)
-        adderrbuf("ERROR: removeProcQ(): failed on last entry   ");
-    freePcb(q);
+        adderrbuf("ERROR: bka_pcb_queue_pop(): failed on last entry   ");
+	bka_pcb_free(q);
 
-    if (removeProcQ(&qa) != NULL)
-        adderrbuf("ERROR: removeProcQ(&qa): removes too many entries   ");
+    if (bka_pcb_queue_pop(&qa) != NULL)
+        adderrbuf("ERROR: bka_pcb_queue_pop(&qa): removes too many entries   ");
 
-    if (!emptyProcQ(&qa))
-        adderrbuf("ERROR: emptyProcQ(qa): unexpected FALSE   ");
+    if (!bka_pcb_queue_isempty(&qa))
+        adderrbuf("ERROR: bka_pcb_queue_isempty(qa): unexpected FALSE   ");
 
-    addokbuf(" Test insertProcQ(), removeProcQ() and emptyProcQ(): OK   \n");
+    addokbuf(" Test bka_pcb_queue_ins(), bka_pcb_queue_pop() and bka_pcb_queue_isempty(): OK   \n");
     addokbuf(" Test process queues module: OK      \n");
 
     addokbuf(" Testing process trees...\n");
 
-    if (!emptyChild(procp[2]))
-        adderrbuf("ERROR: emptyChild: unexpected FALSE   ");
+    if (!bka_pcb_tree_isempty(procp[2]))
+        adderrbuf("ERROR: bka_pcb_tree_isempty: unexpected FALSE   ");
 
     /* make procp[1],procp[2],procp[3], procp[7] children of procp[0] */
     addokbuf("Inserting...   \n");
-    insertChild(procp[0], procp[1]);
-    insertChild(procp[0], procp[2]);
-    insertChild(procp[0], procp[3]);
-    insertChild(procp[0], procp[7]);
+    bka_pcb_tree_push(procp[0], procp[1]);
+    bka_pcb_tree_push(procp[0], procp[2]);
+    bka_pcb_tree_push(procp[0], procp[3]);
+    bka_pcb_tree_push(procp[0], procp[7]);
     addokbuf("Inserted 2 children of pcb0  \n");
 
     /* make procp[8],procp[9] children of procp[7] */
-    insertChild(procp[7], procp[8]);
-    insertChild(procp[7], procp[9]);
+    bka_pcb_tree_push(procp[7], procp[8]);
+    bka_pcb_tree_push(procp[7], procp[9]);
     addokbuf("Inserted 2 children of pcb7  \n");
 
-    if (emptyChild(procp[0]))
-        adderrbuf("ERROR: emptyChild(procp[0]): unexpected TRUE   ");
+    if (bka_pcb_tree_isempty(procp[0]))
+        adderrbuf("ERROR: bka_pcb_tree_isempty(procp[0]): unexpected TRUE   ");
 
-    if (emptyChild(procp[7]))
-        adderrbuf("ERROR: emptyChild(procp[0]): unexpected TRUE   ");
+    if (bka_pcb_tree_isempty(procp[7]))
+        adderrbuf("ERROR: bka_pcb_tree_isempty(procp[0]): unexpected TRUE   ");
 
-    /* Check outChild */
-    q = outChild(procp[1]);
+    /* Check bka_pcb_tree_parentrm */
+    q = bka_pcb_tree_parentrm(procp[1]);
     if (q == NULL || q != procp[1])
-        adderrbuf("ERROR: outChild(procp[1]) failed ");
+        adderrbuf("ERROR: bka_pcb_tree_parentrm(procp[1]) failed ");
 
-    q = outChild(procp[8]);
+    q = bka_pcb_tree_parentrm(procp[8]);
     if (q == NULL || q != procp[8])
-        adderrbuf("ERROR: outChild(procp[8]) failed ");
+        adderrbuf("ERROR: bka_pcb_tree_parentrm(procp[8]) failed ");
 
-    /* Check removeChild */
-    q = removeChild(procp[0]);
+    /* Check bka_pcb_tree_pop */
+    q = bka_pcb_tree_pop(procp[0]);
     if (q == NULL || q != procp[2])
-        adderrbuf("ERROR: removeChild(procp[0]) failed ");
+        adderrbuf("ERROR: bka_pcb_tree_pop(procp[0]) failed ");
 
-    q = removeChild(procp[7]);
+    q = bka_pcb_tree_pop(procp[7]);
     if (q == NULL || q != procp[9])
-        adderrbuf("ERROR: removeChild(procp[7]) failed ");
+        adderrbuf("ERROR: bka_pcb_tree_pop(procp[7]) failed ");
 
-    q = removeChild(procp[0]);
+    q = bka_pcb_tree_pop(procp[0]);
     if (q == NULL || q != procp[3])
-        adderrbuf("ERROR: removeChild(procp[0]) failed ");
+        adderrbuf("ERROR: bka_pcb_tree_pop(procp[0]) failed ");
 
-    q = removeChild(procp[0]);
+    q = bka_pcb_tree_pop(procp[0]);
     if (q == NULL || q != procp[7])
-        adderrbuf("ERROR: removeChild(procp[0]) failed ");
+        adderrbuf("ERROR: bka_pcb_tree_pop(procp[0]) failed ");
 
 
-    if (removeChild(procp[0]) != NULL)
-        adderrbuf("ERROR: removeChild(): removes too many children   ");
+    if (bka_pcb_tree_pop(procp[0]) != NULL)
+        adderrbuf("ERROR: bka_pcb_tree_pop(): removes too many children   ");
 
-    if (!emptyChild(procp[0]))
-        adderrbuf("ERROR: emptyChild(procp[0]): unexpected FALSE   ");
+    if (!bka_pcb_tree_isempty(procp[0]))
+        adderrbuf("ERROR: bka_pcb_tree_isempty(procp[0]): unexpected FALSE   ");
 
-    addokbuf("Test: insertChild(), removeChild() and emptyChild() OK   \n");
+    addokbuf("Test: bka_pcb_tree_push(), bka_pcb_tree_pop() and bka_pcb_tree_isempty() OK   \n");
     addokbuf("Testing process tree module OK      \n");
 
 
-    freePcb(procp[0]);
-    freePcb(procp[1]);
-    freePcb(procp[2]);
-    freePcb(procp[3]);
-    freePcb(procp[4]);
-    freePcb(procp[5]);
-    freePcb(procp[6]);
-    freePcb(procp[7]);
-    freePcb(procp[8]);
-    freePcb(procp[9]);
+	bka_pcb_free(procp[0]);
+	bka_pcb_free(procp[1]);
+	bka_pcb_free(procp[2]);
+	bka_pcb_free(procp[3]);
+	bka_pcb_free(procp[4]);
+	bka_pcb_free(procp[5]);
+	bka_pcb_free(procp[6]);
+	bka_pcb_free(procp[7]);
+	bka_pcb_free(procp[8]);
+	bka_pcb_free(procp[9]);
 
 
     /* check ASL */
@@ -330,14 +330,14 @@ int main() {
     /* check removeBlocked and insertBlocked */
     addokbuf(" Test insertBlocked(): test #1 started  \n");
     for (i = 10; i < MAXPROC; i++) {
-        procp[i] = allocPcb();
+        procp[i] = bka_pcb_alloc();
         if (insertBlocked(&sem[i], procp[i]))
             adderrbuf("ERROR: insertBlocked() test#1: unexpected TRUE   ");
     }
 
     addokbuf("Test insertBlocked(): test #2 started  \n");
     for (i = 0; i < 10; i++) {
-        procp[i] = allocPcb();
+        procp[i] = bka_pcb_alloc();
         if (insertBlocked(&sem[i], procp[i]))
             adderrbuf("ERROR:insertBlocked() test #2: unexpected TRUE   ");
     }
@@ -376,10 +376,10 @@ int main() {
         adderrbuf("ERROR: outBlocked(1): couldn't remove from valid queue   ");
 
     /* Creating a 2-layer tree */
-    insertChild(procp[0], procp[1]);
-    insertChild(procp[0], procp[2]);
-    insertChild(procp[0], procp[3]);
-    insertChild(procp[3], procp[4]);
+    bka_pcb_tree_push(procp[0], procp[1]);
+    bka_pcb_tree_push(procp[0], procp[2]);
+    bka_pcb_tree_push(procp[0], procp[3]);
+    bka_pcb_tree_push(procp[3], procp[4]);
 
     /* Testing outChildBlocked */
     outChildBlocked(procp[0]);
