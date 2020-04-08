@@ -106,6 +106,8 @@ void test1() {
 
     termprint("Good job from test1\n");
     test1_baton[STEPS] = 1;
+    /* Once phase 1.5 is over, implement SYS3 with bka_sys_kill instead,
+     * feeding the pid of the process to kill here. */
     SYSCALL(SYS3, 0, 0, 0);
 }
 
