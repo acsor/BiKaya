@@ -1,6 +1,3 @@
-#ifndef BKA_PCB_H
-#define BKA_PCB_H
-
 #include "pcb.h"
 #include "string.h"
 #include "sys.h"
@@ -13,7 +10,7 @@ static pcb_t pcb_table[BKA_MAX_PROC];
 /**
  * The free PCB list.
  */
-static struct list_head free_pcb_list;
+static list_t free_pcb_list;
 
 
 void bka_pcbs_init(void) {
@@ -86,16 +83,16 @@ pcb_t* bka_pid_to_pcb (unsigned pid) {
 }
 
 
-void bka_pcb_queue_init(struct list_head *head) {
+void bka_pcb_queue_init(list_t *head) {
 	INIT_LIST_HEAD(head);
 }
 
-int bka_pcb_queue_isempty(struct list_head *head) {
+int bka_pcb_queue_isempty(list_t *head) {
 	return head->next == head && head->prev == head;
 }
 
-void bka_pcb_queue_ins(struct list_head *head, pcb_t *p) {
-	struct list_head *curr_list = head->next;
+void bka_pcb_queue_ins(list_t *head, pcb_t *p) {
+	list_t *curr_list = head->next;
 	pcb_t *curr_proc = container_of(curr_list, pcb_t, next);
 
 	// Iterate until we either end the list or find a matching process with
@@ -108,11 +105,11 @@ void bka_pcb_queue_ins(struct list_head *head, pcb_t *p) {
 	__list_add(&p->next, curr_list->prev, curr_list);
 }
 
-pcb_t* bka_pcb_queue_head(struct list_head *head) {
+pcb_t* bka_pcb_queue_head(list_t *head) {
 	return list_empty(head) ? NULL: container_of(head->next, pcb_t, next);
 }
 
-pcb_t* bka_pcb_queue_pop(struct list_head *head) {
+pcb_t* bka_pcb_queue_pop(list_t *head) {
 	pcb_t *p = NULL;
 
 	if (!list_empty(head)) {
@@ -123,8 +120,8 @@ pcb_t* bka_pcb_queue_pop(struct list_head *head) {
 	return p;
 }
 
-pcb_t* bka_pcb_queue_rm(struct list_head *head, pcb_t *p) {
-	struct list_head *curr_list = head;
+pcb_t* bka_pcb_queue_rm(list_t *head, pcb_t *p) {
+	list_t *curr_list = head;
 	pcb_t *curr_proc;
 
 	do {
@@ -153,7 +150,7 @@ void bka_pcb_tree_push(pcb_t *parent, pcb_t *child) {
 }
 
 pcb_t* bka_pcb_tree_pop(pcb_t *p) {
-	struct list_head *to_remove;
+	list_t *to_remove;
 
 	if (list_empty(&p->first_child)) {
 		return NULL;
@@ -166,7 +163,7 @@ pcb_t* bka_pcb_tree_pop(pcb_t *p) {
 }
 
 pcb_t* bka_pcb_tree_parentrm(pcb_t *p) {
-	struct list_head *to_remove = NULL;
+	list_t *to_remove = NULL;
 	pcb_t *curr_proc = NULL;
 
 	if (p->parent != NULL) {
@@ -183,6 +180,3 @@ pcb_t* bka_pcb_tree_parentrm(pcb_t *p) {
 
 	return NULL;
 }
-
-
-#endif

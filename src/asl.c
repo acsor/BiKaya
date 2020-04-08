@@ -10,13 +10,13 @@ static semd_t semd_table[BKA_MAX_PROC];
 /**
  * Head of the Active Semaphore List (ASL).
  */
-static struct list_head asl_head;
+static list_t asl_head;
 /**
  * Head of the Free Semaphore List (FSL).
  * Note: this name does not appear in public slides, but belongs only to this
  * project.
  */
-static struct list_head fsl_head;
+static list_t fsl_head;
 
 
 void initASL() {

@@ -9,9 +9,9 @@
  * Semaphore Descriptor (SEMD) data structure.
  */
 typedef struct semd_t {
-		struct list_head next;
+		list_t next;
 		/* Queue of PCBs blocked on the semaphore */
-		struct list_head proc_queue;
+		list_t proc_queue;
 
 		/* Semaphore key */
 		int *key;

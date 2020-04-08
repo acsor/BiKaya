@@ -1,5 +1,5 @@
-#ifndef PCB_H
-#define PCB_H
+#ifndef BKA_PCB_H
+#define BKA_PCB_H
 
 #include "sys.h"
 #include "list.h"
@@ -17,11 +17,11 @@ typedef unsigned int memaddr_t;
  */
 typedef struct pcb_t {
 		/* Process queue fields */
-		struct list_head next;
+		list_t next;
 
 		/* Process tree fields */
 		struct pcb_t *parent;
-		struct list_head first_child, siblings;
+		list_t first_child, siblings;
 
 		state_t state;
 		int priority, original_priority;
@@ -85,11 +85,11 @@ pcb_t* bka_pid_to_pcb(unsigned pid);
  * Initialize the PCB list pointed to by @c head.
  * @param head Sentinel element of the list
  */
-void bka_pcb_queue_init(struct list_head *head);
+void bka_pcb_queue_init(list_t *head);
 /**
  * @return @c true if @c head refers to an empty list, @c false otherwise.
  */
-int bka_pcb_queue_isempty(struct list_head *head);
+int bka_pcb_queue_isempty(list_t *head);
 /**
  * Inserts @c p into the PCB queue pointed to by @c head, so that the
  * process priority is preserved, i.e. the list is ordered in a descending
@@ -97,19 +97,19 @@ int bka_pcb_queue_isempty(struct list_head *head);
  * @param head Pointer to the sentinel of the list to insert to.
  * @param p PCB to be inserted.
  */
-void bka_pcb_queue_ins(struct list_head *head, pcb_t *p);
+void bka_pcb_queue_ins(list_t *head, pcb_t *p);
 /**
  * @return The head element of @c list, or @c NULL if that list is empty. No
  * removal is performed.
  */
-pcb_t* bka_pcb_queue_head(struct list_head *head);
+pcb_t* bka_pcb_queue_head(list_t *head);
 /**
  * Removes the first element from the process queue pointed to by @c head.
  * @param head Sentinel element of the list to remove from.
  * @return The first element of the process queue, or @c NULL if the list
  * contains no element.
  */
-pcb_t* bka_pcb_queue_pop(struct list_head *head);
+pcb_t* bka_pcb_queue_pop(list_t *head);
 /**
  * Removes the PCB pointed to by @c p from the list @c head.
  * @param head List to remove from
@@ -118,7 +118,7 @@ pcb_t* bka_pcb_queue_pop(struct list_head *head);
  * @return @c p if it was successfully removed from @c head, @c NULL
  * otherwise, i.e. @c p was not within @c head.
  */
-pcb_t* bka_pcb_queue_rm(struct list_head *head, pcb_t *p);
+pcb_t* bka_pcb_queue_rm(list_t *head, pcb_t *p);
 
 /* Tree view functions */
 /**
