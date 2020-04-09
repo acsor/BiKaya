@@ -243,7 +243,7 @@ int main() {
         freePcb(q);
     }
 
-    // Removing the last element
+    /* Removing the last element */
     q = removeProcQ(&qa);
     if (q != minproc)
         adderrbuf("ERROR: removeProcQ(): failed on last entry   ");

@@ -239,7 +239,7 @@ int main() {
 		bka_pcb_free(q);
     }
 
-    // Removing the last element
+    /* Removing the last element */
     q = bka_pcb_queue_pop(&qa);
     if (q != minproc) {
 		adderrbuf("ERROR: bka_pcb_queue_pop(): failed on last entry   ");

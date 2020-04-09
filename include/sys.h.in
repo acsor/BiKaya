@@ -2,7 +2,7 @@
 #define BKA_SYS_H
 
 
-// TODO Turn this file into an .h file
+/* TODO Turn this file into an .h file */
 #cmakedefine BKA_ARCH_UMPS
 #cmakedefine BKA_ARCH_UARM
 

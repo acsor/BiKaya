@@ -25,7 +25,7 @@ void initASL() {
 	INIT_LIST_HEAD(&asl_head);
 	INIT_LIST_HEAD(&fsl_head);
 
-	// Add all semaphores to the FSL
+	/* Add all semaphores to the FSL */
 	for (i = 0; i < BKA_MAX_PROC; i++)
 		list_add_tail(&semd_table[i].next, &fsl_head);
 }
@@ -37,7 +37,7 @@ semd_t* bka_sem_alloc(int *key) {
 		return NULL;
 
 	result = container_of(fsl_head.next, semd_t, next);
-	// Remove the newly fetched semaphore from the FSL
+	/* Remove the newly fetched semaphore from the FSL */
 	list_del(&result->next);
 	result->key = key;
 	INIT_LIST_HEAD(&result->proc_queue);
@@ -63,14 +63,14 @@ semd_t* getSemd(int *key) {
 }
 
 int insertBlocked (int *key, pcb_t *p) {
-	// Look for an existing semaphore with the given key
+	/* Look for an existing semaphore with the given key */
 	semd_t *s = getSemd(key);
 
-	// If no such semaphore exists, try to allocate it
+	/* If no such semaphore exists, try to allocate it */
 	if (!s)
 		s = bka_sem_alloc(key);
 
-	// If the semaphore is finally available
+	/* If the semaphore is finally available */
 	if (s) {
 		list_add_tail(&p->next, &s->proc_queue);
 		p->semkey = key;

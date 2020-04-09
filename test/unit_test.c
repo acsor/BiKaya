@@ -64,10 +64,10 @@ int main (int argc, char *argv[]) {
 		}
 	}
 
-	// printf(
-	// 		"\nRUN %lu TESTS (%lu OK, %lu FAILED).\n",
-	// 		tests_no, tests_no - failed_no, failed_no
-	// );
+	/* printf( */
+	/* 		"\nRUN %lu TESTS (%lu OK, %lu FAILED).\n", */
+	/* 		tests_no, tests_no - failed_no, failed_no */
+	/* ); */
 	bka_term_puts(term0, "\nALL TESTS RUN.\n", NULL);
 
 	return 0;
@@ -159,13 +159,13 @@ int test_bka_strcpy(void *data, char* errmsg, int errdim) {
 
 int test_bka_strcmp(void *data, char* errmsg, int errdim) {
 	char *inputs[] = {
-		// Equal strings
+		/* Equal strings */
 		"", "",
 		"1234567890", "1234567890",
 		"fortytwo", "fortytwo",
 		"AAABBBCCCDDDEEEFFF","AAABBBCCCDDDEEEFFF",
 
-		// Unequal strings
+		/* Unequal strings */
 		"", " ",
 		"12345 67890", "1234567890",
 		"fortytwx", "fortytwo",

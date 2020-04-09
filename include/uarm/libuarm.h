@@ -74,4 +74,4 @@ void TLBR();
 void TLBP();
 void TLBCLR();
 
-#endif //UARM_LIBURAM_H
+#endif /* UARM_LIBURAM_H */

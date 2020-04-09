@@ -28,16 +28,16 @@ pcb_t* bka_pcb_alloc(void) {
 	if (list_empty(&free_pcb_list))
 		return NULL;
 
-	// Acquire the PCB from the free PCB list
+	/* Acquire the PCB from the free PCB list */
 	out = container_of(free_pcb_list.next, pcb_t, next);
 	list_del(&out->next);
 
-	// Initialize the new PCB
+	/* Initialize the new PCB */
 	INIT_LIST_HEAD(&out->next);
 	out->parent = NULL;
 	INIT_LIST_HEAD(&out->first_child);
 	INIT_LIST_HEAD(&out->siblings);
-	// Initialize the out->state field to all 0s
+	/* Initialize the out->state field to all 0s */
 	bka_memset(&out->state, 0, sizeof(state_t));
 	out->priority = 0;
 	out->original_priority = 0;
@@ -56,20 +56,19 @@ void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
 
 #ifdef BKA_ARCH_UMPS
 	p->state.pc_epc = (unsigned) f;
-	// Enable interrupts
-	p->state.status |= STATUS_IEp | STATUS_IEc;
-	// Enable interval timer
+	/* Enable interrupts */
+	/* Enable interval timer */
 	p->state.status |= STATUS_IM(2);
-	// Set stack pointer
+	/* Set stack pointer */
 	p->state.reg_sp = BKA_RAMTOP - FRAMESIZE * (bka_pcb_to_pid(p) + 1);
 #elif defined(BKA_ARCH_UARM)
-	// Virtual memory off because the corresponding bit is set to 0
+	/* Virtual memory off because the corresponding bit is set to 0 */
 	p->state.pc = (unsigned) f;
-	// Enable kernel mode
+	/* Enable kernel mode */
 	p->state.cpsr |= STATUS_SYS_MODE;
-	// Enable regular interrupt handling
-	// TODO Is it correct to enable the interrupt handling mode by unsetting IRQ and FIQ?
-	// set stack pointer
+	/* Enable regular interrupt handling */
+	/* TODO Is it correct to enable the interrupt handling mode by unsetting IRQ and FIQ? */
+	/* set stack pointer */
 	p->state.sp = BKA_RAMTOP - FRAMESIZE * (bka_pcb_to_pid(p) + 1);
 #endif
 }
@@ -95,8 +94,8 @@ void bka_pcb_queue_ins(list_t *head, pcb_t *p) {
 	list_t *curr_list = head->next;
 	pcb_t *curr_proc = container_of(curr_list, pcb_t, next);
 
-	// Iterate until we either end the list or find a matching process with
-	// priority less than p
+	/* Iterate until we either end the list or find a matching process with */
+	/* priority less than p */
 	while (curr_list != head && p->priority < curr_proc->priority) {
 		curr_list = curr_list->next;
 		curr_proc = container_of(curr_list, pcb_t, next);
@@ -129,7 +128,7 @@ pcb_t* bka_pcb_queue_rm(list_t *head, pcb_t *p) {
 		curr_proc = container_of(curr_list, pcb_t, next);
 	} while (curr_list != head && curr_proc != p);
 
-	// If we exited the loop due to finding the corresponding entry
+	/* If we exited the loop due to finding the corresponding entry */
 	if (curr_proc == p) {
 		list_del(curr_list);
 
