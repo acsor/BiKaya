@@ -19,7 +19,8 @@ void bka_sched_ready_enqueue(pcb_t *p) {
 void bka_sched_switch_top_hard() {
 	/* TODO The running process might have some children to it. What to do in
 	 * case of an hard switch? */
-	bka_pcb_free(bka_sched_curr);
+	if (bka_sched_curr)
+		bka_pcb_free(bka_sched_curr);
 
 	if (list_empty(&bka_sched_ready)) {
 		bka_sched_curr = NULL;
