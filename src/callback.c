@@ -26,6 +26,8 @@ void bka_na_exit(unsigned new_area) {
 #elif defined(BKA_ARCH_UARM)
 	unsigned old_area = new_area - STATE_T_SIZE;
 	state_t *old_state = (state_t *) old_area;
+    if(new_area == SYSBK_NEWAREA) old_state->pc += WS;
+    else if(new_area == INT_NEWAREA)  old_state->pc -= WS; // su uarm l'operazione non termina quindi bisogna rifarla
 #endif
 
 	LDST(old_state);

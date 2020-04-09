@@ -82,12 +82,21 @@ void new_areas_init() {
 }
 
 void nac_int () {
-	/* If an interrupt is pending on interrupt line 2, i.e. the interval timer: */
+#ifdef BKA_ARCH_UMPS
+    /* If an interrupt is pending on interrupt line 2, i.e. the interval timer: */
 	if (getCAUSE() & CAUSE_IP(2)) {
 		bka_sched_switch_top((state_t *) INT_OLDAREA);
 	} else {
 		bka_na_exit(INT_NEWAREA);
 	}
+#elif defined(BKA_ARCH_UARM)
+    if (CAUSE_IP_GET(getCAUSE(), 2)) {
+        bka_sched_switch_top((state_t *) INT_OLDAREA);
+    } else {
+        bka_na_exit(INT_NEWAREA);
+    }
+#endif
+
 }
 
 void nac_tlb () {
@@ -102,14 +111,27 @@ void nac_sysbk () {
 	state_t *oa;
 
 	/* Check what type of interrupt occurred (syscall, breakpoint or other) */
+#ifdef BKA_ARCH_UMPS
 	switch (CAUSE_GET_EXCCODE(getCAUSE())) {
+#elif defined(BKA_ARCH_UARM)
+    switch (CAUSE_EXCCODE_GET(getCAUSE())){
+#endif
 		case EXC_SYS:
 			oa = (state_t *) SYSBK_OLDAREA;
-
+#ifdef BKA_ARCH_UMPS
 			bka_sys_call(oa->reg_a0, oa->reg_a1, oa->reg_a2, oa->reg_a3);
+#elif defined(BKA_ARCH_UARM)
+            bka_sys_call(oa->a1, oa->a2, oa->a3, oa->a4);
+#endif
 			break;
 		case EXC_BP:
 		default:
 			bka_na_exit(SYSBK_NEWAREA);
 	}
+
+
+
+
+
+
 }
