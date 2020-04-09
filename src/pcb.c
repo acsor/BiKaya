@@ -57,6 +57,7 @@ void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
 #ifdef BKA_ARCH_UMPS
 	p->state.pc_epc = (unsigned) f;
 	/* Enable interrupts */
+	p->state.status |= STATUS_IEp;
 	/* Enable interval timer */
 	p->state.status |= STATUS_IM(2);
 	/* Set stack pointer */
