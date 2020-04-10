@@ -32,7 +32,7 @@ target_link_libraries(
 )
 
 add_executable(test3.uarm ${BKA_TEST}/test3.c)
-target_link_libraries(test3.uarm callback crtso io libuarm pcb scheduler string)
+target_link_libraries(test3.uarm callback crtso io libuarm pcb sched string)
 
 add_executable(unit_test.uarm ${BKA_TEST}/unit_test.c)
 target_link_libraries(unit_test.uarm crtso libuarm libdiv asl io string)

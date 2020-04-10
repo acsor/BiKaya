@@ -2,7 +2,7 @@
 #include "io.h"
 #include "pcb.h"
 #include "string.h"
-#include "scheduler.h"
+#include "sched.h"
 #include "sys.h"
 #include "syscall.h"
 #include "test2_aux.h"

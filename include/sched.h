@@ -1,5 +1,5 @@
-#ifndef BKA_SCHEDULER_H
-#define BKA_SCHEDULER_H
+#ifndef BKA_SCHED_H
+#define BKA_SCHED_H
 
 #include "list.h"
 #include "pcb.h"

@@ -1,5 +1,5 @@
 #include "pcb.h"
-#include "scheduler.h"
+#include "sched.h"
 #include "syscall.h"
 
 

@@ -48,7 +48,7 @@ target_link_libraries(
 
 # Add test2 executable
 add_executable(test3 ${BKA_TEST}/test3.c)
-target_link_libraries(test3 callback crtso io libumps pcb scheduler string)
+target_link_libraries(test3 callback crtso io libumps pcb sched string)
 
 # Add unit_test executable
 add_executable(unit_test ${BKA_TEST}/unit_test.c)

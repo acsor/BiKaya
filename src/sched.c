@@ -1,4 +1,4 @@
-#include "scheduler.h"
+#include "sched.h"
 #include "string.h"
 #include "sys.h"
 
