@@ -1,7 +1,7 @@
 /* This file was formerly known by our professor and tutor as "p1.5test_bikaya_v0.c". */
 #include "list.h"
 #include "pcb.h"
-#include "sys.h"
+#include "arch.h"
 #include "test2_aux.h"
 
 #ifdef BKA_ARCH_UMPS

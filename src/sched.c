@@ -1,6 +1,6 @@
 #include "sched.h"
 #include "string.h"
-#include "sys.h"
+#include "arch.h"
 
 
 list_t	bka_sched_ready;

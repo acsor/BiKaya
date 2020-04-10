@@ -1,6 +1,6 @@
 #include "pcb.h"
 #include "string.h"
-#include "sys.h"
+#include "arch.h"
 
 
 /**

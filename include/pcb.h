@@ -1,7 +1,7 @@
 #ifndef BKA_PCB_H
 #define BKA_PCB_H
 
-#include "sys.h"
+#include "arch.h"
 #include "list.h"
 
 

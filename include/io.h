@@ -1,7 +1,7 @@
 #ifndef BKA_IO
 #define BKA_IO
 
-#include "sys.h"
+#include "arch.h"
 
 /**
  * Print to the terminal device @c term until a @c NULL is met in the

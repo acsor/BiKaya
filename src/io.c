@@ -1,4 +1,4 @@
-#include "sys.h"
+#include "arch.h"
 #include "stdarg.h"
 
 #define TERM_ST_NOTINST		0

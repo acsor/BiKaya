@@ -1,5 +1,5 @@
 #include "asl.h"
-#include "sys.h"
+#include "arch.h"
 #include "pcb.h"
 
 

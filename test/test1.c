@@ -36,7 +36,7 @@
 #include "uarm/arch.h"
 #endif
 
-#include "sys.h"
+#include "arch.h"
 #include "pcb.h"
 #include "asl.h"
 

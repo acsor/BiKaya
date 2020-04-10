@@ -1,10 +1,6 @@
-#ifndef BKA_SYS_H
-#define BKA_SYS_H
+#ifndef BKA_ARCH_H
+#define BKA_ARCH_H
 
-
-/* TODO Turn this file into an .h file */
-#cmakedefine BKA_ARCH_UMPS
-#cmakedefine BKA_ARCH_UARM
 
 #ifdef BKA_ARCH_UMPS
 #include "umps/arch.h"

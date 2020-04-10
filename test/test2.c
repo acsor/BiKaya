@@ -3,7 +3,7 @@
 #include "pcb.h"
 #include "string.h"
 #include "sched.h"
-#include "sys.h"
+#include "arch.h"
 #include "syscall.h"
 #include "test2_aux.h"
 #include "utils.h"

@@ -19,18 +19,16 @@ set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
 # Include targets according to the cross-compiling setup
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL mips)
-	set(BKA_ARCH_UMPS 1)
+	add_definitions(-D BKA_ARCH_UMPS)
 	include(umps.cmake)
 elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
-	set(BKA_ARCH_UARM 1)
+	add_definitions(-D BKA_ARCH_UARM)
 	include(uarm.cmake)
 else()
 	message(FATAL_ERROR "You need to specify a toolchain file with either -D
 	CMAKE_TOOLCHAIN_FILE=toolchains/umps.cmake or -D
 	CMAKE_TOOLCHAIN_FILE=toolchains/uarm.cmake")
 endif()
-
-configure_file(${BKA_INC}/sys.h.in ${BKA_BIN_INC}/sys.h)
 
 # Architecture-independent libraries
 add_library(asl ${BKA_SRC}/asl.c)
