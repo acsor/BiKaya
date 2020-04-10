@@ -34,7 +34,7 @@ configure_file(${BKA_INC}/sys.h.in ${BKA_BIN_INC}/sys.h)
 
 # Architecture-independent libraries
 add_library(asl ${BKA_SRC}/asl.c)
-add_library(callback ${BKA_SRC}/callback.c)
+add_library(exc ${BKA_SRC}/exc.c)
 add_library(io ${BKA_SRC}/io.c)
 add_library(math ${BKA_SRC}/math.c)
 add_library(pcb ${BKA_SRC}/pcb.c)
