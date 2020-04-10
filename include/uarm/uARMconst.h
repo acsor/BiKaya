@@ -158,6 +158,7 @@
 
 /* Utility definitions for the Cause CP15 register */
 #define CAUSE_EXCCODE_GET(cause) ((cause) & 0xFFFFFF)
+#define CAUSE_GET_EXCCODE(cause) CAUSE_EXCCODE_GET(cause)
 #define CAUSE_EXCCODE_SET(cause, exc_code) (((cause) & 0xFF000000) | (exc_code))
 
 /* Returns 1 if the interrupt int_no is pending */

@@ -74,7 +74,7 @@ void termprint(char *str) {
 }
 #endif
 #ifdef BKA_ARCH_UARM
-#define termprint(str) tprint(str);
+#define termprint(str) tprint(str)
 #endif
 
 static char *toprint[] = {

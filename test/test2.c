@@ -111,13 +111,10 @@ void nac_sysbk () {
 	state_t *oa;
 
 	/* Check what type of interrupt occurred (syscall, breakpoint or other) */
-#ifdef BKA_ARCH_UMPS
 	switch (CAUSE_GET_EXCCODE(getCAUSE())) {
-#elif defined(BKA_ARCH_UARM)
-    switch (CAUSE_EXCCODE_GET(getCAUSE())){
-#endif
 		case EXC_SYS:
 			oa = (state_t *) SYSBK_OLDAREA;
+
 #ifdef BKA_ARCH_UMPS
 			bka_sys_call(oa->reg_a0, oa->reg_a1, oa->reg_a2, oa->reg_a3);
 #elif defined(BKA_ARCH_UARM)
@@ -128,10 +125,4 @@ void nac_sysbk () {
 		default:
 			bka_na_exit(SYSBK_NEWAREA);
 	}
-
-
-
-
-
-
 }

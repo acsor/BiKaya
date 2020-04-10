@@ -12,22 +12,24 @@ void bka_na_init(state_t *s, nac_t c) {
 #elif defined(BKA_ARCH_UARM)
 	s->pc = (unsigned) c;
 	s->sp = BKA_RAMTOP;
-	/* interrupt disabilitati perchè l'ottavo bit è stato impostato a 0 */
 	s->cpsr |= STATUS_SYS_MODE;
+	s->cpsr |= STATUS_ALL_INT_DISABLE(s->cpsr);
 #endif
 }
 
 void bka_na_exit(unsigned new_area) {
 #ifdef BKA_ARCH_UMPS
-	unsigned old_area = new_area - RRF_FS;
-	state_t *old_state = (state_t *) old_area;
+	state_t *old_state = (state_t *) (new_area - RRF_FS);
 
 	old_state->pc_epc += WS;
 #elif defined(BKA_ARCH_UARM)
-	unsigned old_area = new_area - STATE_T_SIZE;
-	state_t *old_state = (state_t *) old_area;
-    if(new_area == SYSBK_NEWAREA) old_state->pc += WS;
-    else if(new_area == INT_NEWAREA)  old_state->pc -= WS; // su uarm l'operazione non termina quindi bisogna rifarla
+	state_t *old_state = (state_t *) (new_area - STATE_T_SIZE);
+
+	/* TODO Is this actually needed? */
+    if (new_area == SYSBK_NEWAREA)
+    	old_state->pc += WS;
+    else if (new_area == INT_NEWAREA)
+    	old_state->pc -= WS;
 #endif
 
 	LDST(old_state);

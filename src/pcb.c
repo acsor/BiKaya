@@ -52,7 +52,7 @@ void bka_pcb_free(pcb_t *p) {
 
 void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
 	p->priority = p->original_priority = original_priority;
-	bka_memset(&p->state, 0, sizeof(p->state));
+	bka_memset(&p->state, 0, sizeof(state_t));
 
 #ifdef BKA_ARCH_UMPS
 	p->state.pc_epc = (unsigned) f;
@@ -63,13 +63,15 @@ void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
 	/* Set stack pointer */
 	p->state.reg_sp = BKA_RAMTOP - FRAMESIZE * (bka_pcb_to_pid(p) + 1);
 #elif defined(BKA_ARCH_UARM)
-	/* Virtual memory off because the corresponding bit is set to 0 */
 	p->state.pc = (unsigned) f;
 	/* Enable kernel mode */
 	p->state.cpsr |= STATUS_SYS_MODE;
-	/* Enable regular interrupt handling */
-	/* TODO Is it correct to enable the interrupt handling mode by unsetting IRQ and FIQ? */
-	/* set stack pointer */
+	/* Enable regular interrupt handling and interval timer */
+	p->state.cpsr |= STATUS_ALL_INT_ENABLE(p->state.cpsr);
+	p->state.cpsr |= STATUS_ENABLE_TIMER(p->state.cpsr);
+	/* Set virtual memory off */
+	p->state.CP15_Control = CP15_DISABLE_VM(p->state.CP15_Control);
+	/* Set stack pointer */
 	p->state.sp = BKA_RAMTOP - FRAMESIZE * (bka_pcb_to_pid(p) + 1);
 #endif
 }
