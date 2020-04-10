@@ -16,6 +16,8 @@ void bka_sys_call(unsigned id, unsigned arg1, unsigned arg2, unsigned arg3) {
 void bka_sys_kill_running() {
 	if (bka_sched_curr)
 		bka_sys_kill(bka_pcb_to_pid(bka_sched_curr));
+	else
+		PANIC();
 }
 
 void bka_sys_kill(unsigned pid) {
@@ -44,7 +46,7 @@ void bka_sys_kill(unsigned pid) {
 	}
 
 	/* If, among the others, we killed the running process, we have to properly
-	 * switch to another process. */
+	 * switch to another one. */
 	if (killed_running)
 		bka_sched_switch_top_hard();
 }

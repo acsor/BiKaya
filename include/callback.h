@@ -29,10 +29,21 @@ typedef void (*sec_t)(void);
  */
 void bka_na_init(state_t *s, sec_t c);
 /**
- * Exits the new area "pointed to" by @c new_area, resuming the process
- * execution stored at the corresponding old area.
+ * Startup function to be invoked before managing one system-level exception
+ * (e.g. program traps, syscalls, breakpoints, interrupts etc.). Similarly to
+ * its counterpart, @c bka_na_exit(), this function performs initialization
+ * steps needed to ensure the correct entering in of new areas/exception
+ * managers.
+ * @param new_area New area which the processor is entering in.
+ * @see bka_na_exit
  */
 void bka_na_enter(unsigned new_area);
+/**
+ * Like @c bka_na_enter(), but to be (preferably) invoked as the last
+ * instruction of a system-level exception handler.
+ * @param new_area New area which the processor is exiting out from.
+ * @see bka_na_enter
+ */
 void bka_na_exit(unsigned new_area);
 
 

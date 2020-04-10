@@ -10,7 +10,7 @@
 
 
 /**
- * Initializes the system-wide ready process queue to containg three test
+ * Initializes the system-wide ready process queue to contain three simple test
  * processes.
  * @see pcb_test_factory
  */
@@ -26,17 +26,37 @@ static void sched_queue_init();
 static pcb_t* pcb_test_factory(unsigned test_no);
 /**
  * Initializes the New Areas (fixed memory areas containing callback code to
- * be executed upon certain events) to execute specified callback functions.
- * @see nac_int, nac_tlb, nac_trap, nac_sysbk
+ * be executed upon system exceptions) to execute specific callback functions.
+ * @see sec_int, sec_tlb, sec_trap, sec_sysbk
  */
 static void new_areas_init();
 
-static void nac_int ();
-static void nac_tlb ();
-static void nac_trap ();
-static void nac_sysbk ();
+/**
+ * System Exception Callback (SEC) to be executed during external
+ * device and software interrupts.
+ */
+static void sec_int ();
+/**
+ * System Exception Callback (SEC) to be executed during TLB exceptions.
+ */
+static void sec_tlb ();
+/**
+ * System Exception Callback (SEC) to be executed during program trap
+ * exceptions.
+ */
+static void sec_trap ();
+/**
+ * System Exception Callback (SEC) to be executed during syscall and
+ * breakpoints exceptions.
+ */
+static void sec_sysbk ();
 
 
+/**
+ * Test program designed to ensure the correctness of scheduling, ROM and
+ * exception-handling primitives, whose expected output is a recognizable
+ * penguin ASCII-art image.
+ */
 int main () {
 	bka_sched_init();
 	bka_pcbs_init();
