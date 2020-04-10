@@ -5,9 +5,9 @@
 
 
 /**
- * Function type for a new area callback (NAC).
+ * Function type for a System Exception Callback (SEC).
  */
-typedef void (*nac_t)(void);
+typedef void (*sec_t)(void);
 
 /**
  * Initializes the new area (NA) pointed to by @c s in such a way that
@@ -27,11 +27,12 @@ typedef void (*nac_t)(void);
  * @param s New area to initialize.
  * @param c Callback code to be executed upon reaching this new area.
  */
-void bka_na_init(state_t *s, nac_t c);
+void bka_na_init(state_t *s, sec_t c);
 /**
  * Exits the new area "pointed to" by @c new_area, resuming the process
  * execution stored at the corresponding old area.
  */
+void bka_na_enter(unsigned new_area);
 void bka_na_exit(unsigned new_area);
 
 

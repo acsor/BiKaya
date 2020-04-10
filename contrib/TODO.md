@@ -48,7 +48,7 @@ and a list of author names. An example is
 
 ## Phase 1.5
 ### `callback.h`
-1. [x] `void bka_na_init(state_t *s, nac_t c)`: Andrea, Daniele, Nicolò
+1. [x] `void bka_na_init(state_t *s, sec_t c)`: Andrea, Daniele, Nicolò
 
 ### `pcb.h`
 1. [x] `void bka_pcb_init(pcb_t *p, pfun_t f)`: Andrea, Daniele, Nicolò

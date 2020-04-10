@@ -73,7 +73,7 @@ void new_areas_init() {
 	unsigned new_areas[] = {
 		INT_NEWAREA, TLB_NEWAREA, PGMTRAP_NEWAREA, SYSBK_NEWAREA
 	};
-	nac_t callbacks[] = {nac_int, nac_tlb, nac_trap, nac_sysbk};
+	sec_t callbacks[] = {sec_int, sec_tlb, sec_trap, sec_sysbk};
 	unsigned i;
 	unsigned const n = BKA_LENGTH(new_areas, unsigned);
 
@@ -81,34 +81,32 @@ void new_areas_init() {
 		bka_na_init((state_t *) new_areas[i], callbacks[i]);
 }
 
-void nac_int () {
-#ifdef BKA_ARCH_UMPS
-    /* If an interrupt is pending on interrupt line 2, i.e. the interval timer: */
+
+void sec_int () {
+	bka_na_enter(INT_NEWAREA);
+
+	/* If an interrupt is pending on interrupt line 2, i.e. the interval timer: */
 	if (getCAUSE() & CAUSE_IP(2)) {
 		bka_sched_switch_top((state_t *) INT_OLDAREA);
 	} else {
 		bka_na_exit(INT_NEWAREA);
 	}
-#elif defined(BKA_ARCH_UARM)
-    if (CAUSE_IP_GET(getCAUSE(), 2)) {
-        bka_sched_switch_top((state_t *) INT_OLDAREA);
-    } else {
-        bka_na_exit(INT_NEWAREA);
-    }
-#endif
-
 }
 
-void nac_tlb () {
+void sec_tlb () {
+	bka_na_enter(TLB_NEWAREA);
 	bka_na_exit(TLB_NEWAREA);
 }
 
-void nac_trap () {
+void sec_trap () {
+	bka_na_enter(PGMTRAP_NEWAREA);
 	bka_na_exit(PGMTRAP_NEWAREA);
 }
 
-void nac_sysbk () {
+void sec_sysbk () {
 	state_t *oa;
+
+	bka_na_enter(SYSBK_NEWAREA);
 
 	/* Check what type of interrupt occurred (syscall, breakpoint or other) */
 	switch (CAUSE_GET_EXCCODE(getCAUSE())) {

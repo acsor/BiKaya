@@ -163,6 +163,8 @@
 
 /* Returns 1 if the interrupt int_no is pending */
 #define CAUSE_IP_GET(cause, int_no) ((cause) & (1 << ((int_no) + 24)))
+/* Returns the bit associated to the given interrupt line. */
+#define CAUSE_IP(line) (1 << ((line) + 24))
 
 /* Values for CP15 Cause.ExcCode */
 #define EXC_INTERRUPT       INTEXCEPTION

@@ -65,10 +65,10 @@ void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
 #elif defined(BKA_ARCH_UARM)
 	p->state.pc = (unsigned) f;
 	/* Enable kernel mode */
-	p->state.cpsr |= STATUS_SYS_MODE;
+	p->state.cpsr  = STATUS_SYS_MODE;
 	/* Enable regular interrupt handling and interval timer */
-	p->state.cpsr |= STATUS_ALL_INT_ENABLE(p->state.cpsr);
-	p->state.cpsr |= STATUS_ENABLE_TIMER(p->state.cpsr);
+	p->state.cpsr = STATUS_ALL_INT_DISABLE(p->state.cpsr);
+	p->state.cpsr = STATUS_ENABLE_TIMER(p->state.cpsr);
 	/* Set virtual memory off */
 	p->state.CP15_Control = CP15_DISABLE_VM(p->state.CP15_Control);
 	/* Set stack pointer */
