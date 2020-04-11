@@ -18,12 +18,12 @@ add_compile_options(${BKA_CFLAGS_LANG})
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
 # Include targets according to the cross-compiling setup
-if (CMAKE_SYSTEM_PROCESSOR STREQUAL mips)
-	add_definitions(-D BKA_ARCH_UMPS)
-	include(umps.cmake)
-elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
+if (CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
 	add_definitions(-D BKA_ARCH_UARM)
-	include(uarm.cmake)
+	include(cmake/uarm.cmake)
+elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL mips)
+	add_definitions(-D BKA_ARCH_UMPS)
+	include(cmake/umps.cmake)
 else()
 	message(FATAL_ERROR "You need to specify a toolchain file with either -D
 	CMAKE_TOOLCHAIN_FILE=toolchains/umps.cmake or -D

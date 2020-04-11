@@ -6,39 +6,73 @@ respectively.
 ## Running
 BiKaya (meta) build system is CMake. The list of available executables is
 
-* For uMPS: `test0.core.umps`, `test1.core.umps`, `test2.core.umps `, `unit_test.core.umps`
 * For uARM: `test0.uarm`, `test1.uarm`, `test2.uarm`, `unit_test.uarm`
+* For uMPS: `test0.core.umps`, `test1.core.umps`, `test2.core.umps `, `unit_test.core.umps`
  
- ### Instructor note
- If you are an istructor willing to grade our project, note that the "phase 1.5"
- program can be launched by compiling and running `test2.core.umps`
- and `test2.uarm` executables.
+### Instructor's note (italian paragraph)
+Il programma di test per la fase 1.5 è `test2.uarm` per uARM e `test2.core.umps`
+per uMPS. Rifarsi alla sezione seguente per le istruzioni sul come compilare.
 
-### Build example
-As an example, assume you want to compile and then run `test2.core.umps`
-and `test2.uarm`. Your terminal steps should then be
-
-1. For the uMPS architecture
-
-	```bash
-    mkdir build-umps
-    cd build-umps
-    cmake -D CMAKE_TOOLCHAIN_FILE=../toolchains/umps.cmake ..
-    make test2.core.umps
-
-    # Launch the umps2 emulator
-	```
+### Build instructions
+As an example, assume you want to compile and then run `test2.uarm` and
+`test2.core.umps`. Your terminal steps should then be
 
 1. For the uARM architecture
 
 	```bash
     mkdir build-uarm
     cd build-uarm
-    cmake -D CMAKE_TOOLCHAIN_FILE=../toolchains/uarm.cmake ..
+    cmake -D CMAKE_TOOLCHAIN_FILE=../cmake/arm-none-eabi.cmake ..
     make test2.uarm
 
     # Launch the uarm emulator
+    ```
+
+1. For the uMPS architecture
+
+	```bash
+    mkdir build-umps
+    cd build-umps
+    cmake -D CMAKE_TOOLCHAIN_FILE=../cmake/mipsel-linux-gnu.cmake ..
+    make test2.core.umps
+
+    # Launch the umps2 emulator
 	```
+ 
+#### Build insructions: alternative toolchain(s)
+The [CMAKE_TOOLCHAIN_FILE][ctf] command-line variabile passed to CMake instructs
+it on where to find the cross-compiling toolchain. Since we are building for
+architectures other than the host one, we cannot use the ordinary toolchain
+(e.g. `gcc`).
+
+It might be that your operating system (e.g. Linux distribution) doesn't have
+an easy access to the toolchains our project looks for, or that you have any
+other compelling reason to switch from the ones you already own. If that is the
+case, you may obtain the required components to compile our project by
+downloading and installing them with [crosstool-ng][ct-ng]. That's where the
+`CMAKE_TOOLCHAIN_FILE` variable comes in handy: if the toolchain is installed
+locally, you can provide an alternative file location to it, like
+`mipsel-linux-gnu-local.cmake`, filled in like so
+
+```cmake
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR mips)
+set(TOOLCHAIN_ROOT /home/user/.../mipsel-unknown-linux-gnu)     # 1
+set(TOOLCHAIN_PREFIX mipsel-linux-gnu)                          # 2
+
+set(CMAKE_C_COMPILER ${TOOLCHAIN_ROOT}/bin/${TOOLCHAIN_PREFIX}-gcc)
+set(CMAKE_ASM_COMPILER ${TOOLCHAIN_ROOT}/bin/${TOOLCHAIN_PREFIX}-gcc)
+set(CMAKE_C_LINKER ${TOOLCHAIN_ROOT}/bin/${TOOLCHAIN_PREFIX}-ld)
+```
+
+Ideally, you should only change lines `1` and `2` to match your local
+configuration. The particular instructions, and even the name itself of the file,
+are entirely arbitrary suggestions. See more in the [official CMake
+documentation][cdoc].
+
+[ctf]: https://cmake.org/cmake/help/latest/variable/CMAKE_TOOLCHAIN_FILE.html
+[ct-ng]: https://crosstool-ng.github.io/
+[cdoc]: https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html
 
 ## Packaging
 This option is mostly intended for people working on the project.

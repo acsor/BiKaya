@@ -1,11 +1,12 @@
 # Directories section
 __pycache__/
 *build*/
+cmake/*
 
 # Specific files section
 Session.vim
-toolchains/uarm-local.cmake
-toolchains/umps-local.cmake
+!cmake/arm-none-eabi.cmake
+!cmake/mipsel-linux-gnu.cmake
 
 # Generic files section
 *.o
