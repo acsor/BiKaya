@@ -23,12 +23,14 @@ void bka_na_enter(unsigned new_area) {
 	if (new_area == SYSBK_NEWAREA) {
 		state_t *old_area = (state_t *) SYSBK_OLDAREA;
 
-		old_area->pc_epc -= WS;
+		old_area->pc_epc += WS;
 	}
 #elif defined(BKA_ARCH_UARM)
-	state_t *old_area = (state_t *) (new_area - STATE_T_SIZE);
+	if (new_area == INT_NEWAREA || new_area == SYSBK_NEWAREA) {
+		state_t *old_area = (state_t *) (new_area - STATE_T_SIZE);
 
-	old_area->pc -= WS;
+		old_area->pc -= WS;
+	}
 #endif
 }
 
