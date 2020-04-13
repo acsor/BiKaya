@@ -127,20 +127,25 @@ void sec_trap () {
 }
 
 void sec_sysbk () {
-	state_t *oa;
+	state_t *oa = (state_t *) SYSBK_OLDAREA;
 
-	bka_na_enter(SYSBK_NEWAREA);
+	unsigned int cause;
+#ifdef BKA_ARCH_UMPS
+	cause = oa->cause;
+#elif defined(BKA_ARCH_UARM)
+	cause = oa->CP15_Cause;
+#endif
 
 	/* Check what type of interrupt occurred (syscall, breakpoint or other) */
-	switch (CAUSE_GET_EXCCODE(getCAUSE())) {
+	switch(CAUSE_GET_EXCCODE(cause)) {
 		case EXC_SYS:
-			oa = (state_t *) SYSBK_OLDAREA;
 
 #ifdef BKA_ARCH_UMPS
 			bka_sys_call(oa->reg_a0, oa->reg_a1, oa->reg_a2, oa->reg_a3);
 #elif defined(BKA_ARCH_UARM)
             bka_sys_call(oa->a1, oa->a2, oa->a3, oa->a4);
 #endif
+
 			break;
 		case EXC_BP:
 		default:
