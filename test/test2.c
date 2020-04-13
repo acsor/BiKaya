@@ -5,7 +5,6 @@
 #include "sched.h"
 #include "arch.h"
 #include "syscall.h"
-#include "test2_aux.h"
 #include "utils.h"
 
 
@@ -50,6 +49,10 @@ static void sec_trap ();
  * breakpoints exceptions.
  */
 static void sec_sysbk ();
+
+void test1();
+void test2();
+void test3();
 
 
 /**
