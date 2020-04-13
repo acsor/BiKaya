@@ -129,11 +129,10 @@ void sec_trap () {
 void sec_sysbk () {
 	state_t *oa = (state_t *) SYSBK_OLDAREA;
 
-	unsigned int cause;
 #ifdef BKA_ARCH_UMPS
-	cause = oa->cause;
+	unsigned cause = oa->cause;
 #elif defined(BKA_ARCH_UARM)
-	cause = oa->CP15_Cause;
+	unsigned cause = oa->CP15_Cause;
 #endif
 
 	/* Check what type of interrupt occurred (syscall, breakpoint or other) */
