@@ -106,11 +106,13 @@ void new_areas_init() {
 
 
 void sec_int () {
+	state_t *oa = (state_t *) INT_OLDAREA;
+
 	bka_na_enter(INT_NEWAREA);
 
 	/* If an interrupt is pending on interrupt line 2, i.e. the interval timer: */
-	if (getCAUSE() & CAUSE_IP(2)) {
-		bka_sched_switch_top((state_t *) INT_OLDAREA);
+	if (BKA_STATE_CAUSE(oa) & CAUSE_IP(2)) {
+		bka_sched_switch_top(oa);
 	} else {
 		bka_na_exit(INT_NEWAREA);
 	}
@@ -129,20 +131,14 @@ void sec_trap () {
 void sec_sysbk () {
 	state_t *oa = (state_t *) SYSBK_OLDAREA;
 
-#ifdef BKA_ARCH_UMPS
-	unsigned cause = oa->cause;
-#elif defined(BKA_ARCH_UARM)
-	unsigned cause = oa->CP15_Cause;
-#endif
-
 	/* Check what type of interrupt occurred (syscall, breakpoint or other) */
-	switch(CAUSE_GET_EXCCODE(cause)) {
+	switch(CAUSE_GET_EXCCODE(BKA_STATE_CAUSE(oa))) {
 		case EXC_SYS:
 
-#ifdef BKA_ARCH_UMPS
+#ifdef BKA_ARCH_UARM
+			bka_sys_call(oa->a1, oa->a2, oa->a3, oa->a4);
+#elif defined(BKA_ARCH_UMPS)
 			bka_sys_call(oa->reg_a0, oa->reg_a1, oa->reg_a2, oa->reg_a3);
-#elif defined(BKA_ARCH_UARM)
-            bka_sys_call(oa->a1, oa->a2, oa->a3, oa->a4);
 #endif
 
 			break;

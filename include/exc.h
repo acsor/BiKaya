@@ -4,6 +4,17 @@
 #include "arch.h"
 
 
+#ifdef BKA_ARCH_UARM
+/**
+ * @param p	A pointer to @c state_t.
+ * @return The cause register of the state pointed to by @c p.
+ */
+#define	BKA_STATE_CAUSE(p)	p->CP15_Cause
+#elif defined(BKA_ARCH_UMPS)
+#define	BKA_STATE_CAUSE(p)	p->cause
+#endif
+
+
 /**
  * Function type for a System Exception Callback (SEC).
  */
