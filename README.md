@@ -8,10 +8,6 @@ BiKaya (meta) build system is CMake. The list of available executables is
 
 * For uARM: `test0.uarm`, `test1.uarm`, `test2.uarm`, `unit_test.uarm`
 * For uMPS: `test0.core.umps`, `test1.core.umps`, `test2.core.umps `, `unit_test.core.umps`
- 
-### Instructor's note (italian paragraph)
-Il programma di test per la fase 1.5 è `test2.uarm` per uARM e `test2.core.umps`
-per uMPS. Rifarsi alla sezione seguente per le istruzioni sul come compilare.
 
 ### Build instructions
 As an example, assume you want to compile and then run `test2.uarm` and

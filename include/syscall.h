@@ -1,7 +1,14 @@
 #ifndef BKA_SYSCALL
 #define BKA_SYSCALL
 
-#define BKA_SYS_KILL	3
+#define BKA_SYS_GETCPUTIME	1
+#define BKA_SYS_FORK		2
+#define BKA_SYS_KILL		3
+#define BKA_SYS_VERHOGEN	4
+#define BKA_SYS_PASSEREN	5
+#define BKA_SYS_WAITIO		6
+#define BKA_SYS_SPECPASSUP	7
+#define BKA_SYS_GETPID		8
 
 
 /**
