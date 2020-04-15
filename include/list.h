@@ -51,9 +51,9 @@ typedef unsigned int size_tt;
     una lista bidirezionale. Per creare liste di strutture arbitrarie basta
     inserire al loro interno un campo di tipo list_head. 
 */
-struct list_head {
+typedef struct list_head {
 	struct list_head *next, *prev;
-};
+} list_t;
 
 /*
     Macro che definisce una lista vuota, inizializzando una list_head con 
@@ -64,7 +64,7 @@ struct list_head {
     return: struttura list_head inizializzata come vuota
 
     Esempio:
-    struct list_head lista = LIST_HEAD_INIT(lista);
+    list_t lista = LIST_HEAD_INIT(lista);
 */
 #define LIST_HEAD_INIT(name) { &(name), &(name) }
 
@@ -75,7 +75,7 @@ struct list_head {
     name: nome che si vuole dare alla variabile lista
 */
 #define LIST_HEAD(name) \
-	struct list_head name = LIST_HEAD_INIT(name)
+	list_t name = LIST_HEAD_INIT(name)
 
 /*
     Funzione inline che inizializza la lista list come vuota (entrambi i campi 
@@ -88,7 +88,7 @@ struct list_head {
     
     return: void
 */
-static inline void INIT_LIST_HEAD(struct list_head *list)
+static inline void INIT_LIST_HEAD(list_t *list)
 {
 	list->next = list;
 	list->prev = list;
@@ -101,9 +101,9 @@ static inline void INIT_LIST_HEAD(struct list_head *list)
     prev: elemento che deve precedere new
     next: elemento che deve seguire new
 */
-static inline void __list_add(struct list_head *new,
-		struct list_head *prev,
-		struct list_head *next)
+static inline void __list_add(list_t *new,
+		list_t *prev,
+		list_t *next)
 {
 	next->prev = new;
 	new->next = next;
@@ -119,7 +119,7 @@ static inline void __list_add(struct list_head *new,
 
     return: void
 */
-static inline void list_add(struct list_head *new, struct list_head *head)
+static inline void list_add(list_t *new, list_t *head)
 {
 	__list_add(new, head, head->next);
 }
@@ -132,7 +132,7 @@ static inline void list_add(struct list_head *new, struct list_head *head)
 
     return: void
 */
-static inline void list_add_tail(struct list_head *new, struct list_head *head)
+static inline void list_add_tail(list_t *new, list_t *head)
 {
 	__list_add(new, head->prev, head);
 }
@@ -145,7 +145,7 @@ static inline void list_add_tail(struct list_head *new, struct list_head *head)
 
     return: void
 */
-static inline void __list_del(struct list_head * prev, struct list_head * next)
+static inline void __list_del(list_t * prev, list_t * next)
 {
 	next->prev = prev;
 	prev->next = next;
@@ -158,7 +158,7 @@ static inline void __list_del(struct list_head * prev, struct list_head * next)
 
     return: void
 */
-static inline void list_del(struct list_head *entry)
+static inline void list_del(list_t *entry)
 {
 	__list_del(entry->prev, entry->next);
 }
@@ -171,8 +171,8 @@ static inline void list_del(struct list_head *entry)
 
     return: 0 se list non e' l'ultimo elemento, 1 altrimenti
 */
-static inline int list_is_last(const struct list_head *list,
-		const struct list_head *head)
+static inline int list_is_last(const list_t *list,
+		const list_t *head)
 {
 	return list->next == head;
 }
@@ -184,7 +184,7 @@ static inline int list_is_last(const struct list_head *list,
 
     return: 1 se la lista e' vuota, 0 altrimenti
 */
-static inline int list_empty(const struct list_head *head)
+static inline int list_empty(const list_t *head)
 {
 	return head->next == head;
 }
@@ -197,7 +197,7 @@ static inline int list_empty(const struct list_head *head)
 
     return: current->next se la lista non e' vuota, NULL altrimenti
 */
-static inline struct list_head *list_next(const struct list_head *current)
+static inline list_t *list_next(const list_t *current)
 {
 	if (list_empty(current))
 		return NULL;
@@ -213,7 +213,7 @@ static inline struct list_head *list_next(const struct list_head *current)
 
     return: current->prev se la lista non e' vuota, NULL altrimenti
 */
-static inline struct list_head *list_prev(const struct list_head *current)
+static inline list_t *list_prev(const list_t *current)
 {
 	if (list_empty(current))
 		return NULL;
@@ -223,13 +223,13 @@ static inline struct list_head *list_prev(const struct list_head *current)
 
 /*
     Macro che costruisce un ciclo for per iterare su ogni elemento della lista
-    che ha inizio in head. La variabile pos punta al campo struct list_head
+    che ha inizio in head. La variabile pos punta al campo list_t
     della lista.
     Ad ogni iterazione la variabile pos puntera' a uno degli elementi
     della lista, procedendo in ordine.
 
     Esempio:
-    struct list_head* iter;
+    list_t* iter;
 	list_for_each(iter,&head) {
 		kitem_t* item=container_of(iter,kitem_t,list);
 		printf("Elemento i-esimo %d \n",item->elem);
@@ -257,7 +257,7 @@ static inline struct list_head *list_prev(const struct list_head *current)
     
     pos: puntatore da utilizzare per iterare sul contenuto della lista
     head: inizio della lista (elemento sentinella)
-    member: nome del campo contenente la list_head
+    member: nome del campo contenente la lista
 */
 #define list_for_each_entry(pos, head, member)                          \
 	for (pos = container_of((head)->next, typeof(*pos), member);      \

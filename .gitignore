@@ -1,9 +1,14 @@
 # Directories section
 __pycache__/
 *build*/
+cmake/*
 
-# Files section
+# Specific files section
 Session.vim
+!cmake/arm-none-eabi.cmake
+!cmake/mipsel-linux-gnu.cmake
+
+# Generic files section
 *.o
 *.out
 *.a

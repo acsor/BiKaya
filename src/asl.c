@@ -1,5 +1,5 @@
 #include "asl.h"
-#include "sys.h"
+#include "arch.h"
 #include "pcb.h"
 
 
@@ -10,13 +10,13 @@ static semd_t semd_table[BKA_MAX_PROC];
 /**
  * Head of the Active Semaphore List (ASL).
  */
-static struct list_head asl_head;
+static list_t asl_head;
 /**
  * Head of the Free Semaphore List (FSL).
  * Note: this name does not appear in public slides, but belongs only to this
  * project.
  */
-static struct list_head fsl_head;
+static list_t fsl_head;
 
 
 void initASL() {
@@ -25,7 +25,7 @@ void initASL() {
 	INIT_LIST_HEAD(&asl_head);
 	INIT_LIST_HEAD(&fsl_head);
 
-	// Add all semaphores to the FSL
+	/* Add all semaphores to the FSL */
 	for (i = 0; i < BKA_MAX_PROC; i++)
 		list_add_tail(&semd_table[i].next, &fsl_head);
 }
@@ -37,7 +37,7 @@ semd_t* bka_sem_alloc(int *key) {
 		return NULL;
 
 	result = container_of(fsl_head.next, semd_t, next);
-	// Remove the newly fetched semaphore from the FSL
+	/* Remove the newly fetched semaphore from the FSL */
 	list_del(&result->next);
 	result->key = key;
 	INIT_LIST_HEAD(&result->proc_queue);
@@ -63,14 +63,14 @@ semd_t* getSemd(int *key) {
 }
 
 int insertBlocked (int *key, pcb_t *p) {
-	// Look for an existing semaphore with the given key
+	/* Look for an existing semaphore with the given key */
 	semd_t *s = getSemd(key);
 
-	// If no such semaphore exists, try to allocate it
+	/* If no such semaphore exists, try to allocate it */
 	if (!s)
 		s = bka_sem_alloc(key);
 
-	// If the semaphore is finally available
+	/* If the semaphore is finally available */
 	if (s) {
 		list_add_tail(&p->next, &s->proc_queue);
 		p->semkey = key;
@@ -86,9 +86,9 @@ pcb_t* removeBlocked(int *key) {
 	pcb_t *p = NULL;
 
 	if (s)
-		p = removeProcQ(&s->proc_queue);
+		p = bka_pcb_queue_pop(&s->proc_queue);
 
-	if (emptyProcQ(&s->proc_queue))
+	if (bka_pcb_queue_isempty(&s->proc_queue))
 		bka_sem_free(s);
 
 	return p;
@@ -117,7 +117,7 @@ pcb_t* outBlocked(pcb_t *p) {
 pcb_t* headBlocked(int *key) {
 	semd_t *s = getSemd(key);
 
-	return s != NULL ? headProcQ(&s->proc_queue): NULL;
+	return s != NULL ? bka_pcb_queue_head(&s->proc_queue) : NULL;
 }
 
 void outChildBlocked(pcb_t *p) {

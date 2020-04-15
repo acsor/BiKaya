@@ -158,13 +158,17 @@
 
 /* Utility definitions for the Cause CP15 register */
 #define CAUSE_EXCCODE_GET(cause) ((cause) & 0xFFFFFF)
+#define CAUSE_GET_EXCCODE(cause) CAUSE_EXCCODE_GET(cause)
 #define CAUSE_EXCCODE_SET(cause, exc_code) (((cause) & 0xFF000000) | (exc_code))
 
 /* Returns 1 if the interrupt int_no is pending */
 #define CAUSE_IP_GET(cause, int_no) ((cause) & (1 << ((int_no) + 24)))
+/* Returns the bit associated to the given interrupt line. */
+#define CAUSE_IP(line) (1 << ((line) + 24))
 
 /* Values for CP15 Cause.ExcCode */
 #define EXC_INTERRUPT       INTEXCEPTION
+#define EXC_INT             EXC_INTERRUPT
 #define EXC_TLBMOD          MODEXCEPTION
 #define EXC_TLBINVLOAD      TLBLEXCEPTION
 #define EXC_TLBINVSTORE     TLBSEXCEPTION
@@ -173,7 +177,9 @@
 #define EXC_BUSINVFETCH     BUSERROR
 #define EXC_BUSINVLDSTORE   BUSERROR
 #define EXC_SYSCALL         SYSEXCEPTION
+#define EXC_SYS             EXC_SYSCALL
 #define EXC_BREAKPOINT      BPEXCEPTION
+#define EXC_BP              EXC_BREAKPOINT
 #define EXC_RESERVEDINSTR   20
 #define EXC_COPROCUNUSABLE  COPROCEXCEPTION
 #define EXC_BADPTE          INVALIDPAGE
@@ -209,7 +215,7 @@
 
 #define CR 0x0a   /* carriage return as returned by the terminal */
 
-// hardware constants
+/* hardware constants */
 
 #define VM_PSEG_START   0x00008000
 #define VM_PSEG_TOP     0xF0000000
@@ -228,19 +234,19 @@
 #define ROMF_STACKBASE  0x00007FF0
 #define ROMF_STACKTOP   0x00008000
 
-// physical memory page frame size (in words)
+/* physical memory page frame size (in words) */
 #define FRAMESIZE	1024
 
-// KB per frame
+/* KB per frame */
 #define FRAMEKB	4
 
-// number of ASIDs
+/* number of ASIDs */
 #define MAXASID 128
 
-// eth packet size
+/* eth packet size */
 #define PACKETSIZE 1514
 
-// exception type constants (simulator internal coding)
+/* exception type constants (simulator internal coding) */
 #define NOEXCEPTION 	0
 #define MEMERROR     	1
 #define BUSERROR     	2
@@ -262,4 +268,4 @@
 #define ADESEXCEPTION	17
 #define MODEXCEPTION    18
 
-#endif // UARMCONST_H
+#endif /* UARMCONST_H */

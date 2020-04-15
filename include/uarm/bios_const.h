@@ -40,4 +40,4 @@
 .equ TOD_HI_INFO, 0x2DC
 .equ TOD_LO_INFO, 0x2E0
 
-#endif // BIOS_CONST_H
+#endif /* BIOS_CONST_H */

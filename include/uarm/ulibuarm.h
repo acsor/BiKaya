@@ -24,4 +24,4 @@
 /* call kernel system call handler */
 int SYSCALL(unsigned int sysNum, unsigned int arg1, unsigned int arg2, unsigned int arg3);
 
-#endif //UARM_ULIBURAM_H
+#endif /* UARM_ULIBURAM_H */

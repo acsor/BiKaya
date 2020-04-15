@@ -1,53 +1,57 @@
-cmake_minimum_required(VERSION 3.16)
-project(
-	BiKaya
-	VERSION 0.1.0
-	DESCRIPTION "Double-architecture operating system"
-	HOMEPAGE_URL https://github.com/newnone/BiKaya
-	LANGUAGES C ASM
-)
-
+cmake_minimum_required(VERSION 3.3)
+project(BiKaya VERSION 0.1.0 LANGUAGES C ASM)
 
 # All the variables defined in this project start with a BKA_ prefix
-set(BKA_INC include)
-set(BKA_SRC src)
+set(BKA_INC ${PROJECT_SOURCE_DIR}/include)
+set(BKA_BIN_INC ${PROJECT_BINARY_DIR}/include)
+set(BKA_SRC ${PROJECT_SOURCE_DIR}/src)
+set(BKA_TEST ${PROJECT_SOURCE_DIR}/test)
 
 set(CMAKE_C_STANDARD 90)
 set(BKA_CFLAGS_LANG -ffreestanding -ansi -Wall)
 
-# TODO Are we better off using target_include_directories()?
-include_directories(${PROJECT_SOURCE_DIR}/${BKA_INC})
-include_directories(${PROJECT_BINARY_DIR}/${BKA_INC})
+# TODO Should we rather use target_include_directories()?
+include_directories(${BKA_INC})
+include_directories(${BKA_BIN_INC})
 
 add_compile_options(${BKA_CFLAGS_LANG})
-
+set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
 # Include targets according to the cross-compiling setup
-if (CMAKE_SYSTEM_PROCESSOR STREQUAL mips)
-	set(BKA_ARCH_UMPS 1)
-	include(umps.cmake)
-elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
-	set(BKA_ARCH_UARM 1)
-	include(uarm.cmake)
+if (CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
+	add_definitions(-D BKA_ARCH_UARM)
+	include(cmake/uarm.cmake)
+elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL mips)
+	add_definitions(-D BKA_ARCH_UMPS)
+	include(cmake/umps.cmake)
 else()
 	message(FATAL_ERROR "You need to specify a toolchain file with either -D
 	CMAKE_TOOLCHAIN_FILE=toolchains/umps.cmake or -D
 	CMAKE_TOOLCHAIN_FILE=toolchains/uarm.cmake")
 endif()
 
+# Architecture-independent libraries
+add_library(asl ${BKA_SRC}/asl.c)
+add_library(exc ${BKA_SRC}/exc.c)
+add_library(io ${BKA_SRC}/io.c)
+add_library(math ${BKA_SRC}/math.c)
+add_library(pcb ${BKA_SRC}/pcb.c)
+add_library(sched ${BKA_SRC}/sched.c)
+add_library(string ${BKA_SRC}/string.c)
+add_library(syscall ${BKA_SRC}/syscall.c)
+add_library(utils ${BKA_SRC}/utils.c)
 
-configure_file(${BKA_INC}/sys.h.in ${PROJECT_BINARY_DIR}/${BKA_INC}/sys.h)
+# Libraries dependecies
+target_link_libraries(asl PRIVATE pcb)
+target_link_libraries(pcb PRIVATE string utils)
+target_link_libraries(sched PRIVATE pcb)
+target_link_libraries(string PRIVATE math utils)
+target_link_libraries(syscall PRIVATE sched)
+target_link_libraries(utils PRIVATE math)
 
-add_library(io OBJECT ${BKA_SRC}/io.c)
-add_library(math OBJECT ${BKA_SRC}/math.c)
-add_library(string OBJECT ${BKA_SRC}/string.c)
-add_library(utils OBJECT ${BKA_SRC}/utils.c)
-add_library(pcb OBJECT ${BKA_SRC}/pcb.c)
-add_library(asl OBJECT ${BKA_SRC}/asl.c)
-add_library(phase0 OBJECT ${BKA_SRC}/phase0.c)
-add_library(phase1 OBJECT ${BKA_SRC}/phase1.c)
-add_library(_bka_test OBJECT ${BKA_SRC}/bka_test.c)
-
+if (CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
+	target_link_libraries(math PRIVATE libdiv)
+endif()
 
 # CPack configuration -- useful for packaging the project in various formats
 # (e.g. .tar, .zip, .deb etc.)
@@ -66,6 +70,5 @@ list(APPEND CPACK_SOURCE_IGNORE_FILES ".*build.*/")
 list(APPEND CPACK_SOURCE_IGNORE_FILES ".git/")
 list(APPEND CPACK_SOURCE_IGNORE_FILES ".idea/")
 list(APPEND CPACK_SOURCE_IGNORE_FILES "sw[op]$")
-
 
 include(CPack)

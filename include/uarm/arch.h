@@ -41,11 +41,11 @@
 #define RAM_TOP ((*((unsigned int *)BUS_REG_RAM_BASE)) + (*((unsigned int *)BUS_REG_RAM_SIZE)))
 
 /* Coprocessor instructions opcodes */
-#define OP_TLBWR    0xEE280F00  // opcode 2
-#define OP_TLBWI    0xEE3A0F00  // opcode 3
-#define OP_TLBR     0xEE4A2F00  // opcode 4
-#define OP_TLBP     0xEE52AF00  // opcode 5
-#define OP_TLBCLR   0xEE600F00  // opcode 6
+#define OP_TLBWR    0xEE280F00  /* opcode 2 */
+#define OP_TLBWI    0xEE3A0F00  /* opcode 3 */
+#define OP_TLBR     0xEE4A2F00  /* opcode 4 */
+#define OP_TLBP     0xEE52AF00  /* opcode 5 */
+#define OP_TLBCLR   0xEE600F00  /* opcode 6 */
 
 /* Segment-related constants */
 #define KSEGOS_BASE        0x00000000
@@ -56,7 +56,7 @@
 #define USEG2	2
 #define USEG3	3
 
-// segments base addresses
+/* segments base addresses */
 #define KSEG0BASE	0x00008000UL
 #define USEG2BASE	0x80000000UL
 #define USEG3BASE	0xC0000000UL
@@ -139,4 +139,4 @@
 #define CPUCTL_TPR_PRIORITY_MASK    0x0000000f
 #define IRT_POLICY_FIXED   0
 
-#endif //UARM_ARCH_H
+#endif /* UARM_ARCH_H */

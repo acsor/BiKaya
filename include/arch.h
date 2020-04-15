@@ -1,13 +1,11 @@
-#ifndef BKA_SYS_H
-#define BKA_SYS_H
+#ifndef BKA_ARCH_H
+#define BKA_ARCH_H
 
-
-#cmakedefine BKA_ARCH_UMPS
-#cmakedefine BKA_ARCH_UARM
 
 #ifdef BKA_ARCH_UMPS
-#include "umps/libumps.h"
 #include "umps/arch.h"
+#include "umps/cp0.h"
+#include "umps/libumps.h"
 #include "umps/types.h"
 #elif defined(BKA_ARCH_UARM)
 #include "uarm/libuarm.h"
@@ -40,6 +38,14 @@
 #ifndef NULL
 #define NULL	((void*)0)
 #endif
+
+
+/* CODE INHERITED FROM p1.5test_bikaya_v0.c. */
+#define BKA_TOD_LO     *((unsigned int *)BUS_REG_TOD_LO)
+#define BKA_TIME_SCALE *((unsigned int *)BUS_REG_TIME_SCALE)
+#define BKA_RAMBASE    *((unsigned int *)BUS_REG_RAM_BASE)
+#define BKA_RAMSIZE    *((unsigned int *)BUS_REG_RAM_SIZE)
+#define BKA_RAMTOP     (BKA_RAMBASE + BKA_RAMSIZE)
 
 
 /* CODE INHERITED FROM const.h, PROVIDED BY UNIVERSITY TUTOR AND PROFESSOR. */

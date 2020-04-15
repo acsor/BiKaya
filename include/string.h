@@ -68,8 +68,8 @@ void* bka_memcpy(void *dest, void const *src, unsigned n);
  * @see bka_memcpy
  */
 void* memcpy(void *dest, void const *src, unsigned n);
-// TODO Can we define memcpy as a function pointer?
-// void* (*memcpy)(void*, const void *, unsigned);
+/* TODO Can we define memcpy as a function pointer? */
+/* void* (*memcpy)(void*, const void *, unsigned); */
 
 
 #endif

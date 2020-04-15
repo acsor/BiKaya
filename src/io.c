@@ -1,4 +1,4 @@
-#include "sys.h"
+#include "arch.h"
 #include "stdarg.h"
 
 #define TERM_ST_NOTINST		0
@@ -162,7 +162,7 @@ static int bka_term_putchar(termreg_t *term, char c) {
 static int bka_print_putchar(dtpreg_t *p, char c) {
 	unsigned int status = p->status & PRINT_STATUS_MASK;
 
-	// TODO Can we expand the set of allowable statuses?
+	/* TODO Can we expand the set of allowable statuses? */
 	if (status != PRINT_ST_READY)
 		return BKA_E_GEN;
 

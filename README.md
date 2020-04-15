@@ -1,47 +1,78 @@
 # BiKaya
-BiKaya is an operating system running on two emulated, micro computer
- architectures, uARM and uMIPS2. Designed for educational purposes,
-this project was commissioned as part of the Operating Systems course from the
-University of Bologna, 2019-2020 a.y.
+BiKaya is an educational-purpose, cross-architecture operating system
+compatible with uARM and uM(I)PS2, two micro ISAs derived from ARM and MIPS,
+respectively.
 
-## Installation
-BiKaya features several executable targets, each one described in its own
-section.
+## Running
+BiKaya (meta) build system is CMake. The list of available executables is
 
-### Building phase 0 targets
-In order to build the cross-compiled executables, do the following
+* For uARM: `test0.uarm`, `test1.uarm`, `test2.uarm`, `unit_test.uarm`
+* For uMPS: `test0.core.umps`, `test1.core.umps`, `test2.core.umps `, `unit_test.core.umps`
+ 
+### Instructor's note (italian paragraph)
+Il programma di test per la fase 1.5 è `test2.uarm` per uARM e `test2.core.umps`
+per uMPS. Rifarsi alla sezione seguente per le istruzioni sul come compilare.
 
-1. For the micro MIPS architecture
+### Build instructions
+As an example, assume you want to compile and then run `test2.uarm` and
+`test2.core.umps`. Your terminal steps should then be
 
-	```bash
-	cmake -B build-umps -S . -D CMAKE_TOOLCHAIN_FILE=toolchains/umps.cmake
-	cd build-umps
-	make kernel0.core.umps
-
-	# Launch the umps2 emulator
-	```
-
-1. Equivalently, for the micro ARM architecture
+1. For the uARM architecture
 
 	```bash
-	cmake -B build-uarm -S . -D CMAKE_TOOLCHAIN_FILE=toolchains/uarm.cmake
-	cd build-uarm
-	make kernel0.uarm
+    mkdir build-uarm
+    cd build-uarm
+    cmake -D CMAKE_TOOLCHAIN_FILE=../cmake/arm-none-eabi.cmake ..
+    make test2.uarm
 
-	# Launch the uarm emulator
+    # Launch the uarm emulator
+    ```
+
+1. For the uMPS architecture
+
+	```bash
+    mkdir build-umps
+    cd build-umps
+    cmake -D CMAKE_TOOLCHAIN_FILE=../cmake/mipsel-linux-gnu.cmake ..
+    make test2.core.umps
+
+    # Launch the umps2 emulator
 	```
  
-### Building phase 1 targets
-Follow the steps exactly as in building targets for the phase0 phase, except
-for substituting `kernel0.core.umps` with `kernel1.core.umps`, and `kernel0.uarm`
-with `kernel1.uarm`.
+#### Build insructions: alternative toolchain(s)
+The [CMAKE_TOOLCHAIN_FILE][ctf] command-line variabile passed to CMake instructs
+it on where to find the cross-compiling toolchain. Since we are building for
+architectures other than the host one, we cannot use the ordinary toolchain
+(e.g. `gcc`).
 
-## Testing
-BiKaya features a moderably-sized unit-testing suite. In order to run it,
-build the `bka_test.umps` (or `bka_test.uarm`) exeutable and launch it as the
-others.
+It might be that your operating system (e.g. Linux distribution) doesn't have
+an easy access to the toolchains our project looks for, or that you have any
+other compelling reason to switch from the ones you already own. If that is the
+case, you may obtain the required components to compile our project by
+downloading and installing them with [crosstool-ng][ct-ng]. That's where the
+`CMAKE_TOOLCHAIN_FILE` variable comes in handy: if the toolchain is installed
+locally, you can provide an alternative file location to it, like
+`mipsel-linux-gnu-local.cmake`, filled in like so
 
-**Note**: currently available for uMIPS only.
+```cmake
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR mips)
+set(TOOLCHAIN_ROOT /home/user/.../mipsel-unknown-linux-gnu)     # 1
+set(TOOLCHAIN_PREFIX mipsel-linux-gnu)                          # 2
+
+set(CMAKE_C_COMPILER ${TOOLCHAIN_ROOT}/bin/${TOOLCHAIN_PREFIX}-gcc)
+set(CMAKE_ASM_COMPILER ${TOOLCHAIN_ROOT}/bin/${TOOLCHAIN_PREFIX}-gcc)
+set(CMAKE_C_LINKER ${TOOLCHAIN_ROOT}/bin/${TOOLCHAIN_PREFIX}-ld)
+```
+
+Ideally, you should only change lines `1` and `2` to match your local
+configuration. The particular instructions, and even the name itself of the file,
+are entirely arbitrary suggestions. See more in the [official CMake
+documentation][cdoc].
+
+[ctf]: https://cmake.org/cmake/help/latest/variable/CMAKE_TOOLCHAIN_FILE.html
+[ct-ng]: https://crosstool-ng.github.io/
+[cdoc]: https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html
 
 ## Packaging
 This option is mostly intended for people working on the project.
