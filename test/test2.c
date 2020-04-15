@@ -1,11 +1,12 @@
+#include "arch.h"
 #include "exc.h"
 #include "io.h"
 #include "pcb.h"
-#include "string.h"
 #include "sched.h"
-#include "arch.h"
 #include "syscall.h"
 #include "utils.h"
+
+#define TEST_STEPS	6
 
 
 /**
@@ -50,9 +51,29 @@ static void sec_trap ();
  */
 static void sec_sysbk ();
 
-void test1();
-void test2();
-void test3();
+static unsigned get_microseconds();
+static void delay_ms(unsigned ms);
+
+static void proc_test1();
+static void proc_test2();
+static void proc_test3();
+
+
+volatile int test1_baton[TEST_STEPS + 1] = {0};
+volatile int test2_baton[TEST_STEPS + 1] = {0};
+volatile int test3_baton[TEST_STEPS + 1] = {0};
+
+static char *to_print[] = {
+		"1                        \n","2          _nnnn_        \n",
+		"3         dGGGGMMb       \n", "4        @p~qp~~qMb      \n",
+		"5        M|@||@) M|      \n",  "6        @,----.JM|      \n",
+		"7       JS^\\__/  qKL     \n", "8      dZP        qKRb   \n",
+		"9     dZP          qKKb  \n", "10   fZP            SMMb \n",
+		"11   HZM            MMMM \n",  "12   FqM            MMMM \n",
+		"13 __| '.        |\\dS'qML\n", "14 |    `.       | `' \\Zq\n",
+		"15_)      \\.___.,|     .'\n", "16\\____   )MMMMMP|   .'  \n",
+		"17     `-'       `--'    \n",  "18                       \n",
+};
 
 
 /**
@@ -81,7 +102,7 @@ void sched_queue_init() {
 
 pcb_t* pcb_test_factory(unsigned test_no) {
 	pcb_t *p = bka_pcb_alloc();
-	pfun_t tests[] = {test1, test2, test3};
+	pfun_t tests[] = {proc_test1, proc_test2, proc_test3};
 
 	if (p) {
 		bka_pcb_init(p, tests[test_no], test_no);
@@ -146,4 +167,86 @@ void sec_sysbk () {
 		default:
 			bka_na_exit(SYSBK_NEWAREA);
 	}
+}
+
+
+static unsigned get_microseconds() {
+	return BKA_TOD_LO / BKA_TIME_SCALE;
+}
+
+static void delay_ms(unsigned ms) {
+	unsigned start = get_microseconds();
+
+	while (get_microseconds() - start <= ms * 1000);
+}
+
+void proc_test1() {
+	termreg_t *term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
+	int i = 0;
+
+	bka_term_puts(term0, "Entering test1!\n", NULL);
+
+	for (i = 0; i < TEST_STEPS; i++) {
+		while (test3_baton[i] == 0)
+			;
+
+		bka_term_puts(term0, to_print[i * 3], NULL);
+		delay_ms(100);
+		test1_baton[i] = 1;
+	}
+
+	while (test3_baton[TEST_STEPS] == 0)
+		;
+
+	bka_term_puts(term0, "Good job from test1\n", NULL);
+	test1_baton[TEST_STEPS] = 1;
+	/* TODO Once phase 1.5 is over, implement BKA_SYS_KILL with bka_sys_kill
+	 * instead, feeding the pid of the process to kill here. */
+	SYSCALL(BKA_SYS_KILL, 0, 0, 0);
+}
+
+void proc_test2() {
+	termreg_t *term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
+	int i = 0;
+
+	bka_term_puts(term0, "Entering test2!\n", NULL);
+
+	for (i = 0; i < TEST_STEPS; i++) {
+		while (test1_baton[i] == 0)
+			;
+
+		bka_term_puts(term0, to_print[i * 3 + 1], NULL);
+		delay_ms(100);
+		test2_baton[i] = 1;
+	}
+
+	while (test1_baton[TEST_STEPS] == 0)
+		;
+
+	bka_term_puts(term0, "Good job from test2\n", NULL);
+	test2_baton[TEST_STEPS] = 1;
+	SYSCALL(BKA_SYS_KILL, 0, 0, 0);
+}
+
+void proc_test3() {
+	termreg_t *term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
+	int i = 0;
+
+	bka_term_puts(term0, "Entering test3!\n", NULL);
+	test3_baton[0] = 1;
+
+	for (i = 0; i < TEST_STEPS; i++) {
+		while (test2_baton[i] == 0)
+			;
+
+		bka_term_puts(term0, to_print[i * 3 + 2], NULL);
+		delay_ms(100);
+		test3_baton[i + 1] = 1;
+	}
+
+	while (test2_baton[TEST_STEPS] == 0)
+		;
+
+	bka_term_puts(term0, "Good job from test3\n", NULL);
+	SYSCALL(BKA_SYS_KILL, 0, 0, 0);
 }
