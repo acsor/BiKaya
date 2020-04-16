@@ -29,8 +29,8 @@ target_link_libraries(test1.uarm crtso libuarm libdiv asl io string)
 add_executable(test2.uarm ${BKA_TEST}/test2.c)
 target_link_libraries(test2.uarm exc crtso io libuarm pcb syscall)
 
-add_executable(test3.uarm ${BKA_TEST}/test3.c)
-target_link_libraries(test3.uarm exc crtso io libuarm pcb sched string)
+add_executable(test3.uarm ${BKA_TEST}/test3.c ${BKA_SRC}/p2test_bikaya_v0.1.c)
+target_link_libraries(test3.uarm crtso exc io libuarm pcb sched string)
 
 add_executable(unit_test.uarm ${BKA_TEST}/unit_test.c)
-target_link_libraries(unit_test.uarm crtso libuarm libdiv asl io string)
+target_link_libraries(unit_test.uarm asl crtso io libdiv libuarm string)

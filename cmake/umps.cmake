@@ -29,26 +29,23 @@ add_compile_options(${CFLAGS_UMPS})
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LDFLAGS_UMPS}")
 # set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
+# uMPS libraries
 add_library(libumps ${UMPS_SRC}/libumps.S)
 add_library(crtso ${UMPS_SRC}/crtso.S)
 
-# Add test0 executable
+# uMPS executables
 add_executable(test0 ${BKA_TEST}/test0.c)
 target_link_libraries(test0 crtso libumps io)
 
-# Add test1 executable
 add_executable(test1 ${BKA_TEST}/test1.c)
 target_link_libraries(test1 crtso libumps io string utils asl)
 
-# Add test2 executable
 add_executable(test2 ${BKA_TEST}/test2.c)
 target_link_libraries(test2 exc crtso io libumps pcb syscall)
 
-# Add test2 executable
-add_executable(test3 ${BKA_TEST}/test3.c)
-target_link_libraries(test3 exc crtso io libumps pcb sched string)
+add_executable(test3 ${BKA_TEST}/test3.c ${BKA_SRC}/p2test_bikaya_v0.1.c)
+target_link_libraries(test3 crtso exc io libumps pcb sched string)
 
-# Add unit_test executable
 add_executable(unit_test ${BKA_TEST}/unit_test.c)
 target_link_libraries(unit_test crtso io libumps string utils)
 
