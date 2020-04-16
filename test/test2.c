@@ -200,9 +200,7 @@ void proc_test1() {
 
 	bka_term_puts(term0, "Good job from test1\n", NULL);
 	test1_baton[TEST_STEPS] = 1;
-	/* TODO Once phase 1.5 is over, implement BKA_SYS_KILL with bka_sys_kill
-	 * instead, feeding the pid of the process to kill here. */
-	SYSCALL(BKA_SYS_KILL, 0, 0, 0);
+	SYSCALL(BKA_SYS_KILL, (unsigned) NULL, 0, 0);
 }
 
 void proc_test2() {
@@ -225,7 +223,7 @@ void proc_test2() {
 
 	bka_term_puts(term0, "Good job from test2\n", NULL);
 	test2_baton[TEST_STEPS] = 1;
-	SYSCALL(BKA_SYS_KILL, 0, 0, 0);
+	SYSCALL(BKA_SYS_KILL, (unsigned) NULL, 0, 0);
 }
 
 void proc_test3() {
@@ -248,5 +246,5 @@ void proc_test3() {
 		;
 
 	bka_term_puts(term0, "Good job from test3\n", NULL);
-	SYSCALL(BKA_SYS_KILL, 0, 0, 0);
+	SYSCALL(BKA_SYS_KILL, (unsigned) NULL, 0, 0);
 }

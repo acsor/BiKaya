@@ -70,13 +70,13 @@ typedef unsigned int cpu_t;
 typedef unsigned int pid_t;
 typedef memaddr_t memaddr;
 
-#define GETCPUTIME       BKA_SYS_GETCPUTIME
+#define GETCPUTIME       BKA_SYS_CPU_TIME
 #define CREATEPROCESS    BKA_SYS_FORK
 #define TERMINATEPROCESS BKA_SYS_KILL
 #define VERHOGEN         BKA_SYS_VERHOGEN
 #define PASSEREN         BKA_SYS_PASSEREN
-#define WAITIO           BKA_SYS_WAITIO
-#define SPECPASSUP       BKA_SYS_SPECPASSUP
+#define WAITIO           BKA_SYS_IOCMD
+#define SPECPASSUP       BKA_SYS_SPEC_PASSUP
 #define GETPID           BKA_SYS_GETPID
 
 #define DEFAULT_PRIORITY 1
