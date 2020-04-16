@@ -4,6 +4,10 @@
 #include "arch.h"
 #include "list.h"
 
+#define	BKA_PCB_STAT_OK	0
+#define	BKA_PCB_STAT_FREED 1
+#define	BKA_PCB_STAT_INV 2
+
 
 /**
  * A process function type, to be associated as the code executed by a given
@@ -68,6 +72,11 @@ void bka_pcb_free(pcb_t *p);
  */
 void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority);
 /**
+ * @return @c BKA_PCB_STAT_FREED if @c p was returned to the free PCB list, @c
+ * BKA_PCB_STAT_INV if it points to an invalid memory area or @c 0 otherwise.
+ */
+int bka_pcb_stat(pcb_t const *p);
+/**
  * @param p A process' PCB to get a PID for. Undefined behavior might occur if
  * @c p is @c NULL or points to an invalid memory area.
  * @return The PID (Process ID) corresponding to the given process control
@@ -103,6 +112,10 @@ void bka_pcb_queue_ins(list_t *head, pcb_t *p);
  * removal is performed.
  */
 pcb_t* bka_pcb_queue_head(list_t *head);
+/**
+ * @return @c 1 if @c head contains @c p, @c 0 otherwise.
+ */
+int bka_pcb_queue_contains(list_t *head, pcb_t const *p);
 /**
  * Removes the first element from the process queue pointed to by @c head.
  * @param head Sentinel element of the list to remove from.

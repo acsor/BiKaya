@@ -76,6 +76,15 @@ void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
 #endif
 }
 
+int bka_pcb_stat(pcb_t const *p) {
+	if (p < pcb_table || (pcb_table + BKA_MAX_PROC - 1) < p)
+		return BKA_PCB_STAT_INV;
+	else if (bka_pcb_queue_contains(&free_pcb_list, p))
+		return BKA_PCB_STAT_FREED;
+
+	return 0;
+}
+
 int bka_pcb_to_pid (pcb_t const * const p) {
 	return p - pcb_table;
 }
@@ -109,6 +118,17 @@ void bka_pcb_queue_ins(list_t *head, pcb_t *p) {
 
 pcb_t* bka_pcb_queue_head(list_t *head) {
 	return list_empty(head) ? NULL: container_of(head->next, pcb_t, next);
+}
+
+int bka_pcb_queue_contains(list_t *head, pcb_t const *p) {
+	pcb_t *curr;
+
+	list_for_each_entry(curr, head, next) {
+		if (curr == p)
+			return 1;
+	}
+
+	return 0;
 }
 
 pcb_t* bka_pcb_queue_pop(list_t *head) {
