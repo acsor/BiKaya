@@ -30,6 +30,10 @@ typedef struct pcb_t {
 
 		state_t state;
 		int priority, original_priority;
+		
+		unsigned int user_timer;
+		unsigned int kernel_timer;
+		unsigned int full_timer;
 
 		/* Key of the semaphore which the process is eventually blocked on */
 		int *semkey;

@@ -151,11 +151,22 @@ void sys_return_stay(unsigned retval) {
 #endif
 }
 
-
-void sys_cpu_time(unsigned arg1, unsigned arg2, unsigned arg3) {
-	/* TODO Implement. */
-	sys_return(-1);
+/*
+Return -1 if the time can't be returned, 0 otherwise.
+*/
+void sys_cpu_time(unsigned int* user, unsigned int* kernel, unsigned int* wallclock) {
+	
+	pcb_t *to_calculate = ((pcb_t *) arg1) == NULL ? bka_sched_curr: (pcb_t *) arg1;;
+	
+	/* If the process is in the free PCB list return -1.*/
+	if (bka_pcb_stat(to_calculate)) 
+		sys_return(-1);
+	
+	*wallclock = out->full_timer;
+	sys_return(0);	
+	
 }
+
 
 void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3) {
 	/* TODO Implement. */

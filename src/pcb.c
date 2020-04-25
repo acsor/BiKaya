@@ -42,7 +42,11 @@ pcb_t* bka_pcb_alloc(void) {
 	out->priority = 0;
 	out->original_priority = 0;
 	out->semkey = NULL;
-
+	/*Initialize the timer fields to the appropriate values */
+	//out->user_timer = 0;
+	//out->kernel_timer = 0;
+	out->full_timer = BKA_TOD_LO;
+	
 	return out;
 }
 
