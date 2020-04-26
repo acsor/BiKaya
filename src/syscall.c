@@ -22,7 +22,7 @@ static void sys_return(unsigned retval);
  */
 static void sys_return_stay(unsigned retval);
 
-static void sys_cpu_time(unsigned arg1, unsigned arg2, unsigned arg3);
+static void sys_cpu_time(unsigned int* user, unsigned int* kernel, unsigned int* wallclock);
 static void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3);
 /**
  * Terminates the process identified by @c arg1 and all of its descendant
@@ -156,17 +156,19 @@ Return -1 if the time can't be returned, 0 otherwise.
 */
 void sys_cpu_time(unsigned int* user, unsigned int* kernel, unsigned int* wallclock) {
 	
-	pcb_t *to_calculate = ((pcb_t *) arg1) == NULL ? bka_sched_curr: (pcb_t *) arg1;;
-	
+	pcb_t *to_calculate = bka_sched_curr;
+
 	/* If the process is in the free PCB list return -1.*/
 	if (bka_pcb_stat(to_calculate)) 
 		sys_return(-1);
-	
-	*wallclock = out->full_timer;
+
+    *user = (to_calculate->user_timer) - (to_calculate->full_timer);
+    *kernel = (to_calculate->kernel_timer) - (to_calculate->full_timer);
+    /*The difference between the current value of TODLO and the initial value(when the process was created)*/
+	*wallclock = (BKA_TOD_LO) - (to_calculate->full_timer);
 	sys_return(0);	
 	
 }
-
 
 void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3) {
 	/* TODO Implement. */
