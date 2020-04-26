@@ -45,9 +45,7 @@ pcb_t* bka_pcb_alloc(void) {
 	/*Initialize the timer fields to the appropriate values */
 	out->user_timer = 0;
 	out->kernel_timer = 0;
-	/*Used this field to save the starting time of the process*/
-	out->full_timer = BKA_TOD_LO;
-	
+	out->full_timer = 0;
 	return out;
 }
 
@@ -79,6 +77,8 @@ void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
 	/* Set stack pointer */
 	p->state.sp = BKA_RAMTOP - FRAMESIZE * (bka_pcb_to_pid(p) + 1);
 #endif
+    /*Used this field to save the starting time of the process*/
+    p->full_timer = BKA_TOD_LO;
 }
 
 void bka_pcb_state_set(pcb_t *p, state_t *s) {
