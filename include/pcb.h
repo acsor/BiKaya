@@ -34,6 +34,9 @@ typedef struct pcb_t {
 		unsigned int user_timer;
 		unsigned int kernel_timer;
 		unsigned int full_timer;
+		/*This 2 variables are useful to sum the time, without declaring different temporary variables every time we need it*/
+		unsigned int start_time;
+		unsigned int end_time;
 
 		/* Key of the semaphore which the process is eventually blocked on */
 		int *semkey;

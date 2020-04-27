@@ -162,11 +162,12 @@ void sys_cpu_time(unsigned int* user, unsigned int* kernel, unsigned int* wallcl
 	if (bka_pcb_stat(to_calculate)) 
 		sys_return(-1);
 
-    *user = (to_calculate->user_timer) - (to_calculate->full_timer);
-    *kernel = (to_calculate->kernel_timer) - (to_calculate->full_timer);
+
     /*The difference between the current value of TODLO and the initial value(when the process was created)*/
 	*wallclock = (BKA_TOD_LO) - (to_calculate->full_timer);
-	sys_return(0);	
+    *kernel = to_calculate->kernel_timer;
+	*user = (*wallclock - *kernel);
+	sys_return_stay(0);
 	
 }
 
