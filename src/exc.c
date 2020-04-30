@@ -43,6 +43,6 @@ void bka_na_exit(unsigned new_area) {
 	state_t *old_state = (state_t *) (new_area - STATE_T_SIZE);
 #endif
     bka_sched_curr->end_time = BKA_TOD_LO;
-    bka_sched_curr->kernel_timer += (bka_sched_curr->end_time - bka_sched_curr->start_time = BKA_TOD_LO);
+    bka_sched_curr->kernel_timer += (bka_sched_curr->end_time - bka_sched_curr->start_time);
 	LDST(old_state);
 }
