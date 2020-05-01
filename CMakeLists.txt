@@ -26,8 +26,8 @@ elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL mips)
 	include(cmake/umps.cmake)
 else()
 	message(FATAL_ERROR "You need to specify a toolchain file with either -D
-	CMAKE_TOOLCHAIN_FILE=toolchains/umps.cmake or -D
-	CMAKE_TOOLCHAIN_FILE=toolchains/uarm.cmake")
+	CMAKE_TOOLCHAIN_FILE=cmake/arm-none-eabi.cmake or -D
+	CMAKE_TOOLCHAIN_FILE=cmake/mipsel-linux-gnu.cmake")
 endif()
 
 # Architecture-independent libraries
