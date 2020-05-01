@@ -168,27 +168,49 @@ void sys_return_stay(unsigned retval) {
 /*
 Return -1 if the time can't be returned, 0 otherwise.
 */
-void sys_cpu_time(unsigned int* user, unsigned int* kernel, unsigned int* wallclock) {
+void sys_cpu_time(unsigned arg1, unsigned arg2, unsigned arg3) {
+	unsigned int* user = (unsigned int*) arg1;
+	unsigned int* kernel = (unsigned int*) arg2;
+	unsigned int* wallclock = (unsigned int*) arg3;
+	
 	
 	pcb_t *to_calculate = bka_sched_curr;
 
 	/* If the process is in the free PCB list return -1.*/
 	if (bka_pcb_stat(to_calculate)) 
-		sys_return(-1);
+		sys_return(BKA_E_GEN);
 
 
     /*The difference between the current value of TODLO and the initial value(when the process was created)*/
 	*wallclock = (BKA_TOD_LO) - (to_calculate->full_timer);
     *kernel = to_calculate->kernel_timer;
 	*user = (*wallclock - *kernel);
-	sys_return_stay(0);
-	
+	sys_return(0);
 }
 
+/*
+ * @statep is the state we assign to the process created
+ * @cpid contains the pid of the process we have created if @cpid != NULL and the syscall has gone well
+ */
 void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3) {
-	/* TODO Implement. */
-	sys_return(-1);
+	state_t *statep = (state_p *) arg1;
+	int priority = (int) arg2;
+	pcb_t **cpid= (pcb_t **) arg3;
+    /*Allocating a new pcb and initialize it with given parameters*/
+	pcb_t *child = bka_pcb_alloc();
+	child -> parent = bka_sched_curr;
+	child -> original_priority = priority;
+	child -> priority = priority;
+	child -> state = statep;
+	if(cpid == NULL)
+        sys_return(BKA_E_GEN);
+	else
+	    *cpid = child;
+
+    bka_sched_ready_enqueue(child);
+    sys_return(0);
 }
+
 
 void sys_kill(unsigned arg1, unsigned arg2, unsigned arg3) {
 	pcb_t *to_kill = ((pcb_t *) arg1) == NULL ? bka_sched_curr: (pcb_t *) arg1;
