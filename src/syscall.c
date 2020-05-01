@@ -271,7 +271,25 @@ void sys_spec_passup(unsigned type, unsigned old_area, unsigned new_area) {
 	}
 }
 
-void sys_get_pid(unsigned arg1, unsigned arg2, unsigned arg3) {
-	/* TODO Implement. */
-	sys_return(-1);
+/*
+ * Return 0 if the syscall has assigned the correct value to @pid and @ppid, -1 otherwise
+ * TODO:shall we introduce a third value if @pid or @ppid is NULL?
+ *
+ */
+void sys_get_pid(void ** pid, void ** ppid, 0) {
+    pcb_t *to_getpid = bka_sched_curr;
+
+    if(pid == NULL){
+        sys_return_stay(-1);
+    } else{
+        *pid = to_getpid;
+
+        if(ppid == NULL){
+            sys_return_stay(-1)
+        }
+        else {
+            *ppid = to_getpid->parent;
+        }
+    }
+    sys_return_stay(0);
 }
