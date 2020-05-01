@@ -22,7 +22,21 @@ static void sys_return(unsigned retval);
  */
 static void sys_return_stay(unsigned retval);
 
-static void sys_cpu_time(unsigned int* user, unsigned int* kernel, unsigned int* wallclock);
+/**
+ * Assuming @c arg1, @c arg2 and @c arg2 parameters encoding variables of
+ * type @c unsigned*, this syscall acts in such a way that
+ *
+ * <ul>
+ * 	<li>@c arg1 encodes the time the current process used in user-space</li>
+ * 	<li>@c arg2 encodes the time the current process used in kernel-space</li>
+ * 	<li>@c arg3 encodes the total time the current process used since being
+ * 	started<li>
+ * </ul>
+ *
+ * By time unit we mean here one clock cycle.
+ * @return @c BKA_E_GEN if the time can't be returned, @c 0 otherwise.
+ */
+static void sys_cpu_time(unsigned arg1, unsigned arg2, unsigned arg3);
 static void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3);
 /**
  * Terminates the process identified by @c arg1 and all of its descendant
@@ -78,13 +92,19 @@ static void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3);
  * @return TODO Fill in.
  */
 static void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3);
+static void sys_spec_passup(unsigned arg1, unsigned arg2, unsigned arg3);
 /**
- * TODO Document.
- * @param type
- * @param old_area
- * @param new_area
+ * Assuming @c arg1 and @c arg2 encoding two variables @c curr and @c parent
+ * of type @c pcb_t**, assigns to @c *curr the pointer to the currently
+ * running process, and to @c *parent the pointer to @c curr's parent.
+ * @param arg1 Pointer to a pointer where the currently running process has
+ * to be stored.
+ * @param arg2 Pointer to a pointer where the currently running process' parent
+ * has to be stored.
+ * @param arg3 Unused.
+ * @return @c 0 if the syscall was able to correctly assign a value to @c curr,
+ * @c BKA_E_GEN otherwise.
  */
-static void sys_spec_passup(unsigned type, unsigned old_area, unsigned new_area);
 static void sys_get_pid(unsigned arg1, unsigned arg2, unsigned arg3);
 
 
@@ -97,14 +117,8 @@ typedef void (*syscall_t)(unsigned, unsigned, unsigned);
  * A mapping from syscall ID to the corresponding syscall function pointer.
  */
 static syscall_t sys_id_to_syscall[] = {
-		sys_cpu_time,
-		sys_fork,
-		sys_kill,
-		sys_verhogen,
-		sys_passeren,
-		sys_iocmd,
-		sys_spec_passup,
-		sys_get_pid,
+	sys_cpu_time, sys_fork, sys_kill, sys_verhogen, sys_passeren, sys_iocmd,
+	sys_spec_passup, sys_get_pid,
 };
 
 
@@ -271,25 +285,17 @@ void sys_spec_passup(unsigned type, unsigned old_area, unsigned new_area) {
 	}
 }
 
-/*
- * Return 0 if the syscall has assigned the correct value to @pid and @ppid, -1 otherwise
- * TODO:shall we introduce a third value if @pid or @ppid is NULL?
- *
- */
-void sys_get_pid(void ** pid, void ** ppid, 0) {
-    pcb_t *to_getpid = bka_sched_curr;
+void sys_get_pid(unsigned arg1, unsigned arg2, unsigned arg3) {
+	pcb_t **current = (pcb_t **) arg1, **parent = (pcb_t **) arg2;
 
-    if(pid == NULL){
-        sys_return_stay(-1);
-    } else{
-        *pid = to_getpid;
+	if (current) {
+		*current = bka_sched_curr;
 
-        if(ppid == NULL){
-            sys_return_stay(-1)
-        }
-        else {
-            *ppid = to_getpid->parent;
-        }
-    }
-    sys_return_stay(0);
+		if (parent)
+            *parent = bka_sched_curr->parent;
+
+		sys_return(0);
+	}
+
+	sys_return(BKA_E_GEN);
 }
