@@ -69,20 +69,21 @@ static void sys_verhogen(unsigned arg1, unsigned arg2, unsigned arg3);
  * @return The updated value of the identified semaphore.
  */
 static void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3);
-
 /**
- * Syscall used to interact with devices.
- * It executes an I/O operation by copying @command in the 'command'
- * field of the device register pointed to by @device.
+ * Syscall to interact with devices.
+ *
+ * This syscall issues an I/O operation by copying @c command in the 'command'
+ * field of the device register pointed to by @c device.
  * The caller is blocked until command termination since operation on
  * devices are asynchronous.
- * @command: I/O operation to execute
- * @device: pointer to the register of the desired device
- * @subdevice: used only if device is a terminal, to distinguish between
+ *
+ * @param command: I/O operation to execute
+ * @param device: pointer to the register of the desired device
+ * @param subdevice: used only if device is a terminal, to distinguish between
  * transmitting and receiving subdevice; trans = 0, recv = 1.
+ * @return TODO Fill in.
  */
-
-static void sys_iocmd(unsigned command, unsigned* device, unsigned subdevice);
+static void sys_iocmd(unsigned command, unsigned device, unsigned subdevice);
 static void sys_spec_passup(unsigned arg1, unsigned arg2, unsigned arg3);
 static void sys_get_pid(unsigned arg1, unsigned arg2, unsigned arg3);
 
@@ -182,48 +183,48 @@ void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3) {
 	bka_sched_resume();
 }
 
-
-void sys_iocmd(unsigned command, unsigned* device, unsigned subdevice) {
+void sys_iocmd(unsigned command, unsigned device, unsigned subdevice) {
+	unsigned *_device = (unsigned *) device;
     /* blocco il processo chiamante */
     SYSCALL(BKA_SYS_PASSEREN, (unsigned) bka_sched_curr->semkey,0, 0);
 
     /* start communication with device by writing @command into the device's device register */
-    if (FIRST_TERM_ADDR <= *device && *device <= LAST_TERM_ADDR) {    /* terminals */
+    if (FIRST_TERM_ADDR <= *_device && *_device <= LAST_TERM_ADDR) {    /* terminals */
         if (subdevice == TERM_TRANSM)
-            ((termreg_t*) device)->transm_command = command; /* maybe ((devreg_t*) device)->term.transm_command ?? */
+            ((termreg_t*) _device)->transm_command = command; /* maybe ((devreg_t*) _device)->term.transm_command ?? */
         else if (subdevice == TERM_RECV)
-            ((termreg_t*) device)->recv_command = command;
+            ((termreg_t*) _device)->recv_command = command;
     }
     else {    /* disks, tapes, printers */
-        ((dtpreg_t*) device)->command =  command;
+        ((dtpreg_t*) _device)->command =  command;
     }
 
     /* wait until the I/O operation is completed: wait until the device raises an interrupt, by looking at the bit corresponding to the device in the interrupting devices bitmap */
-    unsigned device_number = (*device - DEV_REG_START) % DEV_REGBLOCK_SIZE;
-    unsigned device_line   = (*device - DEV_REG_START) / DEV_REGBLOCK_SIZE;
+    unsigned device_number = (*_device - DEV_REG_START) % DEV_REGBLOCK_SIZE;
+    unsigned device_line   = (*_device - DEV_REG_START) / DEV_REGBLOCK_SIZE;
     while ((CDEV_BITMAP_ADDR(device_line) & (1 << device_number)) == 0)    /* wait until interrupt is raised*/
         ;
 
     /* ack the interrupt */
-    if (FIRST_TERM_ADDR <= *device && *device <= LAST_TERM_ADDR) {
+    if (FIRST_TERM_ADDR <= *_device && *_device <= LAST_TERM_ADDR) {
         if (subdevice == TERM_TRANSM)
-            ((termreg_t*) device)->transm_command = CMD_ACK;
+            ((termreg_t*) _device)->transm_command = CMD_ACK;
         else if (subdevice == TERM_RECV)
-            ((termreg_t*) device)->recv_command = CMD_ACK;
+            ((termreg_t*) _device)->recv_command = CMD_ACK;
     }
     else {    /* disks, tapes, printers */
-        ((dtpreg_t*) device)->command =  CMD_ACK;
+        ((dtpreg_t*) _device)->command =  CMD_ACK;
     }
 
     /* save the content of the device's status register */
     unsigned dev_status;
-    if (FIRST_TERM_ADDR <= *device && *device <= LAST_TERM_ADDR) {
+    if (FIRST_TERM_ADDR <= *_device && *_device <= LAST_TERM_ADDR) {
         if (subdevice == TERM_TRANSM)
-            dev_status = ((termreg_t*) device)->transm_status;
+            dev_status = ((termreg_t*) _device)->transm_status;
         else if (subdevice == TERM_RECV)
-            dev_status = ((termreg_t*) device)->recv_status;
+            dev_status = ((termreg_t*) _device)->recv_status;
     } else {
-        dev_status = ((dtpreg_t *) device)->status;
+        dev_status = ((dtpreg_t *) _device)->status;
     }
 
     /* faccio riprendere processo chiamante */
