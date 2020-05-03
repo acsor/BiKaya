@@ -10,6 +10,10 @@
 #define FIRST_TERM_ADDR (DEV_REG_ADDR(IL_TERMINAL, 0))
 #define LAST_TERM_ADDR  (DEV_REG_ADDR(IL_TERMINAL, N_DEV_PER_IL - 1))
 
+#define SPECPASSUP_SYSBP 0
+#define SPECPASSUP_TLB 1
+#define SPECPASSUP_TRAP 2
+
 /**
  * Terminates the current syscall handling by placing the return value given
  * by @c retval at an appropriate old area register. Code placed after this
@@ -109,14 +113,26 @@ static syscall_t sys_id_to_syscall[] = {
 
 
 void bka_sys_call(unsigned id, unsigned arg1, unsigned arg2, unsigned arg3) {
-	/* TODO Shall we perform checks on whether sys_return() is called by
-	 * subordinate syscalls? */
-	if (BKA_SYS_CPU_TIME <= id && id <= BKA_SYS_GETPID) {
-		sys_id_to_syscall[id](arg1, arg2, arg3);
-	} else {
-		PANIC();
-	}
+    /* TODO Shall we perform checks on whether sys_return() is called by
+     * subordinate syscalls? */
+    if (BKA_SYS_CPU_TIME <= id && id <= BKA_SYS_GETPID) {
+        sys_id_to_syscall[id](arg1, arg2, arg3);
+    }
+    else if (BKA_SYS_GETPID < id && id <= MAX_SYSCALL_ID){ /* TODO: is there a limit? */
+        /* se avevo invocato la specpassup con un gestore SYS/BP personalizzato. E' sufficiente verificare una delle due aree, ad esempio la [0]*/
+        if (bka_sched_curr->specpassup_areas_sysbp[0] != NULL) {
+            // TODO: salvo lo stato del processo corrente nella OA personalizzata
+            bka_na_enter(bka_sched_curr->specpassup_areas_sysbp[1]);
+        }
+        else {
+            SYSCALL(TERMINATEPROCESS, NULL, 0, 0);
+        }
+    }
+    else {
+        PANIC();
+    }
 }
+
 
 void sys_return(unsigned retval) {
 	sys_return_stay(retval);
@@ -227,14 +243,46 @@ void sys_iocmd(unsigned command, unsigned device, unsigned subdevice) {
         dev_status = ((dtpreg_t *) _device)->status;
     }
 
-    /* faccio riprendere processo chiamante */
+    /* faccio riprendere processo chiamante. TODO: quando? qui, o subito dopo che venga sollevato l'interrupt? */
     SYSCALL(BKA_SYS_VERHOGEN, (unsigned) bka_sched_curr->semkey,0, 0);
     sys_return(dev_status);
 }
 
-void sys_spec_passup(unsigned arg1, unsigned arg2, unsigned arg3) {
-	/* TODO Implement. */
-	sys_return(-1);
+void sys_spec_passup(unsigned type, unsigned old, unsigned new) {
+    state_t* _old = (state_t*) old;
+    state_t* _new = (state_t*) new;
+
+    switch (type) {
+        case SPECPASSUP_SYSBP:
+            if (bka_sched_curr->specpassup_areas_sysbp[0] != NULL)
+                SYSCALL(TERMINATEPROCESS, NULL, 0, 0);
+            else {
+                /* save custom old/new areas for sys/bp in the pcb_t of the current process */
+                bka_sched_curr->specpassup_areas_sysbp[0] = _old;
+                bka_sched_curr->specpassup_areas_sysbp[1] = _new;
+            }
+            break;
+
+        case SPECPASSUP_TLB:
+            if (bka_sched_curr->specpassup_areas_tlb[0] != NULL)
+                SYSCALL(TERMINATEPROCESS, NULL, 0, 0);
+            else {
+                /* save custom old/new areas for tlb in the pcb_t of the current process */
+                bka_sched_curr->specpassup_areas_tlb[0] = _old;
+                bka_sched_curr->specpassup_areas_tlb[1] = _new;
+            }
+            break;
+
+        case SPECPASSUP_TRAP:
+            if (bka_sched_curr->specpassup_areas_trap[0] != NULL)
+                SYSCALL(TERMINATEPROCESS, NULL, 0, 0);
+            else {
+                /* save custom old/new areas for trap in the pcb_t of the current process */
+                bka_sched_curr->specpassup_areas_trap[0] = _old;
+                bka_sched_curr->specpassup_areas_trap[1] = _new;
+            }
+            break;
+    }
 }
 
 void sys_get_pid(unsigned arg1, unsigned arg2, unsigned arg3) {

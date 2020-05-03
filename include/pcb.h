@@ -32,6 +32,11 @@ typedef struct pcb_t {
 
 		/* Key of the semaphore which the process is eventually blocked on */
 		int *semkey;
+
+		/* custom old/new areas to handle specific exceptions based on syscall SPECPASSUP. areas[0/1] = old/new area */
+        state_t* specpassup_areas_sysbp[2];
+        state_t* specpassup_areas_tlb[2];
+        state_t* specpassup_areas_trap[2];
 } pcb_t;
 
 
