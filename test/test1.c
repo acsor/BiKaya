@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /**
- *	Test program for the ASL and PCB modules (phase 1).
+ *	Test program for the sem and PCB modules (phase 1).
  *
  *	Produces progress messages on terminal 0 in addition to the array
  *	``okbuf[]''. Error messages will also appear on terminal 0 in addition to
@@ -38,7 +38,7 @@
 
 #include "arch.h"
 #include "pcb.h"
-#include "asl.h"
+#include "sem.h"
 
 #define MAXSEM MAXPROC
 
@@ -328,7 +328,7 @@ int main() {
 	bka_pcb_free(procp[9]);
 
 
-    /* check ASL */
+    /* check sem */
 	bka_sem_init();
     addokbuf("Initializing active semaphore list   \n");
 
@@ -404,7 +404,7 @@ int main() {
 
     addokbuf("Test bka_sem_head() and bka_sem_pcb_rm(): OK   \n");
 
-    addokbuf("ASL module OK   \n");
+    addokbuf("sem module OK   \n");
     addokbuf("So Long and Thanks for All the Fish\n");
 
     return 0;

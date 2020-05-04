@@ -31,20 +31,20 @@ else()
 endif()
 
 # Architecture-independent libraries
-add_library(asl ${BKA_SRC}/asl.c)
 add_library(exc ${BKA_SRC}/exc.c)
 add_library(io ${BKA_SRC}/io.c)
 add_library(math ${BKA_SRC}/math.c)
 add_library(pcb ${BKA_SRC}/pcb.c)
 add_library(sched ${BKA_SRC}/sched.c)
+add_library(sem ${BKA_SRC}/sem.c)
 add_library(string ${BKA_SRC}/string.c)
 add_library(syscall ${BKA_SRC}/syscall.c)
 add_library(utils ${BKA_SRC}/utils.c)
 
 # Libraries dependecies
-target_link_libraries(asl PRIVATE pcb)
 target_link_libraries(pcb PRIVATE string utils)
 target_link_libraries(sched PRIVATE pcb)
+target_link_libraries(sem PRIVATE pcb)
 target_link_libraries(string PRIVATE math utils)
 target_link_libraries(syscall PRIVATE sched)
 target_link_libraries(utils PRIVATE math)

@@ -1,4 +1,4 @@
-#include "asl.h"
+#include "sem.h"
 #include "arch.h"
 #include "pcb.h"
 
@@ -10,7 +10,7 @@ static semd_t semd_table[BKA_MAX_PROC];
 /**
  * Head of the Active Semaphore List (ASL).
  */
-static list_t asl_head;
+static list_t sem_head;
 /**
  * Head of the Free Semaphore List (FSL).
  * Note: this name does not appear in public slides, but belongs only to this
@@ -22,7 +22,7 @@ static list_t fsl_head;
 void bka_sem_init() {
 	int i;
 
-	INIT_LIST_HEAD(&asl_head);
+	INIT_LIST_HEAD(&sem_head);
 	INIT_LIST_HEAD(&fsl_head);
 
 	/* Add all semaphores to the FSL */
@@ -41,7 +41,7 @@ semd_t* bka_sem_alloc(int *key) {
 	list_del(&result->next);
 	result->key = key;
 	INIT_LIST_HEAD(&result->proc_queue);
-	list_add_tail(&result->next, &asl_head);
+	list_add_tail(&result->next, &sem_head);
 
 	return result;
 }
@@ -54,7 +54,7 @@ void bka_sem_free(semd_t *s) {
 semd_t* bka_sem_get(int *key) {
 	semd_t *s;
 
-	list_for_each_entry(s, &asl_head, next) {
+	list_for_each_entry(s, &sem_head, next) {
 		if (s->key == key)
 			return s;
 	}

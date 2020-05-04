@@ -38,7 +38,7 @@ add_executable(test0 ${BKA_TEST}/test0.c)
 target_link_libraries(test0 crtso libumps io)
 
 add_executable(test1 ${BKA_TEST}/test1.c)
-target_link_libraries(test1 crtso libumps io string utils asl)
+target_link_libraries(test1 crtso libumps io sem string utils)
 
 add_executable(test2 ${BKA_TEST}/test2.c)
 target_link_libraries(test2 exc crtso io libumps pcb syscall)
