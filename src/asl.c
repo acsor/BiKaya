@@ -19,7 +19,7 @@ static list_t asl_head;
 static list_t fsl_head;
 
 
-void initASL() {
+void bka_sem_init() {
 	int i;
 
 	INIT_LIST_HEAD(&asl_head);
@@ -51,7 +51,7 @@ void bka_sem_free(semd_t *s) {
 	list_add_tail(&s->next, &fsl_head);
 }
 
-semd_t* getSemd(int *key) {
+semd_t* bka_sem_get(int *key) {
 	semd_t *s;
 
 	list_for_each_entry(s, &asl_head, next) {
@@ -62,9 +62,9 @@ semd_t* getSemd(int *key) {
 	return NULL;
 }
 
-int insertBlocked (int *key, pcb_t *p) {
+int bka_sem_enqueue (int *key, pcb_t *p) {
 	/* Look for an existing semaphore with the given key */
-	semd_t *s = getSemd(key);
+	semd_t *s = bka_sem_get(key);
 
 	/* If no such semaphore exists, try to allocate it */
 	if (!s)
@@ -81,8 +81,8 @@ int insertBlocked (int *key, pcb_t *p) {
 	}
 }
 
-pcb_t* removeBlocked(int *key) {
-	semd_t *s = getSemd(key);
+pcb_t* bka_sem_dequeue(int *key) {
+	semd_t *s = bka_sem_get(key);
 	pcb_t *p = NULL;
 
 	if (s)
@@ -94,8 +94,14 @@ pcb_t* removeBlocked(int *key) {
 	return p;
 }
 
-pcb_t* outBlocked(pcb_t *p) {
-	semd_t *s = getSemd(p->semkey);
+pcb_t* bka_sem_head(int *key) {
+	semd_t *s = bka_sem_get(key);
+
+	return s != NULL ? bka_pcb_queue_head(&s->proc_queue) : NULL;
+}
+
+pcb_t* bka_sem_pcb_rm(pcb_t *p) {
+	semd_t *s = bka_sem_get(p->semkey);
 	pcb_t *to_remove;
 
 	if (s) {
@@ -114,18 +120,12 @@ pcb_t* outBlocked(pcb_t *p) {
 	return NULL;
 }
 
-pcb_t* headBlocked(int *key) {
-	semd_t *s = getSemd(key);
-
-	return s != NULL ? bka_pcb_queue_head(&s->proc_queue) : NULL;
-}
-
-void outChildBlocked(pcb_t *p) {
-	pcb_t *removed = outBlocked(p);
+void bka_sem_pcb_rm_desc(pcb_t *p) {
+	pcb_t *removed = bka_sem_pcb_rm(p);
 	pcb_t *child;
 
 	if (removed) {
-		list_for_each_entry(child, &removed->first_child, siblings)
-			outChildBlocked(child);
+		list_for_each_entry(child, &removed->first_child, siblings) bka_sem_pcb_rm_desc(
+					child);
 	}
 }
