@@ -1,6 +1,7 @@
 #include "exc.h"
 #include "pcb.h"
 #include "sched.h"
+#include "sem.h"
 #include "syscall.h"
 
 
@@ -43,7 +44,25 @@ static void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3);
  * where @c arg1 identifies an already freed or invalid PCB pointer).
  */
 static void sys_kill(unsigned arg1, unsigned arg2, unsigned arg3);
+/**
+ * Implements the V() operation of classical semaphores. If no semaphore
+ * could be identified starting from @c arg1, the kernel will enter @c PANIC
+ * mode.
+ * @param arg1 To be cast to <tt>(int *)</tt>, identifies the semaphore key.
+ * @param arg2 Unused.
+ * @param arg3 Unused.
+ * @return The updated value of the identified semaphore.
+ */
 static void sys_verhogen(unsigned arg1, unsigned arg2, unsigned arg3);
+/**
+ * Implements the P() operation of classical semaphores. If no semaphore
+ * could be identified starting from @c arg1, the kernel will enter @c PANIC
+ * mode.
+ * @param arg1 To be cast to <tt>(int *)</tt>, identifies the semaphore key.
+ * @param arg2 Unused.
+ * @param arg3 Unused.
+ * @return The updated value of the identified semaphore.
+ */
 static void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3);
 static void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3);
 static void sys_spec_passup(unsigned arg1, unsigned arg2, unsigned arg3);
@@ -143,13 +162,51 @@ void sys_kill(unsigned arg1, unsigned arg2, unsigned arg3) {
 }
 
 void sys_verhogen(unsigned arg1, unsigned arg2, unsigned arg3) {
-	/* TODO Implement. */
-	sys_return(-1);
+	int *semkey = (int *) arg1;
+	semd_t *sem = bka_sem_get(semkey);
+	pcb_t	*to_restore;
+
+	if (!sem) {
+		/* TODO Print out an error message */
+		PANIC();
+	}
+
+	*(sem->key) += 1;
+
+	/* TODO Le slide mostrano l'inverso di questa condizione, cioè
+	 * *(sem->key) <= 0; qual'è la versione corretta? (Direi quella di questo
+	 * codice.)
+	 */
+	if (*(sem->key) >= 0) {
+		to_restore = bka_sem_dequeue(semkey);
+
+		if (to_restore)
+			bka_sched_ready_enqueue(to_restore);
+
+		sys_return((unsigned) *(sem->key));
+	}
 }
 
 void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3) {
-	/* TODO Implement. */
-	sys_return(-1);
+	int *semkey = (int *) arg1;
+	semd_t *sem = bka_sem_get(semkey);
+
+	if (!sem) {
+		/* TODO Print out an error message */
+		PANIC();
+	}
+
+	*(sem->key) -= 1;
+
+	if (*(sem->key) < 0) {
+		/* Suspend process */
+		bka_sem_enqueue(sem->key, bka_sched_curr);
+		sys_return_stay((unsigned) *(sem->key));
+
+		bka_sched_switch_top_hard();
+	} else {
+		sys_return((unsigned) *(sem->key));
+	}
 }
 
 void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3) {

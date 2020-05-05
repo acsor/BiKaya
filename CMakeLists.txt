@@ -46,7 +46,7 @@ target_link_libraries(pcb PRIVATE string utils)
 target_link_libraries(sched PRIVATE pcb)
 target_link_libraries(sem PRIVATE pcb)
 target_link_libraries(string PRIVATE math utils)
-target_link_libraries(syscall PRIVATE sched)
+target_link_libraries(syscall PRIVATE sched sem)
 target_link_libraries(utils PRIVATE math)
 
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
