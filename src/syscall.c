@@ -1,14 +1,11 @@
 #include "exc.h"
 #include "pcb.h"
+#include "sem.h"
 #include "sched.h"
 #include "sem.h"
 #include "syscall.h"
 
-#define TERM_RECV   1
-#define TERM_TRANSM 0
 #define CMD_ACK     1
-#define FIRST_TERM_ADDR (DEV_REG_ADDR(IL_TERMINAL, 0))
-#define LAST_TERM_ADDR  (DEV_REG_ADDR(IL_TERMINAL, N_DEV_PER_IL - 1))
 
 #define SPECPASSUP_SYSBP 0
 #define SPECPASSUP_TLB 1
@@ -74,20 +71,21 @@ static void sys_verhogen(unsigned arg1, unsigned arg2, unsigned arg3);
  */
 static void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3);
 /**
- * Syscall to interact with devices.
+ * This syscall issues an I/O operation by copying @c arg1 in the command
+ * field of the device register pointed to by @c device. The caller is
+ * blocked until command termination since operation on devices are synchronous.
  *
- * This syscall issues an I/O operation by copying @c command in the 'command'
- * field of the device register pointed to by @c device.
- * The caller is blocked until command termination since operation on
- * devices are asynchronous.
+ * @b Note: prior to invoking this syscall, the calling process must provide
+ * a pointer (via @c pcb_t.semkey) to the semaphore which will eventually be
+ * used.
  *
- * @param command: I/O operation to execute
- * @param device: pointer to the register of the desired device
- * @param subdevice: used only if device is a terminal, to distinguish between
+ * @param arg1: I/O operation to execute
+ * @param arg2: pointer to the register of the desired device
+ * @param arg3: used only if device is a terminal, to distinguish between
  * transmitting and receiving subdevice; trans = 0, recv = 1.
  * @return TODO Fill in.
  */
-static void sys_iocmd(unsigned command, unsigned device, unsigned subdevice);
+static void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3);
 static void sys_spec_passup(unsigned arg1, unsigned arg2, unsigned arg3);
 static void sys_get_pid(unsigned arg1, unsigned arg2, unsigned arg3);
 
@@ -199,53 +197,33 @@ void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3) {
 	bka_sched_resume();
 }
 
-void sys_iocmd(unsigned command, unsigned device, unsigned subdevice) {
-	unsigned *_device = (unsigned *) device;
-    /* blocco il processo chiamante */
-    SYSCALL(BKA_SYS_PASSEREN, (unsigned) bka_sched_curr->semkey,0, 0);
+void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3) {
+	unsigned *uns_dev = (unsigned *) arg2;
+	dtpreg_t *dtp_dev = (dtpreg_t *) arg2;
+	termreg_t *term_dev = (termreg_t *) arg2;
+	unsigned *command, *status;
+	semd_t *sem = bka_dev_sem_get(uns_dev, arg3);
 
-    /* start communication with device by writing @command into the device's device register */
-    if (FIRST_TERM_ADDR <= *_device && *_device <= LAST_TERM_ADDR) {    /* terminals */
-        if (subdevice == TERM_TRANSM)
-            ((termreg_t*) _device)->transm_command = command; /* maybe ((devreg_t*) _device)->term.transm_command ?? */
-        else if (subdevice == TERM_RECV)
-            ((termreg_t*) _device)->recv_command = command;
-    }
-    else {    /* disks, tapes, printers */
-        ((dtpreg_t*) _device)->command =  command;
-    }
+	if (bka_dev_line(uns_dev) == IL_TERMINAL) {
+		command = (int) arg3 ? term_dev->recv_command: term_dev->transm_command;
+		status = (int) arg3 ? term_dev->recv_status: term_dev->transm_command;
+	} else {
+		command = &dtp_dev->command;
+		status = &dtp_dev->status;
+	}
 
-    /* wait until the I/O operation is completed: wait until the device raises an interrupt, by looking at the bit corresponding to the device in the interrupting devices bitmap */
-    unsigned device_number = (*_device - DEV_REG_START) % DEV_REGBLOCK_SIZE;
-    unsigned device_line   = (*_device - DEV_REG_START) / DEV_REGBLOCK_SIZE;
-    while ((CDEV_BITMAP_ADDR(device_line) & (1 << device_number)) == 0)    /* wait until interrupt is raised*/
-        ;
+	*command = arg1;
 
-    /* ack the interrupt */
-    if (FIRST_TERM_ADDR <= *_device && *_device <= LAST_TERM_ADDR) {
-        if (subdevice == TERM_TRANSM)
-            ((termreg_t*) _device)->transm_command = CMD_ACK;
-        else if (subdevice == TERM_RECV)
-            ((termreg_t*) _device)->recv_command = CMD_ACK;
-    }
-    else {    /* disks, tapes, printers */
-        ((dtpreg_t*) _device)->command =  CMD_ACK;
-    }
+	if (!sem) {
+		/* TODO Print out error message. */
+		PANIC();
+	}
 
-    /* save the content of the device's status register */
-    unsigned dev_status;
-    if (FIRST_TERM_ADDR <= *_device && *_device <= LAST_TERM_ADDR) {
-        if (subdevice == TERM_TRANSM)
-            dev_status = ((termreg_t*) _device)->transm_status;
-        else if (subdevice == TERM_RECV)
-            dev_status = ((termreg_t*) _device)->recv_status;
-    } else {
-        dev_status = ((dtpreg_t *) _device)->status;
-    }
+	*(sem->key)--;
+	bka_sem_enqueue(sem->key, bka_sched_curr);
 
-    /* faccio riprendere processo chiamante. TODO: quando? qui, o subito dopo che venga sollevato l'interrupt? */
-    SYSCALL(BKA_SYS_VERHOGEN, (unsigned) bka_sched_curr->semkey,0, 0);
-    sys_return(dev_status);
+	sys_return_stay(*status);
+	bka_sched_switch_top_hard();
 }
 
 void sys_spec_passup(unsigned type, unsigned old, unsigned new) {
