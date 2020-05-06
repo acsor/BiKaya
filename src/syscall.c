@@ -193,21 +193,23 @@ void sys_cpu_time(unsigned arg1, unsigned arg2, unsigned arg3) {
  * @cpid contains the pid of the process we have created if @cpid != NULL and the syscall has gone well
  */
 void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3) {
-	state_t *statep = (state_p *) arg1;
+	state_t *statep = ((state_p *) arg1;
 	int priority = (int) arg2;
 	pcb_t **cpid= (pcb_t **) arg3;
+	
+	if(statep == NULL || cpid == NULL)
+		sys_return(BKA_E_GEN);
+		
     /*Allocating a new pcb and initialize it with given parameters*/
 	pcb_t *child = bka_pcb_alloc();
 	child -> parent = bka_sched_curr;
 	child -> original_priority = priority;
 	child -> priority = priority;
 	child -> state = statep;
-	if(cpid == NULL)
-        sys_return(BKA_E_GEN);
-	else
-	    *cpid = child;
-
+	
+	*cpid = child;
     bka_sched_ready_enqueue(child);
+    
     sys_return(0);
 }
 
