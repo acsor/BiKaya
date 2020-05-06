@@ -1,5 +1,6 @@
-#include "arch.h"
+#include "io.h"
 #include "stdarg.h"
+#include "utils.h"
 
 #define TERM_ST_NOTINST		0
 #define TERM_ST_READY       1
@@ -47,12 +48,16 @@
 #define PRINT_STATUS_MASK	0xFF
 
 
+static int io_dev_to_sem[N_EXT_IL * N_DEV_PER_IL];
+static int io_subdev_to_sem[N_DEV_PER_IL];
+
+
 /**
  * Auxiliary function for @c bka_term_puts.
  * @return Number of characters from @c str written to @c term.
  * @see bka_term_puts
  */
-int bka_term_puts_aux(termreg_t *term, char const *str);
+static int bka_term_puts_aux(termreg_t *term, char const *str);
 
 /**
  * Issues a write of character @c c to terminal @c term.
@@ -175,4 +180,38 @@ static int bka_print_putchar(dtpreg_t *p, char c) {
 	p->command = PRINT_CMD_ACK;
 
 	return status != PRINT_ST_READY ? BKA_E_GEN: BKA_E_OK;
+}
+
+
+semd_t* bka_dev_sem_get(unsigned *dev, unsigned subdevice) {
+	semd_t *out;
+	unsigned line = bka_dev_line(dev), instance = bka_dev_instance(dev);
+	int *semkey;
+
+	if (line == IL_TERMINAL && subdevice)
+		semkey = io_subdev_to_sem + instance;
+	else
+		semkey = io_dev_to_sem + line * N_DEV_PER_IL + instance;
+
+	if (!(out = bka_sem_get(semkey)))
+		out = bka_sem_alloc(semkey);
+
+	return out;
+}
+
+unsigned bka_dev_line(unsigned *dev) {
+	/* TODO Implement for uARM too. */
+	/* TODO Turn this into a macro. */
+	dtpreg_t *first = (dtpreg_t *) DEV_REG_ADDR(IL_DISK, 0);
+
+	return (((dtpreg_t *) dev) - first) / N_DEV_PER_IL;
+}
+
+unsigned bka_dev_instance(unsigned *dev) {
+	/* TODO Implement for uARM too. */
+	/* TODO Turn this into a macro. */
+	unsigned line = bka_dev_line(dev);
+	dtpreg_t *first = (dtpreg_t *) DEV_REG_ADDR(line, 0);
+
+	return ((dtpreg_t *) dev) - first;
 }

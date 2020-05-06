@@ -2,6 +2,8 @@
 #define BKA_IO
 
 #include "arch.h"
+#include "sem.h"
+
 
 /**
  * Print to the terminal device @c term until a @c NULL is met in the
@@ -37,6 +39,31 @@ int bka_term_recvs(termreg_t *term, char *dest, unsigned length);
  */
  /* TODO Turn this function into variadic. */
 int bka_print_puts(dtpreg_t *dev, char const *str);
+
+
+/**
+ * Obtains a semaphore association for the given device register @c dev. If
+ * one such association does not exist a new one, if possible, is created;
+ * otherwise, the already existing one is returned.
+ *
+ * @b Note: the actual type of the device register is irrelevant. In order
+ * to identify one such device, its physical memory address is sufficient.
+ *
+ * @param dev Device to get the associated semaphore for.
+ * @param subdevice @c dev subdevice, mostly relevant for terminals only
+ * @return A semaphore associated to the device @c dev, @c NULL in case the
+ * free semaphore list (FSL) is empty.
+ */
+semd_t* bka_dev_sem_get(unsigned *dev, unsigned subdevice);
+/**
+ * @return The interrupt line number the device register @c dev belongs to.
+ */
+unsigned bka_dev_line(unsigned *dev);
+/**
+ * @return The "instance" number within the appropriate interrupt line the
+ * device register @c dev belongs to.
+ */
+unsigned bka_dev_instance(unsigned *dev);
 
 
 #endif
