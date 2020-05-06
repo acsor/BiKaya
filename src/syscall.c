@@ -37,6 +37,17 @@ static void sys_return_stay(unsigned retval);
  * @return @c BKA_E_GEN if the time can't be returned, @c 0 otherwise.
  */
 static void sys_cpu_time(unsigned arg1, unsigned arg2, unsigned arg3);
+/**
+ * Spawns a new process as a child of the calling process.
+ *
+ * @param arg1 @c state_t pointer specifying the initial status of the newly
+ * created process
+ * @param arg2 @c int priority value for the process
+ * @param arg3 Also called @c child_pcb, a @c void** variable to be cast into
+ * @c **pcb_t. If @c *child_pcb is not @c NULL, @c *child_pcb will refer to
+ * the newly created process
+ * @return @c 0 in case of success, @c -1 otherwise.
+ */
 static void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3);
 /**
  * Terminates the process identified by @c arg1 and all of its descendant
@@ -188,31 +199,32 @@ void sys_cpu_time(unsigned arg1, unsigned arg2, unsigned arg3) {
 	sys_return(0);
 }
 
-/*
- * @statep is the state we assign to the process created
- * @cpid contains the pid of the process we have created if @cpid != NULL and the syscall has gone well
- */
 void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3) {
-	state_t *statep = ((state_p *) arg1;
+	state_t *state = (state_t *) arg1;
 	int priority = (int) arg2;
-	pcb_t **cpid= (pcb_t **) arg3;
-	
-	if(statep == NULL || cpid == NULL)
-		sys_return(BKA_E_GEN);
-		
-    /*Allocating a new pcb and initialize it with given parameters*/
-	pcb_t *child = bka_pcb_alloc();
-	child -> parent = bka_sched_curr;
-	child -> original_priority = priority;
-	child -> priority = priority;
-	child -> state = statep;
-	
-	*cpid = child;
-    bka_sched_ready_enqueue(child);
-    
-    sys_return(0);
-}
+	pcb_t **child_pcb = (pcb_t **) arg3;
+	pcb_t *new = bka_pcb_alloc();
 
+	if (!state)
+		sys_return(-1);
+
+	if (!new) {
+		/* TODO Print out error message. */
+		PANIC();
+	}
+
+	new->state = *state;
+	new->priority = new->original_priority = priority;
+	new->parent = bka_sched_curr;
+	bka_pcb_tree_push(bka_sched_curr, new);
+
+	if (child_pcb)
+		*child_pcb = new;
+
+	bka_sched_ready_enqueue(new);
+
+	sys_return(0);
+}
 
 void sys_kill(unsigned arg1, unsigned arg2, unsigned arg3) {
 	pcb_t *to_kill = ((pcb_t *) arg1) == NULL ? bka_sched_curr: (pcb_t *) arg1;
