@@ -3,11 +3,20 @@
 #include "sem.h"
 #include "pcb.h"
 
+/**
+ * The maximum number of allowable semaphores. An attempt to preallocate enough
+ * semaphores for @c BKA_MAX_PROC processes and <tt>N_EXT_IL * N_DEV_PER_IL</tt>
+ * devices is made (enough semaphore for subdevices are preallocated too).
+ *
+ * TODO Are these many semaphores sufficient? How to tackle their eventual
+ * shortage?
+ */
+#define	MAX_SEM	(BKA_MAX_PROC + N_EXT_IL * N_DEV_PER_IL + N_DEV_PER_IL)
 
 /**
  * The semaphore table, allocating data for each one of them.
  */
-static semd_t semd_table[BKA_MAX_PROC];
+static semd_t semd_table[MAX_SEM];
 /**
  * Head of the Active Semaphore List (ASL).
  */
@@ -41,6 +50,8 @@ semd_t* bka_sem_alloc(int *key) {
 	/* Remove the newly fetched semaphore from the FSL */
 	list_del(&result->next);
 	result->key = key;
+	/* TODO Test this setting. */
+	*key = 0;
 	INIT_LIST_HEAD(&result->proc_queue);
 	list_add_tail(&result->next, &sem_head);
 
