@@ -11,8 +11,9 @@
 #define BKA_STU_MILLI	1000
 #define BKA_STU_SEC		1000000
 
-#define TIME_SLICE		3
-#define	TIME_SLICE_UNIT	BKA_STU_MILLI
+/* The Killed Running flag. */
+#define BKA_SCHED_KR	1
+
 
 /**
  * The scheduler ready queue.
@@ -35,6 +36,26 @@ void bka_sched_init();
  * @param p PCB corresponding to the enqueued process.
  */
 void bka_sched_ready_enqueue(pcb_t *p);
+/**
+ * Figuratively "kills" the @c to_kill process. In particular, this has the
+ * effect to
+ *
+ * <ul>
+ * 	<li>"Kill" all the other descendant processes of @c to_kill</li>
+ * 	<li>Remove all killed processes from semaphores they may be pending on/li>
+ * 	<li>Return the corresponding PCBs to the free PCB list</li>
+ * </ul>
+ *
+ * @c Note: this function might have the (intended) effect to kill the
+ * currently running process. If that's the case, no action whatsoever is
+ * performed on @c bka_sched_curr and it is <b>totally up to the caller</b>
+ * the decision of what to do next (e.g. perform a context switch).
+ *
+ * @param to_kill
+ * @return @c BKA_E_INVARG if @c to_kill was invalid, BKA_SCHED_KR if the
+ * currently running process was killed or just @c 0 otherwise.
+ */
+int bka_sched_kill(pcb_t *to_kill);
 /**
  * Like @c bka_sched_switch_top(), but performs no state backup of the
  * running process and does not reinsert it into the ready queue (nor does it

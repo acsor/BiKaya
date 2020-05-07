@@ -127,38 +127,17 @@ void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3) {
 
 void sys_kill(unsigned arg1, unsigned arg2, unsigned arg3) {
 	pcb_t *to_kill = ((pcb_t *) arg1) == NULL ? bka_sched_curr: (pcb_t *) arg1;
-	list_t queue;
-	/* 1 if we removed the running process from the ready queue, 0 otherwise. */
-	int killed_running = bka_sched_curr == to_kill;
 
-	if (bka_pcb_stat(to_kill))
-		sys_return(-1);
-
-	INIT_LIST_HEAD(&queue);
-	bka_pcb_queue_rm(&bka_sched_ready, to_kill);
-	list_add_tail(&to_kill->next, &queue);
-
-	/* Perform a level-wide scanning of the process tree rooted in to_kill. */
-	while (!list_empty(&queue)) {
-		pcb_t *curr = bka_pcb_queue_pop(&queue);
-		pcb_t *child;
-
-		killed_running |= bka_sched_curr == curr;
-
-		/* Remove each child from the ready queue (if at all there) and
-		 * insert into @c queue for a recursive examination. */
-		list_for_each_entry(child, &curr->first_child, siblings) {
-			bka_pcb_queue_rm(&bka_sched_ready, child);
-			list_add_tail(&child->next, &queue);
-		}
+	switch (bka_sched_kill(to_kill)) {
+		case BKA_E_INVARG:
+			sys_return(-1);
+		case BKA_SCHED_KR:
+			sys_return_stay(0);
+			bka_sched_switch_top_hard();
+		case 0:
+		default:
+			sys_return(0);
 	}
-
-	sys_return_stay(0);
-
-	/* If, among the others, we killed the running process, we have to properly
-	 * switch to another one. */
-	if (killed_running)
-		bka_sched_switch_top_hard();
 }
 
 void sys_verhogen(unsigned arg1, unsigned arg2, unsigned arg3) {
