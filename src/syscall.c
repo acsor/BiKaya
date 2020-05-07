@@ -205,8 +205,8 @@ void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3) {
 	semd_t *sem = bka_dev_sem_get(uns_dev, arg3);
 
 	if (bka_dev_line(uns_dev) == IL_TERMINAL) {
-		command = (int) arg3 ? term_dev->recv_command: term_dev->transm_command;
-		status = (int) arg3 ? term_dev->recv_status: term_dev->transm_command;
+		command = arg3 ? &term_dev->recv_command: &term_dev->transm_command;
+		status = arg3 ? &term_dev->recv_status: &term_dev->transm_command;
 	} else {
 		command = &dtp_dev->command;
 		status = &dtp_dev->status;
