@@ -219,11 +219,10 @@ void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3) {
 		PANIC();
 	}
 
-	*(sem->key)--;
-	bka_sem_enqueue(sem->key, bka_sched_curr);
+	bka_sem_p(sem, bka_sched_curr);
 
 	sys_return_stay(*status);
-	bka_sched_switch_top_hard();
+	bka_sched_resume();
 }
 
 void sys_spec_passup(unsigned type, unsigned old, unsigned new) {
