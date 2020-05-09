@@ -1,5 +1,6 @@
-#include "sem.h"
 #include "arch.h"
+#include "sched.h"
+#include "sem.h"
 #include "pcb.h"
 
 
@@ -44,6 +45,32 @@ semd_t* bka_sem_alloc(int *key) {
 	list_add_tail(&result->next, &sem_head);
 
 	return result;
+}
+
+int bka_sem_p(semd_t *s, pcb_t *p) {
+	p->semkey = s->key;
+	*(s->key)--;
+
+	if (*(s->key) < 0) {
+		bka_sched_suspend(p);
+		bka_sem_enqueue(s->key, p);
+	}
+
+	return *(s->key);
+}
+
+int bka_sem_v(semd_t *s, pcb_t *p) {
+	p->semkey = NULL;
+	*(s->key)++;
+
+	if (*(s->key) <= 0) {
+		pcb_t *to_restore = bka_sem_dequeue(s->key);
+
+		if (to_restore)
+			bka_sched_enqueue(to_restore);
+	}
+
+	return *(s->key);
 }
 
 void bka_sem_free(semd_t *s) {

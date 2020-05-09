@@ -28,6 +28,8 @@ void bka_sem_init();
  * @c NULL if the FSL is empty.
  */
 semd_t* bka_sem_alloc(int *key);
+int bka_sem_p(semd_t *s, pcb_t *p);
+int bka_sem_v(semd_t *s, pcb_t *p);
 /**
  * @param s Pointer to a semaphore to return to the free list.
  */

@@ -141,29 +141,14 @@ void sys_kill(unsigned arg1, unsigned arg2, unsigned arg3) {
 }
 
 void sys_verhogen(unsigned arg1, unsigned arg2, unsigned arg3) {
-	int *semkey = (int *) arg1;
-	semd_t *sem = bka_sem_get(semkey);
-	pcb_t	*to_restore;
+	semd_t *sem = bka_sem_get((int *) arg1);
 
 	if (!sem) {
 		/* TODO Print out an error message */
 		PANIC();
 	}
 
-	*(sem->key) += 1;
-
-	/* TODO Le slide mostrano l'inverso di questa condizione, cioè
-	 * *(sem->key) <= 0; qual'è la versione corretta? (Direi quella di questo
-	 * codice.)
-	 */
-	if (*(sem->key) >= 0) {
-		to_restore = bka_sem_dequeue(semkey);
-
-		if (to_restore)
-			bka_sched_enqueue(to_restore);
-
-		sys_return((unsigned) *(sem->key));
-	}
+	sys_return((unsigned) bka_sem_v(sem, bka_sched_curr));
 }
 
 void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3) {
@@ -175,18 +160,8 @@ void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3) {
 		PANIC();
 	}
 
-	*(sem->key) -= 1;
-
-	if (*(sem->key) < 0) {
-		/* Suspend process */
-		bka_sem_enqueue(sem->key, bka_sched_curr);
-		sys_return_stay((unsigned) *(sem->key));
-
-		bka_sched_drop();
-		bka_sched_resume();
-	} else {
-		sys_return((unsigned) *(sem->key));
-	}
+	sys_return_stay((unsigned) bka_sem_p(sem, bka_sched_curr));
+	bka_sched_resume();
 }
 
 void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3) {
