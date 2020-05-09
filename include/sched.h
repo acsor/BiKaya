@@ -27,15 +27,26 @@ extern pcb_t	*bka_sched_curr;
 
 /**
  * Initializes variables for the correct functioning of the scheduler module.
+ * To be called once and only once per program execution before starting to
+ * access this module.
  */
 void bka_sched_init();
+/**
+ * Resumes the currently running process with a renewed time slice. No
+ * changes are performed on the ready queue.
+ */
+void bka_sched_resume();
 /**
  * Enqueues @c p into the ready process queue according to its process
  * priority. Undefined behavior might occur if this function is called
  * consecutively twice (or more) with the same argument.
  * @param p PCB corresponding to the enqueued process.
  */
-void bka_sched_ready_enqueue(pcb_t *p);
+void bka_sched_enqueue(pcb_t *p);
+/**
+ * @param to_suspend
+ */
+void bka_sched_suspend(pcb_t *to_suspend);
 /**
  * Figuratively "kills" the @c to_kill process. In particular, this has the
  * effect to
@@ -47,47 +58,34 @@ void bka_sched_ready_enqueue(pcb_t *p);
  * </ul>
  *
  * @c Note: this function might have the (intended) effect to kill the
- * currently running process. If that's the case, no action whatsoever is
- * performed on @c bka_sched_curr and it is <b>totally up to the caller</b>
- * the decision of what to do next (e.g. perform a context switch).
+ * currently running process. When that happens, @c bka_sched_curr is
+ * assigned the next process from the ready queue (or @c NULL if none is
+ * available). It will be the caller's responsibility to perform a context
+ * switch.
  *
  * @param to_kill
  * @return @c BKA_E_INVARG if @c to_kill was invalid, BKA_SCHED_KR if the
- * currently running process was killed or just @c 0 otherwise.
+ * currently running process was killed or @c 0 otherwise.
  */
 int bka_sched_kill(pcb_t *to_kill);
 /**
- * Like @c bka_sched_switch_top(), but performs no state backup of the
- * running process and does not reinsert it into the ready queue (nor does it
- * actually presume the presence of a running process). Hence, the running
- * process is effectively discarded.
- *
- * This function is ideal when booting up the very first process or switching
- * to a new process disregarding the running one (e.g. killing the current
- * process and switching to the other).
- *
- * The function behavior upon a call with one remaining process only is to halt
- * the processor.
- * @see bka_sched_switch, bka_sched_switch_top, bka_sys_kill
- */
-void bka_sched_switch_top_hard();
-/**
  * A wrapper for @c bka_sched_switch(), selecting the most prioritized
  * process as the one to switch into.
- * @param curr_proc_status Memory area where the current process status is
- * stored.
  * @see bka_sched_switch
  */
-void bka_sched_switch_top(state_t *curr_proc_status);
+void bka_sched_switch_top();
 /**
  * Performs a context switch into the process associated to the @c to_switch
  * PCB. @c to_switch will be removed from the corresponding ready queue, and
  * the current process reinserted into it.
+ *
+ * @b Note: it is the caller's responsibility to save the current process
+ * state before switching out of it.
+ *
  * @param to_switch PCB of the process to switch into.
- * @param curr_proc_status Memory area where the current process status is
- * stored.
+ * @see bka_sched_switch_top
  */
-void bka_sched_switch(pcb_t *const to_switch, state_t *curr_proc_status);
+void bka_sched_switch(pcb_t *const to_switch);
 
 /**
  * Sets the system-wide interval timer.

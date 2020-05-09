@@ -133,7 +133,7 @@ void sys_kill(unsigned arg1, unsigned arg2, unsigned arg3) {
 			sys_return(-1);
 		case BKA_SCHED_KR:
 			sys_return_stay(0);
-			bka_sched_switch_top_hard();
+			bka_sched_resume();
 		case 0:
 		default:
 			sys_return(0);
@@ -160,7 +160,7 @@ void sys_verhogen(unsigned arg1, unsigned arg2, unsigned arg3) {
 		to_restore = bka_sem_dequeue(semkey);
 
 		if (to_restore)
-			bka_sched_ready_enqueue(to_restore);
+			bka_sched_enqueue(to_restore);
 
 		sys_return((unsigned) *(sem->key));
 	}
@@ -182,7 +182,8 @@ void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3) {
 		bka_sem_enqueue(sem->key, bka_sched_curr);
 		sys_return_stay((unsigned) *(sem->key));
 
-		bka_sched_switch_top_hard();
+		bka_sched_drop();
+		bka_sched_resume();
 	} else {
 		sys_return((unsigned) *(sem->key));
 	}

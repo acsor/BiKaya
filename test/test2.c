@@ -87,7 +87,7 @@ int main () {
 	sched_queue_init();
 	new_areas_init();
 
-	bka_sched_switch_top_hard();
+	bka_sched_switch_top();
 
 	return 0;
 }
@@ -97,7 +97,7 @@ void sched_queue_init() {
 	int test_no;
 
 	for (test_no = 0; test_no < 3; test_no++)
-		bka_sched_ready_enqueue(pcb_test_factory(test_no));
+		bka_sched_enqueue(pcb_test_factory(test_no));
 }
 
 pcb_t* pcb_test_factory(unsigned test_no) {
@@ -133,7 +133,9 @@ void sec_int () {
 
 	/* If an interrupt is pending on interrupt line 2, i.e. the interval timer: */
 	if (BKA_STATE_CAUSE(oa) & CAUSE_IP(2)) {
-		bka_sched_switch_top(oa);
+		/* Save the current process state and switch to the next one. */
+		bka_pcb_state_set(bka_sched_curr, oa);
+		bka_sched_switch_top();
 	} else {
 		bka_na_exit(INT_NEWAREA);
 	}

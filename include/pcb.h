@@ -72,6 +72,10 @@ void bka_pcb_free(pcb_t *p);
  */
 void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority);
 /**
+ * Sets @c p process status to match the state given by @c s.
+ */
+void bka_pcb_state_set(pcb_t *p, state_t *s);
+/**
  * @return @c BKA_PCB_STAT_FREED if @c p was returned to the free PCB list, @c
  * BKA_PCB_STAT_INV if it points to an invalid memory area or @c 0 otherwise.
  */
@@ -119,8 +123,8 @@ int bka_pcb_queue_contains(list_t *head, pcb_t const *p);
 /**
  * Removes the first element from the process queue pointed to by @c head.
  * @param head Sentinel element of the list to remove from.
- * @return The first element of the process queue, or @c NULL if the list
- * contains no element.
+ * @return The first element of the process queue, or @c NULL if the queue
+ * contains no elements.
  */
 pcb_t* bka_pcb_queue_pop(list_t *head);
 /**
