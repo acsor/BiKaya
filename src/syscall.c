@@ -1,15 +1,10 @@
 #include "exc.h"
+#include "io.h"
 #include "pcb.h"
 #include "sem.h"
 #include "sched.h"
 #include "sem.h"
 #include "syscall.h"
-
-#define CMD_ACK     1
-
-#define SPECPASSUP_SYSBP 0
-#define SPECPASSUP_TLB 1
-#define SPECPASSUP_TRAP 2
 
 /**
  * Terminates the current syscall handling by placing the return value given
@@ -75,10 +70,6 @@ static void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3);
  * field of the device register pointed to by @c device. The caller is
  * blocked until command termination since operation on devices are synchronous.
  *
- * @b Note: prior to invoking this syscall, the calling process must provide
- * a pointer (via @c pcb_t.semkey) to the semaphore which will eventually be
- * used.
- *
  * @param arg1: I/O operation to execute
  * @param arg2: pointer to the register of the desired device
  * @param arg3: used only if device is a terminal, to distinguish between
@@ -86,7 +77,13 @@ static void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3);
  * @return TODO Fill in.
  */
 static void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3);
-static void sys_spec_passup(unsigned arg1, unsigned arg2, unsigned arg3);
+/**
+ * TODO Document.
+ * @param type
+ * @param old_area
+ * @param new_area
+ */
+static void sys_spec_passup(unsigned type, unsigned old_area, unsigned new_area);
 static void sys_get_pid(unsigned arg1, unsigned arg2, unsigned arg3);
 
 
@@ -111,22 +108,28 @@ static syscall_t sys_id_to_syscall[] = {
 
 
 void bka_sys_call(unsigned id, unsigned arg1, unsigned arg2, unsigned arg3) {
-    /* TODO Shall we perform checks on whether sys_return() is called by
-     * subordinate syscalls? */
+	/* Predefined syscalls. */
     if (BKA_SYS_CPU_TIME <= id && id <= BKA_SYS_GETPID) {
         sys_id_to_syscall[id](arg1, arg2, arg3);
-    }
-    else if (BKA_SYS_GETPID < id && id <= MAX_SYSCALL_ID){ /* TODO: is there a limit? */
-        /* se avevo invocato la specpassup con un gestore SYS/BP personalizzato. E' sufficiente verificare una delle due aree, ad esempio la [0]*/
-        if (bka_sched_curr->specpassup_areas_sysbp[0] != NULL) {
-            // TODO: salvo lo stato del processo corrente nella OA personalizzata
-            bka_na_enter(bka_sched_curr->specpassup_areas_sysbp[1]);
+	/* Custom syscalls. */
+    } else if (BKA_SYS_GETPID < id) {
+    	/* Old area and new area variables, respectively. */
+    	state_t *oa_dest = bka_sched_curr->sysbk_area[0];
+		state_t *na = bka_sched_curr->sysbk_area[1];
+
+		if (oa_dest && na) {
+			state_t *oa_src = (state_t *) SYSBK_OLDAREA;
+
+			/* TODO Is this correct according to the specifications? What is the
+			 * protocol for exiting out of a custom syscall?
+			 */
+			bka_memcpy(oa_dest, oa_src, sizeof(state_t));
+			LDST(na);
+        } else {
+			bka_sched_kill(bka_sched_curr);
+			bka_sched_resume();
         }
-        else {
-            SYSCALL(TERMINATEPROCESS, NULL, 0, 0);
-        }
-    }
-    else {
+    } else {
         PANIC();
     }
 }
@@ -225,41 +228,32 @@ void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3) {
 	bka_sched_resume();
 }
 
-void sys_spec_passup(unsigned type, unsigned old, unsigned new) {
-    state_t* _old = (state_t*) old;
-    state_t* _new = (state_t*) new;
+void sys_spec_passup(unsigned type, unsigned old_area, unsigned new_area) {
+    state_t* oa = (state_t*) old_area, *na = (state_t*) new_area;
+    pcb_t *const curr = bka_sched_curr;
+    state_t **old_areas[] = {
+			curr->sysbk_area + 0, curr->tlb_area + 0, curr->trap_area + 0
+    };
+	state_t **new_areas[] = {
+			curr->sysbk_area + 1, curr->tlb_area + 1, curr->trap_area + 1
+	};
 
-    switch (type) {
-        case SPECPASSUP_SYSBP:
-            if (bka_sched_curr->specpassup_areas_sysbp[0] != NULL)
-                SYSCALL(TERMINATEPROCESS, NULL, 0, 0);
-            else {
-                /* save custom old/new areas for sys/bp in the pcb_t of the current process */
-                bka_sched_curr->specpassup_areas_sysbp[0] = _old;
-                bka_sched_curr->specpassup_areas_sysbp[1] = _new;
-            }
-            break;
+	/* Invalid arguments received. */
+	if (type < 0 || 2 < type || !oa || !na) {
+		sys_return_stay((unsigned) -1);
+		bka_sched_resume();
+	}
 
-        case SPECPASSUP_TLB:
-            if (bka_sched_curr->specpassup_areas_tlb[0] != NULL)
-                SYSCALL(TERMINATEPROCESS, NULL, 0, 0);
-            else {
-                /* save custom old/new areas for tlb in the pcb_t of the current process */
-                bka_sched_curr->specpassup_areas_tlb[0] = _old;
-                bka_sched_curr->specpassup_areas_tlb[1] = _new;
-            }
-            break;
+	/* Syscall already once invoked. */
+	if (*old_areas[type] || *new_areas[type]) {
+		bka_sched_kill(bka_sched_curr);
+		bka_sched_resume();
+	} else {
+		*old_areas[type] = oa;
+		*new_areas[type] = na;
 
-        case SPECPASSUP_TRAP:
-            if (bka_sched_curr->specpassup_areas_trap[0] != NULL)
-                SYSCALL(TERMINATEPROCESS, NULL, 0, 0);
-            else {
-                /* save custom old/new areas for trap in the pcb_t of the current process */
-                bka_sched_curr->specpassup_areas_trap[0] = _old;
-                bka_sched_curr->specpassup_areas_trap[1] = _new;
-            }
-            break;
-    }
+		sys_return(0);
+	}
 }
 
 void sys_get_pid(unsigned arg1, unsigned arg2, unsigned arg3) {
