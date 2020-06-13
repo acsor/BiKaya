@@ -39,14 +39,15 @@ add_library(sched ${BKA_SRC}/sched.c)
 add_library(sem ${BKA_SRC}/sem.c)
 add_library(string ${BKA_SRC}/string.c)
 add_library(syscall ${BKA_SRC}/syscall.c)
+add_library(time ${BKA_SRC}/time.c)
 add_library(utils ${BKA_SRC}/utils.c)
 
 # Libraries dependecies
 target_link_libraries(pcb PRIVATE string utils)
-target_link_libraries(sched PRIVATE pcb)
+target_link_libraries(sched PRIVATE pcb time)
 target_link_libraries(sem PRIVATE pcb)
 target_link_libraries(string PRIVATE math utils)
-target_link_libraries(syscall PRIVATE sched sem)
+target_link_libraries(syscall PRIVATE sched sem time)
 target_link_libraries(utils PRIVATE math)
 
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL arm)

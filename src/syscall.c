@@ -5,6 +5,7 @@
 #include "sched.h"
 #include "sem.h"
 #include "syscall.h"
+#include "time.h"
 
 /**
  * Terminates the current syscall handling by placing the return value given

@@ -3,6 +3,7 @@
 
 #include "arch.h"
 #include "list.h"
+#include "time.h"
 
 #define	BKA_PCB_STAT_OK	0
 #define	BKA_PCB_STAT_FREED 1
