@@ -24,6 +24,7 @@ void bka_pcbs_init(void) {
 
 pcb_t* bka_pcb_alloc(void) {
 	pcb_t *out;
+	unsigned i;
 
 	if (list_empty(&free_pcb_list))
 		return NULL;
@@ -43,12 +44,13 @@ pcb_t* bka_pcb_alloc(void) {
 	out->original_priority = 0;
 	out->semkey = NULL;
 
-	/* Initialize timer fields to appropriate values */
-	out->user_timer = 0;
-	out->kernel_timer = 0;
-	out->full_timer = 0;
-    out->start_time = 0;
-    out->end_time = 0;
+	/* Initialize time fields to appropriate values */
+	out->timer_curr = out->timers + 0;
+	out->timer_prev = out->timers + 1;
+	out->timer_bk = bka_time_now();
+
+	for (i = 0; i < BKA_LENGTH(out->timers, time_t); i++)
+		out->timers[i] = 0;
 
 	return out;
 }
@@ -81,8 +83,6 @@ void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
 	/* Set stack pointer */
 	p->state.sp = BKA_RAMTOP - FRAMESIZE * (bka_pcb_to_pid(p) + 1);
 #endif
-    /*Used this field to save the starting time of the process*/
-    p->full_timer = BKA_TOD_LO;
 }
 
 void bka_pcb_state_set(pcb_t *p, state_t *s) {
@@ -104,6 +104,30 @@ int bka_pcb_to_pid (pcb_t const * const p) {
 
 pcb_t* bka_pid_to_pcb (unsigned pid) {
 	return (0 <= pid && pid < BKA_MAX_PROC) ? pcb_table + pid: NULL;
+}
+
+
+void bka_pcb_time_save(pcb_t *p) {
+	*p->timer_curr += bka_time_now() - p->timer_bk;
+}
+
+void bka_pcb_time_push(pcb_t *p, unsigned type) {
+	*p->timer_curr += bka_time_now() - p->timer_bk;
+	p->timer_prev = p->timer_curr;
+
+	p->timer_curr = p->timers + type;
+	p->timer_bk = bka_time_now();
+}
+
+time_t* bka_pcb_time_pop(pcb_t *p) {
+	time_t *out = p->timer_curr;
+
+	*p->timer_curr += bka_time_now() - p->timer_bk;
+	p->timer_curr = p->timer_prev;
+	p->timer_prev = NULL;
+	p->timer_bk = bka_time_now();
+
+	return out;
 }
 
 

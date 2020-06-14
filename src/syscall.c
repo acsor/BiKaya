@@ -4,6 +4,7 @@
 #include "sem.h"
 #include "sched.h"
 #include "sem.h"
+#include "string.h"
 #include "syscall.h"
 #include "time.h"
 
@@ -147,7 +148,7 @@ void bka_sys_call(unsigned id, unsigned arg1, unsigned arg2, unsigned arg3) {
 			state_t *oa_src = (state_t *) SYSBK_OLDAREA;
 
 			/* TODO Is this correct according to the specifications? What is the
-			 * protocol for exiting out of a custom syscall?
+			 *  protocol for exiting out of a custom syscall?
 			 */
 			bka_memcpy(oa_dest, oa_src, sizeof(state_t));
 			LDST(na);
@@ -176,26 +177,19 @@ void sys_return_stay(unsigned retval) {
 #endif
 }
 
-/*
-Return -1 if the time can't be returned, 0 otherwise.
-*/
 void sys_cpu_time(unsigned arg1, unsigned arg2, unsigned arg3) {
-	unsigned int* user = (unsigned int*) arg1;
-	unsigned int* kernel = (unsigned int*) arg2;
-	unsigned int* wallclock = (unsigned int*) arg3;
-	
-	
-	pcb_t *to_calculate = bka_sched_curr;
+	/* Time variables. */
+	time_t *user = (time_t *) arg1,
+			 *kernel = (time_t *) arg2,
+			 *total = (time_t *) arg3;
 
-	/* If the process is in the free PCB list return -1.*/
-	if (bka_pcb_stat(to_calculate)) 
+	if (bka_sched_curr)
 		sys_return(BKA_E_GEN);
 
+	*kernel = bka_sched_curr->timers[0] + (bka_time_now() - bka_sched_curr->timer_bk);
+	*user = bka_sched_curr->timers[1];
+	*total = *user + *kernel;
 
-    /*The difference between the current value of TODLO and the initial value(when the process was created)*/
-	*wallclock = (BKA_TOD_LO) - (to_calculate->full_timer);
-    *kernel = to_calculate->kernel_timer;
-	*user = (*wallclock - *kernel);
 	sys_return(0);
 }
 
@@ -221,7 +215,7 @@ void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3) {
 	if (child_pcb)
 		*child_pcb = new;
 
-	bka_sched_ready_enqueue(new);
+	bka_sched_enqueue(new);
 
 	sys_return(0);
 }

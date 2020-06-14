@@ -30,13 +30,15 @@ typedef struct pcb_t {
 
 		state_t state;
 		int priority, original_priority;
-		
-		unsigned int user_timer;
-		unsigned int kernel_timer;
-		unsigned int full_timer;
-		/*This 2 variables are useful to sum the time, without declaring different temporary variables every time we need it*/
-		unsigned int start_time;
-		unsigned int end_time;
+
+		/* A general-purpose timer, used as a counting mechanism for
+		 * kernel and user time. */
+		time_t timer_bk;
+		time_t *timer_prev, *timer_curr;
+		/* Cumulative time spent on kernel-level code (timers[0]) and user-level
+		 * code (timers[1]).
+		 */
+		time_t timers[2];
 
 		/* Key of the semaphore which the process is eventually blocked on */
 		int *semkey;
@@ -110,6 +112,13 @@ int bka_pcb_to_pid(pcb_t const * const p);
  * ID, or @c NULL if the @c pid argument is out of range.
  */
 pcb_t* bka_pid_to_pcb(unsigned pid);
+
+
+/* PCB time functions. */
+void bka_pcb_time_save(pcb_t *p);
+void bka_pcb_time_push(pcb_t *p, unsigned type);
+time_t* bka_pcb_time_pop(pcb_t *p);
+
 
 /* PCB queue functions. */
 /**

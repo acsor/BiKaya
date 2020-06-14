@@ -8,7 +8,7 @@ typedef unsigned time_t;
 /**
  * @return The current time stamp.
  */
-time_t bka_time_now();
+#define bka_time_now()	BKA_TOD_LO
 
 /**
  * Starts measurements for future calls to @c bka_time_tock(). If this

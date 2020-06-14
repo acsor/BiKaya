@@ -71,6 +71,7 @@ int bka_sched_kill(pcb_t *to_kill) {
 
 	if (killed_running) {
 		bka_sched_curr = bka_pcb_queue_pop(&bka_sched_ready);
+		bka_sched_curr->timer_bk = bka_time_now();
 
 		return BKA_SCHED_KR;
 	} else {
@@ -93,17 +94,19 @@ void bka_sched_switch(pcb_t *const to_switch) {
 	list_for_each_entry(queued_pcb, &bka_sched_ready, next)
 		queued_pcb->priority++;
 
-	/* Reset the current process priority and reinsert it into the ready queue.
-	 * If bka_sched_curr == NULL, this might be the first run or one in which
-	 * the queue was depleted.
+	/* Reset the current process priority, reinsert it into the ready queue
+	 * and update its kernel time.  If bka_sched_curr == NULL, this might be
+	 * the first run or one in which the queue was depleted.
 	 */
 	if (bka_sched_curr) {
 		bka_sched_curr->priority = bka_sched_curr->original_priority;
 		bka_pcb_queue_ins(&bka_sched_ready, bka_sched_curr);
+		bka_pcb_time_save(bka_sched_curr);
 	}
 
 	/* Renew the running process and extract if from the queue. */
 	bka_sched_curr = to_switch;
+	bka_sched_curr->timer_bk = bka_time_now();
 	bka_pcb_queue_rm(&bka_sched_ready, to_switch);
 
 	bka_kernel_on_exit();

@@ -1,4 +1,5 @@
 #include "exc.h"
+#include "pcb.h"
 #include "sched.h"
 #include "string.h"
 #include "time.h"
@@ -50,16 +51,14 @@ void bka_na_exit(unsigned new_area) {
 	LDST(old_state);
 }
 
-void bka_kernel_on_enter() {
-	time_t const now = bka_time_now();
 
-	bka_sched_curr->kernel_inst = now;
-	bka_sched_curr->user_time += now - bka_sched_curr->user_inst;
+}
+
+
+void bka_kernel_on_enter() {
+	bka_pcb_time_push(bka_sched_curr, 0);
 }
 
 void bka_kernel_on_exit() {
-	time_t const now = bka_time_now();
-
-	bka_sched_curr->kernel_time += now - bka_sched_curr->kernel_inst;
-	bka_sched_curr->user_inst = now;
+	bka_pcb_time_pop(bka_sched_curr);
 }
