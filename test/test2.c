@@ -154,6 +154,8 @@ void sec_trap () {
 void sec_sysbk () {
 	state_t *oa = (state_t *) SYSBK_OLDAREA;
 
+	bka_na_enter(SYSBK_NEWAREA);
+
 	/* Check what type of interrupt occurred (syscall, breakpoint or other) */
 	switch(CAUSE_GET_EXCCODE(BKA_STATE_CAUSE(oa))) {
 		case EXC_SYS:

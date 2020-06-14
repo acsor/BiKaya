@@ -1,5 +1,5 @@
+#include "exc.h"
 #include "sched.h"
-#include "string.h"
 #include "arch.h"
 
 #define TIME_SLICE		3
@@ -17,7 +17,9 @@ void bka_sched_init() {
 
 void bka_sched_resume() {
 	if (bka_sched_curr) {
+		bka_kernel_on_exit();
 		bka_sched_it_set(TIME_SLICE, TIME_SLICE_UNIT);
+
 		LDST(&bka_sched_curr->state);
 	} else {
 		HALT();
@@ -86,7 +88,6 @@ void bka_sched_switch_top() {
 
 void bka_sched_switch(pcb_t *const to_switch) {
 	pcb_t *queued_pcb;
-	bka_sched_curr->start_time = BKA_TOD_LO;
 
 	/* Update priorities of old processes to avoid starvation. */
 	list_for_each_entry(queued_pcb, &bka_sched_ready, next)
@@ -105,6 +106,7 @@ void bka_sched_switch(pcb_t *const to_switch) {
 	bka_sched_curr = to_switch;
 	bka_pcb_queue_rm(&bka_sched_ready, to_switch);
 
+	bka_kernel_on_exit();
 	bka_sched_it_set(TIME_SLICE, TIME_SLICE_UNIT);
 
 	LDST(&to_switch->state);

@@ -1,6 +1,7 @@
 #include "exc.h"
-#include "string.h"
 #include "sched.h"
+#include "string.h"
+#include "time.h"
 
 
 void bka_na_init(state_t *s, sec_t c) {
@@ -20,7 +21,8 @@ void bka_na_init(state_t *s, sec_t c) {
 }
 
 void bka_na_enter(unsigned new_area) {
-    bka_sched_curr->start_time = BKA_TOD_LO;
+	bka_kernel_on_enter();
+
 #ifdef BKA_ARCH_UMPS
 	if (new_area == SYSBK_NEWAREA) {
 		state_t *old_area = (state_t *) SYSBK_OLDAREA;
@@ -42,7 +44,22 @@ void bka_na_exit(unsigned new_area) {
 #elif defined(BKA_ARCH_UARM)
 	state_t *old_state = (state_t *) (new_area - STATE_T_SIZE);
 #endif
-    bka_sched_curr->end_time = BKA_TOD_LO;
-    bka_sched_curr->kernel_timer += (bka_sched_curr->end_time - bka_sched_curr->start_time);
+
+	bka_kernel_on_exit();
+
 	LDST(old_state);
+}
+
+void bka_kernel_on_enter() {
+	time_t const now = bka_time_now();
+
+	bka_sched_curr->kernel_inst = now;
+	bka_sched_curr->user_time += now - bka_sched_curr->user_inst;
+}
+
+void bka_kernel_on_exit() {
+	time_t const now = bka_time_now();
+
+	bka_sched_curr->kernel_time += now - bka_sched_curr->kernel_inst;
+	bka_sched_curr->user_inst = now;
 }

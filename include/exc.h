@@ -40,7 +40,7 @@ typedef void (*sec_t)(void);
  */
 void bka_na_init(state_t *s, sec_t c);
 /**
- * Startup function to be invoked before managing one system-level exception
+ * Startup function to be invoked before managing one kernel-level exception
  * (e.g. program traps, syscalls, breakpoints, interrupts etc.). Similarly to
  * its counterpart, @c bka_na_exit(), this function performs initialization
  * steps needed to ensure the correct entering in of new areas/exception
@@ -51,11 +51,25 @@ void bka_na_init(state_t *s, sec_t c);
 void bka_na_enter(unsigned new_area);
 /**
  * Like @c bka_na_enter(), but to be (preferably) invoked as the last
- * instruction of a system-level exception handler.
+ * instruction of a kernel-level exception handler.
  * @param new_area New area which the processor is exiting out from.
  * @see bka_na_enter
  */
 void bka_na_exit(unsigned new_area);
+
+/**
+ * Callback function to be invoked just after entering kernel-level code.
+ * @see bka_kernel_on_exit()
+ */
+void bka_kernel_on_enter();
+/**
+ * Callback function to be invoked just prior to exiting kernel-level code.
+ * Note that this function has no power to perform any context switch, but
+ * only executes stateful operations on process states (hence the @c _on
+ * prefix).
+ * @see bka_kernel_on_enter()
+ */
+void bka_kernel_on_exit();
 
 
 #endif

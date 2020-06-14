@@ -53,7 +53,7 @@ void bka_sched_suspend(pcb_t *to_suspend);
  *
  * <ul>
  * 	<li>"Kill" all the other descendant processes of @c to_kill</li>
- * 	<li>Remove all killed processes from semaphores they may be pending on/li>
+ * 	<li>Remove all killed processes from semaphores they may be pending on</li>
  * 	<li>Return the corresponding PCBs to the free PCB list</li>
  * </ul>
  *
