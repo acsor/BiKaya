@@ -10,9 +10,9 @@
 #define BKA_SYS_SPEC_PASSUP	6
 #define BKA_SYS_GETPID		7
 
-#define BKA_SYS_SPEC_SYSBP	0
-#define BKA_SYS_SPEC_TLB	1
-#define BKA_SYS_SPEC_TRAP	2
+#define BKA_SP_SYSBK	0
+#define BKA_SP_TLB		1
+#define BKA_SP_TRAP		2
 
 
 /**

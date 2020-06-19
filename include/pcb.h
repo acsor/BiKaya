@@ -31,6 +31,9 @@ typedef struct pcb_t {
 		state_t state;
 		int priority, original_priority;
 
+		/* Key of the semaphore which the process is eventually blocked on */
+		int *semkey;
+
 		/* A general-purpose timer, used as a counting mechanism for
 		 * kernel and user time. */
 		time_t timer_bk;
@@ -40,18 +43,8 @@ typedef struct pcb_t {
 		 */
 		time_t timers[2];
 
-		/* Key of the semaphore which the process is eventually blocked on */
-		int *semkey;
-
-		/* For each one of the @c state_t* arrays @c a below
-		 * 		- a[1] specifies a custom callback to be taken upon receiving
-		 * 		the associated exception
-		 * 		- a[0] specifies a custom area where the current process status
-		 * 		has to be stored while handling the exception
-		 */
-        state_t *sysbk_area[2];
-        state_t *tlb_area[2];
-        state_t *trap_area[2];
+		/* Spec Passup old and new process state areas. */
+        state_t *sp_areas[3][2];
 } pcb_t;
 
 

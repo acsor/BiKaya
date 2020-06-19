@@ -1,6 +1,7 @@
+#include "arch.h"
 #include "pcb.h"
 #include "string.h"
-#include "arch.h"
+#include "utils.h"
 
 
 /**
@@ -40,8 +41,7 @@ pcb_t* bka_pcb_alloc(void) {
 	INIT_LIST_HEAD(&out->siblings);
 	/* Initialize the out->state field to all 0s */
 	bka_memset(&out->state, 0, sizeof(state_t));
-	out->priority = 0;
-	out->original_priority = 0;
+	out->priority = out->original_priority = 0;
 	out->semkey = NULL;
 
 	/* Initialize time fields to appropriate values */
@@ -51,6 +51,11 @@ pcb_t* bka_pcb_alloc(void) {
 
 	for (i = 0; i < BKA_LENGTH(out->timers, time_t); i++)
 		out->timers[i] = 0;
+
+	/* Initialize all spec passup areas to NULL */
+	out->sp_areas[0][0] = out->sp_areas[0][1] = NULL;
+	out->sp_areas[1][0] = out->sp_areas[1][1] = NULL;
+	out->sp_areas[2][0] = out->sp_areas[2][1] = NULL;
 
 	return out;
 }

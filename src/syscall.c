@@ -288,28 +288,22 @@ void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3) {
 }
 
 void sys_spec_passup(unsigned type, unsigned old_area, unsigned new_area) {
-    state_t* oa = (state_t*) old_area, *na = (state_t*) new_area;
+    state_t *oa = (state_t*) old_area, *na = (state_t*) new_area;
     pcb_t *const curr = bka_sched_curr;
-    state_t **old_areas[] = {
-			curr->sysbk_area + 0, curr->tlb_area + 0, curr->trap_area + 0
-    };
-	state_t **new_areas[] = {
-			curr->sysbk_area + 1, curr->tlb_area + 1, curr->trap_area + 1
-	};
 
 	/* Invalid arguments received. */
-	if (type < 0 || 2 < type || !oa || !na) {
+	if (type < BKA_SP_SYSBK || 2 < BKA_SP_TRAP || !oa || !na) {
 		sys_return_stay((unsigned) -1);
 		bka_sched_resume();
 	}
 
 	/* Syscall already once invoked. */
-	if (*old_areas[type] || *new_areas[type]) {
-		bka_sched_kill(bka_sched_curr);
+	if (curr->sp_areas[type][0] || curr->sp_areas[type][1]) {
+		bka_sched_kill(curr);
 		bka_sched_resume();
 	} else {
-		*old_areas[type] = oa;
-		*new_areas[type] = na;
+		curr->sp_areas[type][0] = oa;
+		curr->sp_areas[type][1] = na;
 
 		sys_return(0);
 	}

@@ -26,11 +26,13 @@ void bka_na_enter(unsigned new_area) {
 
 #ifdef BKA_ARCH_UMPS
 	if (new_area == SYSBK_NEWAREA) {
-		state_t *old_area = (state_t *) SYSBK_OLDAREA;
+		state_t *oa = (state_t *) SYSBK_OLDAREA;
 
-		old_area->pc_epc += WS;
+		if (CAUSE_GET_EXCCODE(BKA_STATE_CAUSE(oa)) == EXC_SYS)
+			oa->pc_epc += WS;
 	}
 #elif defined(BKA_ARCH_UARM)
+	/* TODO Decrementing the old area word for uARM might be unnecessary. */
 	if (new_area == INT_NEWAREA || new_area == SYSBK_NEWAREA) {
 		state_t *old_area = (state_t *) (new_area - STATE_T_SIZE);
 
@@ -52,6 +54,16 @@ void bka_na_exit(unsigned new_area) {
 }
 
 
+void bka_sp_enter(unsigned type) {
+	state_t *old_area_src[] = {
+		(state_t *) SYSBK_OLDAREA, (state_t *) TLB_OLDAREA,
+		(state_t *) PGMTRAP_OLDAREA,
+	};
+
+	*bka_sched_curr->sp_areas[type][0] = *(old_area_src[type]);
+}
+
+void bka_sp_exit(unsigned type) {
 }
 
 

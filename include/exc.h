@@ -9,9 +9,9 @@
  * @param p	A pointer to @c state_t.
  * @return The cause register of the state pointed to by @c p.
  */
-#define	BKA_STATE_CAUSE(p)	p->CP15_Cause
+#define	BKA_STATE_CAUSE(p)	(p)->CP15_Cause
 #elif defined(BKA_ARCH_UMPS)
-#define	BKA_STATE_CAUSE(p)	p->cause
+#define	BKA_STATE_CAUSE(p)	(p)->cause
 #endif
 
 
@@ -56,6 +56,9 @@ void bka_na_enter(unsigned new_area);
  * @see bka_na_enter
  */
 void bka_na_exit(unsigned new_area);
+
+void bka_sp_enter(unsigned type);
+void bka_sp_exit(unsigned type);
 
 /**
  * Callback function to be invoked just after entering kernel-level code.
