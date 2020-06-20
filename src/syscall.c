@@ -134,29 +134,11 @@ static syscall_t sys_id_to_syscall[] = {
 };
 
 
-void bka_sys_call(unsigned id, unsigned arg1, unsigned arg2, unsigned arg3) {
-	/* Predefined syscalls. */
-    if (BKA_SYS_CPU_TIME <= id && id <= BKA_SYS_GETPID) {
+void bka_syscall(unsigned id, unsigned arg1, unsigned arg2, unsigned arg3) {
+    if (bka_syscall_avail(id)) {
         sys_id_to_syscall[id](arg1, arg2, arg3);
-	/* Custom syscalls. */
-    } else if (BKA_SYS_GETPID < id) {
-    	/* Old area and new area variables, respectively. */
-    	state_t *oa_dest = bka_sched_curr->sysbk_area[0];
-		state_t *na = bka_sched_curr->sysbk_area[1];
-
-		if (oa_dest && na) {
-			state_t *oa_src = (state_t *) SYSBK_OLDAREA;
-
-			/* TODO Is this correct according to the specifications? What is the
-			 *  protocol for exiting out of a custom syscall?
-			 */
-			bka_memcpy(oa_dest, oa_src, sizeof(state_t));
-			LDST(na);
-        } else {
-			bka_sched_kill(bka_sched_curr);
-			bka_sched_resume();
-        }
     } else {
+    	/* TODO Print out error message. */
         PANIC();
     }
 }

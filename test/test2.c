@@ -161,9 +161,9 @@ void sec_sysbk () {
 		case EXC_SYS:
 
 #ifdef BKA_ARCH_UARM
-			bka_sys_call(oa->a1, oa->a2, oa->a3, oa->a4);
+			bka_syscall(oa->a1, oa->a2, oa->a3, oa->a4);
 #elif defined(BKA_ARCH_UMPS)
-			bka_sys_call(oa->reg_a0, oa->reg_a1, oa->reg_a2, oa->reg_a3);
+			bka_syscall(oa->reg_a0, oa->reg_a1, oa->reg_a2, oa->reg_a3);
 #endif
 
 			break;

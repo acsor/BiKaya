@@ -23,7 +23,7 @@
  * @param arg2 Second syscall argument.
  * @param arg3 Third syscall argument.
  */
-void bka_sys_call(unsigned id, unsigned arg1, unsigned arg2, unsigned arg3);
+void bka_syscall(unsigned id, unsigned arg1, unsigned arg2, unsigned arg3);
 
 
 #endif
