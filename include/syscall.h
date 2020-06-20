@@ -24,6 +24,11 @@
  * @param arg3 Third syscall argument.
  */
 void bka_syscall(unsigned id, unsigned arg1, unsigned arg2, unsigned arg3);
+/**
+ * @return @c 1 if the syscall identified by @c id is registered, @c 0
+ * otherwise.
+ */
+#define bka_syscall_avail(id)	(BKA_SYS_CPU_TIME <= (id) && (id) <= BKA_SYS_GETPID)
 
 
 #endif
