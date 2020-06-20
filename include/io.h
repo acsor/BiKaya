@@ -5,6 +5,10 @@
 #include "sem.h"
 
 
+#define BKA_TERM(term_no)	(termreg_t *) (DEV_REG_ADDR(IL_TERMINAL, term_no))
+#define BKA_PRINT(print_no)	(dtpreg_t *) (DEV_REG_ADDR(IL_PRINTER, print_no))
+
+
 /**
  * Print to the terminal device @c term until a @c NULL is met in the
  * variable-argument list of strings.
@@ -12,12 +16,16 @@
  * @return @c BKA_E_GEN if errors occurred, count of written strings otherwise.
  */
 int bka_term_puts(termreg_t *term, ...);
+#define bka_term_puts2(term_no, ...) bka_term_puts(BKA_TERM(term_no), __VA_ARGS__)
+
 /**
  * Reads a single character from @c term.
  * @return @c BKA_E_GEN if errors occurred, number of read characters
  * otherwise.
  */
 int bka_term_recvc(termreg_t *term);
+#define bka_term_recvc2(term_no) bka_term_recvc(BKA_TERM(term_no))
+
 /**
  * Reads at most <code>length - 1</code> characters from @c term into @c
  * dest, stopping earlier if a newline character is met. A @c '\0'
@@ -29,6 +37,7 @@ int bka_term_recvc(termreg_t *term);
  * @return @c BKA_E_GEN in case of errors, @c BKA_E_OK otherwise.
  */
 int bka_term_recvs(termreg_t *term, char *dest, unsigned length);
+#define bka_term_recvs2(term_no, dest, length) bka_term_recvs(BKA_TERM (term_no), dest, length)
 
 
 /**
@@ -39,6 +48,7 @@ int bka_term_recvs(termreg_t *term, char *dest, unsigned length);
  */
  /* TODO Turn this function into variadic. */
 int bka_print_puts(dtpreg_t *dev, char const *str);
+#define bka_print_puts2(dev_no, str) bka_print_puts(BKA_PRINT(dev_no), str)
 
 
 /**

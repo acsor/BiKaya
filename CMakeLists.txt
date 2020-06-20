@@ -43,15 +43,20 @@ add_library(time ${BKA_SRC}/time.c)
 add_library(utils ${BKA_SRC}/utils.c)
 
 # Libraries dependecies
+target_link_libraries(io PRIVATE sem)
 target_link_libraries(pcb PRIVATE string utils)
-target_link_libraries(sched PRIVATE pcb time)
-target_link_libraries(sem PRIVATE pcb)
+target_link_libraries(sched PRIVATE exc pcb time)
+target_link_libraries(sem PRIVATE pcb sched)
 target_link_libraries(string PRIVATE math utils)
 target_link_libraries(syscall PRIVATE io sched sem time)
 target_link_libraries(utils PRIVATE math)
 
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
 	target_link_libraries(math PRIVATE libdiv)
+	# TODO Try to remove this additional linkage for sched (here and below for uMPS)
+	target_link_libraries(sched PRIVATE crtso libuarm)
+elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL mips)
+	target_link_libraries(sched PRIVATE crtso libumps)
 endif()
 
 # CPack configuration -- useful for packaging the project in various formats

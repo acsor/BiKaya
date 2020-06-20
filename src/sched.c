@@ -1,6 +1,5 @@
-#include "exc.h"
 #include "sched.h"
-#include "arch.h"
+#include "exc.h"
 
 #define TIME_SLICE		3
 #define	TIME_SLICE_UNIT	BKA_STU_MILLI

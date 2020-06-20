@@ -1,6 +1,7 @@
 #ifndef BKA_SCHED_H
 #define BKA_SCHED_H
 
+#include "arch.h"
 #include "list.h"
 #include "pcb.h"
 

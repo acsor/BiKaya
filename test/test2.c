@@ -185,16 +185,15 @@ static void delay_ms(unsigned ms) {
 }
 
 void proc_test1() {
-	termreg_t *term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
 	int i = 0;
 
-	bka_term_puts(term0, "Entering test1!\n", NULL);
+	bka_term_puts2(0, "Entering test1!\n", NULL);
 
 	for (i = 0; i < TEST_STEPS; i++) {
 		while (test3_baton[i] == 0)
 			;
 
-		bka_term_puts(term0, to_print[i * 3], NULL);
+		bka_term_puts2(0, to_print[i * 3], NULL);
 		delay_ms(100);
 		test1_baton[i] = 1;
 	}
@@ -202,22 +201,21 @@ void proc_test1() {
 	while (test3_baton[TEST_STEPS] == 0)
 		;
 
-	bka_term_puts(term0, "Good job from test1\n", NULL);
+	bka_term_puts2(0, "Good job from test1\n", NULL);
 	test1_baton[TEST_STEPS] = 1;
 	SYSCALL(BKA_SYS_KILL, (unsigned) NULL, 0, 0);
 }
 
 void proc_test2() {
-	termreg_t *term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
 	int i = 0;
 
-	bka_term_puts(term0, "Entering test2!\n", NULL);
+	bka_term_puts2(0, "Entering test2!\n", NULL);
 
 	for (i = 0; i < TEST_STEPS; i++) {
 		while (test1_baton[i] == 0)
 			;
 
-		bka_term_puts(term0, to_print[i * 3 + 1], NULL);
+		bka_term_puts2(0, to_print[i * 3 + 1], NULL);
 		delay_ms(100);
 		test2_baton[i] = 1;
 	}
@@ -225,23 +223,22 @@ void proc_test2() {
 	while (test1_baton[TEST_STEPS] == 0)
 		;
 
-	bka_term_puts(term0, "Good job from test2\n", NULL);
+	bka_term_puts2(0, "Good job from test2\n", NULL);
 	test2_baton[TEST_STEPS] = 1;
 	SYSCALL(BKA_SYS_KILL, (unsigned) NULL, 0, 0);
 }
 
 void proc_test3() {
-	termreg_t *term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
 	int i = 0;
 
-	bka_term_puts(term0, "Entering test3!\n", NULL);
+	bka_term_puts2(0, "Entering test3!\n", NULL);
 	test3_baton[0] = 1;
 
 	for (i = 0; i < TEST_STEPS; i++) {
 		while (test2_baton[i] == 0)
 			;
 
-		bka_term_puts(term0, to_print[i * 3 + 2], NULL);
+		bka_term_puts2(0, to_print[i * 3 + 2], NULL);
 		delay_ms(100);
 		test3_baton[i + 1] = 1;
 	}
@@ -249,6 +246,6 @@ void proc_test3() {
 	while (test2_baton[TEST_STEPS] == 0)
 		;
 
-	bka_term_puts(term0, "Good job from test3\n", NULL);
+	bka_term_puts2(0, "Good job from test3\n", NULL);
 	SYSCALL(BKA_SYS_KILL, (unsigned) NULL, 0, 0);
 }

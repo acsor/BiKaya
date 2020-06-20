@@ -28,8 +28,6 @@ int test_bka_log(void *data, char* errmsg, int errdim);
 
 
 int main (int argc, char *argv[]) {
-	termreg_t * const term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
-
 	test_t tests[] = {
 		{"test_bka_atoi", test_bka_atoi}, {"test_bka_itoa", test_bka_itoa},
 		{"test_bka_strlen", test_bka_strlen},
@@ -49,7 +47,7 @@ int main (int argc, char *argv[]) {
 
 	for (i = 0; i < tests_no; i++) {
 		errmsg[0] = '\0';
-		bka_term_puts(term0, "Testing ", tests[i].name, "()... ", NULL);
+		bka_term_puts2(0, "Testing ", tests[i].name, "()... ", NULL);
 		f = tests[i].f;
 
 		/* If the test fails... */
@@ -57,10 +55,10 @@ int main (int argc, char *argv[]) {
 			if (errmsg[0] == '\0')
 				bka_strncpy(errmsg, "UNKNOWN", buffsize);
 
-			bka_term_puts(term0, "FAILED.\n\tREASON: ", errmsg, "\n", NULL);
+			bka_term_puts2(0, "FAILED.\n\tREASON: ", errmsg, "\n", NULL);
 			failed_no++;
 		} else {
-			bka_term_puts(term0, "OK.\n", NULL);
+			bka_term_puts2(0, "OK.\n", NULL);
 		}
 	}
 
@@ -68,7 +66,7 @@ int main (int argc, char *argv[]) {
 	/* 		"\nRUN %lu TESTS (%lu OK, %lu FAILED).\n", */
 	/* 		tests_no, tests_no - failed_no, failed_no */
 	/* ); */
-	bka_term_puts(term0, "\nALL TESTS RUN.\n", NULL);
+	bka_term_puts2(0, "\nALL TESTS RUN.\n", NULL);
 
 	return 0;
 }
