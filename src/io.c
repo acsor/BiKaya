@@ -183,7 +183,7 @@ static int bka_print_putchar(dtpreg_t *p, char c) {
 }
 
 
-semd_t* bka_dev_sem_get(unsigned *dev, unsigned subdevice) {
+semd_t* bka_dev_sem_get(void *dev, unsigned subdevice) {
 	semd_t *out;
 	unsigned line = bka_dev_line(dev), instance = bka_dev_instance(dev);
 	int *semkey;
@@ -199,7 +199,7 @@ semd_t* bka_dev_sem_get(unsigned *dev, unsigned subdevice) {
 	return out;
 }
 
-unsigned bka_dev_line(unsigned *dev) {
+unsigned bka_dev_line(void *dev) {
 	/* TODO Implement for uARM too. */
 	/* TODO Turn this into a macro. */
 	dtpreg_t *first = (dtpreg_t *) DEV_REG_ADDR(IL_DISK, 0);
@@ -207,7 +207,7 @@ unsigned bka_dev_line(unsigned *dev) {
 	return (((dtpreg_t *) dev) - first) / N_DEV_PER_IL;
 }
 
-unsigned bka_dev_instance(unsigned *dev) {
+unsigned bka_dev_instance(void *dev) {
 	/* TODO Implement for uARM too. */
 	/* TODO Turn this into a macro. */
 	unsigned line = bka_dev_line(dev);

@@ -64,16 +64,16 @@ int bka_print_puts(dtpreg_t *dev, char const *str);
  * @return A semaphore associated to the device @c dev, @c NULL in case the
  * free semaphore list (FSL) is empty.
  */
-semd_t* bka_dev_sem_get(unsigned *dev, unsigned subdevice);
+semd_t* bka_dev_sem_get(void *dev, unsigned subdevice);
 /**
  * @return The interrupt line number the device register @c dev belongs to.
  */
-unsigned bka_dev_line(unsigned *dev);
+unsigned bka_dev_line(void *dev);
 /**
  * @return The "instance" number within the appropriate interrupt line the
  * device register @c dev belongs to.
  */
-unsigned bka_dev_instance(unsigned *dev);
+unsigned bka_dev_instance(void *dev);
 
 
 #endif
