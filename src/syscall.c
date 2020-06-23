@@ -225,7 +225,9 @@ void sys_verhogen(unsigned arg1, unsigned arg2, unsigned arg3) {
 		PANIC();
 	}
 
-	sys_return((unsigned) bka_sem_v(sem, bka_sched_curr));
+	bka_sem_v(sem);
+
+	sys_return((unsigned) *(sem->key));
 }
 
 void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3) {

@@ -29,7 +29,13 @@ void bka_sem_init();
  */
 semd_t* bka_sem_alloc(int *key);
 int bka_sem_p(semd_t *s, pcb_t *p);
-int bka_sem_v(semd_t *s, pcb_t *p);
+/**
+ * Performs a V() operation on the semaphore @c s.
+ * @param s Semaphore on which to perform a Verhogen operation.
+ * @return PCB that was eventually reinserted into the ready queue, @c NULL
+ * if no other process was waiting on @c s.
+ */
+pcb_t* bka_sem_v(semd_t *s);
 /**
  * @param s Pointer to a semaphore to return to the free list.
  */

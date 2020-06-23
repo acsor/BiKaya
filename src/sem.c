@@ -60,7 +60,7 @@ semd_t* bka_sem_alloc(int *key) {
 
 int bka_sem_p(semd_t *s, pcb_t *p) {
 	p->semkey = s->key;
-	*(s->key)--;
+	(*s->key)--;
 
 	if (*(s->key) < 0) {
 		bka_sched_suspend(p);
@@ -70,18 +70,21 @@ int bka_sem_p(semd_t *s, pcb_t *p) {
 	return *(s->key);
 }
 
-int bka_sem_v(semd_t *s, pcb_t *p) {
-	p->semkey = NULL;
-	*(s->key)++;
+pcb_t* bka_sem_v(semd_t *s) {
+	(*s->key)++;
 
 	if (*(s->key) <= 0) {
 		pcb_t *to_restore = bka_sem_dequeue(s->key);
 
-		if (to_restore)
+		if (to_restore) {
+			to_restore->semkey = NULL;
 			bka_sched_enqueue(to_restore);
+		}
+
+		return to_restore;
 	}
 
-	return *(s->key);
+	return NULL;
 }
 
 void bka_sem_free(semd_t *s) {
