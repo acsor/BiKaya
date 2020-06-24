@@ -87,7 +87,7 @@ void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority);
 /**
  * Sets @c p process status to match the state given by @c s.
  */
-void bka_pcb_state_set(pcb_t *p, state_t *s);
+#define bka_pcb_state_set(p, s)	(p)->state = *(s)
 /**
  * @return @c BKA_PCB_STAT_FREED if @c p was returned to the free PCB list, @c
  * BKA_PCB_STAT_INV if it points to an invalid memory area or @c 0 otherwise.

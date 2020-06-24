@@ -90,10 +90,6 @@ void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
 #endif
 }
 
-void bka_pcb_state_set(pcb_t *p, state_t *s) {
-	bka_memcpy(&p->state, s, sizeof(state_t));
-}
-
 int bka_pcb_stat(pcb_t const *p) {
 	if (p < pcb_table || (pcb_table + BKA_MAX_PROC - 1) < p)
 		return BKA_PCB_STAT_INV;
