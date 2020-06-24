@@ -1,4 +1,5 @@
 #include "exc.h"
+#include "io.h"
 #include "pcb.h"
 #include "sched.h"
 #include "sem.h"
@@ -10,15 +11,15 @@ void test ();
 
 
 /**
- * Initializes the system-wide ready process queue to contain the test process.
- * @see pcb_test_factory
- */
+* Initializes the system-wide ready process queue to contain the test process.
+* @see pcb_test_factory
+*/
 static void sched_queue_init();
 /**
- * @return The only viable PCB whose process will begin after the
- * initialization phase.
- * @see bka_pcb_init() on how to initialize the PCB.
- */
+* @return The only viable PCB whose process will begin after the
+* initialization phase.
+* @see bka_pcb_init() on how to initialize the PCB.
+*/
 static pcb_t* pcb_test_factory();
 /**
  * Initializes the New Areas (fixed memory areas containing callback code to
@@ -33,6 +34,8 @@ static void new_areas_init();
  * device and software interrupts.
  */
 static void sec_int ();
+void sec_int_handle_interrupt(void *dev);
+void sec_int_handle_term_int(termreg_t *dev);
 /**
  * System Exception Callback (SEC) to be executed during TLB exceptions.
  */
@@ -91,16 +94,67 @@ void new_areas_init() {
 
 void sec_int () {
 	state_t *oa = (state_t *) INT_OLDAREA;
+	void *dev;
 
 	bka_na_enter(INT_NEWAREA);
+
+	/* As long as there are pending device interrupts, handle them. */
+	while ((dev = bka_dev_next_pending()))
+		sec_int_handle_interrupt(dev);
 
 	/* If an interrupt is pending on interrupt line 2, i.e. the interval timer: */
 	if (BKA_STATE_CAUSE(oa) & CAUSE_IP(2)) {
 		/* Save the current process state and switch to the next one. */
 		bka_pcb_state_set(bka_sched_curr, oa);
 		bka_sched_switch_top();
+	}
+
+	bka_na_exit(INT_NEWAREA);
+}
+
+void sec_int_handle_interrupt(void *dev) {
+	unsigned line = bka_dev_line(dev);
+
+	if (line == IL_TERMINAL) {
+		/* Since handling terminal interrupts is a bit more complex, we
+		 * delegate that duty to another function. */
+		sec_int_handle_term_int((termreg_t *) dev);
 	} else {
-		bka_na_exit(INT_NEWAREA);
+		semd_t *s = bka_dev_sem_get(dev, 0);
+		dtpreg_t *dtpdev = (dtpreg_t *) dev;
+		pcb_t *p;
+
+		/* Perform a V() operation on the semaphore, set the device status as
+		 * the syscall return value and acknowledge the interrupt. */
+		p = bka_sem_v(s);
+		bka_syscall_retval(p, dtpdev->status);
+		bka_dev_ack2(dev, 0);
+	}
+}
+
+void sec_int_handle_term_int(termreg_t *dev) {
+	unsigned rs = dev->recv_status, ts = dev->transm_status;
+
+	if (ts == TERM_ST_IOCE || ts == TERM_ST_TRANSME || ts == TERM_ST_TRANSMITTED) {
+		semd_t *s = bka_dev_sem_get(dev, 0);
+		pcb_t *p;
+
+		p = bka_sem_v(s);
+		bka_syscall_retval(p, ts);
+		/** TODO Is it okay to acknowledge error statuses, or should they be
+		 * dealt with the reset command? */
+		bka_dev_ack2(dev, 0);
+	}
+
+	if (rs == TERM_ST_IOCE || rs == TERM_ST_RECVE || rs == TERM_ST_RECEIVED) {
+		semd_t *s = bka_dev_sem_get(dev, 1);
+		pcb_t *p;
+
+		p = bka_sem_v(s);
+		bka_syscall_retval(p, rs);
+		/** TODO Is it okay to acknowledge error statuses, or should they be
+		 * dealt with the reset command? */
+		bka_dev_ack2(dev, 1);
 	}
 }
 
@@ -143,14 +197,12 @@ void sec_sysbk () {
 	state_t *oa = (state_t *) SYSBK_OLDAREA;
 	unsigned cause = CAUSE_GET_EXCCODE(BKA_STATE_CAUSE(oa));
 
-	if (cause == EXC_SYS) {
+	if (cause == EXC_SYS)
 		return sec_sys();
-	} else if (cause == EXC_BP) {
+	else if (cause == EXC_BP)
 		return sec_bk();
-	} else {
-		/* TODO Print out error message. */
-		PANIC();
-	}
+	else
+		PANIC2("sec_sysbk(): cause is neither syscall nor breakpoint\n");
 }
 
 void sec_sys () {
