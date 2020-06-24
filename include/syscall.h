@@ -10,6 +10,9 @@
 #define BKA_SYS_SPEC_PASSUP	6
 #define BKA_SYS_GETPID		7
 
+#define BKA_SYS_FIRST	BKA_SYS_CPU_TIME
+#define BKA_SYS_LAST	BKA_SYS_GETPID
+
 #define BKA_SP_SYSBK	0
 #define BKA_SP_TLB		1
 #define BKA_SP_TRAP		2
@@ -28,7 +31,8 @@ void bka_syscall(unsigned id, unsigned arg1, unsigned arg2, unsigned arg3);
  * @return @c 1 if the syscall identified by @c id is registered, @c 0
  * otherwise.
  */
-#define bka_syscall_avail(id)	(BKA_SYS_CPU_TIME <= (id) && (id) <= BKA_SYS_GETPID)
+#define bka_syscall_avail(id)	(BKA_SYS_FIRST <= (id) && (id) <= BKA_SYS_LAST)
+void bka_syscall_retval(pcb_t *p, unsigned retval);
 
 
 #endif

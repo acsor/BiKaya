@@ -143,6 +143,14 @@ void bka_syscall(unsigned id, unsigned arg1, unsigned arg2, unsigned arg3) {
     }
 }
 
+void bka_syscall_retval(pcb_t *p, unsigned retval) {
+#ifdef BKA_ARCH_UARM
+	p->state.a1 = retval;
+#elif defined(BKA_ARCH_UMPS)
+	p->state.reg_v0 = retval;
+#endif
+}
+
 
 void sys_return(unsigned retval) {
 	sys_return_stay(retval);
@@ -209,7 +217,9 @@ void sys_kill(unsigned arg1, unsigned arg2, unsigned arg3) {
 		case BKA_E_INVARG:
 			sys_return(-1);
 		case BKA_SCHED_KR:
-			sys_return_stay(0);
+			/* The sys_return_stay() call below might be unnecessary, for the
+			 * process we are returning the value to has just been killed. */
+			/* sys_return_stay(0); */
 			bka_sched_resume();
 		case 0:
 		default:
