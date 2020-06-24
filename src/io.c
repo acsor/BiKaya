@@ -172,7 +172,7 @@ unsigned bka_dev_line(void *dev) {
 	/* TODO Turn this into a macro. */
 	dtpreg_t *first = (dtpreg_t *) DEV_REG_ADDR(IL_DISK, 0);
 
-	return (((dtpreg_t *) dev) - first) / N_DEV_PER_IL;
+	return (((dtpreg_t *) dev) - first) / N_DEV_PER_IL + DEV_IL_START;
 }
 
 unsigned bka_dev_instance(void *dev) {

@@ -26,6 +26,8 @@ int test_bka_memset(void *data, char* errmsg, int errdim);
 
 int test_bka_log(void *data, char* errmsg, int errdim);
 
+int test_bka_dev_line(void *data, char* errmsg, int errdim);
+
 
 int main (int argc, char *argv[]) {
 	test_t tests[] = {
@@ -37,6 +39,8 @@ int main (int argc, char *argv[]) {
 		{"test_bka_memset", test_bka_memset},
 
 		{"test_bka_log", test_bka_log},
+
+		{"test_bka_dev_line", test_bka_dev_line},
 	};
 	test_function f;
 
@@ -219,6 +223,23 @@ int test_bka_log(void *data, char* errmsg, int errdim) {
 			errmsg[1] = '\0';
 			return 1;
 		}
+	}
+
+	return 0;
+}
+
+int test_bka_dev_line(void *data, char* errmsg, int errdim) {
+	unsigned expected[] = {
+			IL_DISK, IL_TAPE, IL_ETHERNET, IL_PRINTER, IL_TERMINAL,
+	};
+	unsigned lines[] = {
+			IL_DISK, IL_TAPE, IL_ETHERNET, IL_PRINTER, IL_TERMINAL,
+	};
+	unsigned i;
+
+	for (i = 0; i < BKA_LENGTH(lines, unsigned); i++) {
+		if (bka_dev_line((void *)DEV_REG_ADDR(lines[i], 7)) != expected[i])
+			return 1;
 	}
 
 	return 0;

@@ -50,8 +50,6 @@ semd_t* bka_sem_alloc(int *key) {
 	/* Remove the newly fetched semaphore from the FSL */
 	list_del(&result->next);
 	result->key = key;
-	/* TODO Test this setting. */
-	*key = 0;
 	INIT_LIST_HEAD(&result->proc_queue);
 	list_add_tail(&result->next, &sem_head);
 

@@ -1,4 +1,3 @@
-#include "arch.h"
 #include "pcb.h"
 #include "string.h"
 #include "utils.h"
