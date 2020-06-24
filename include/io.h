@@ -5,8 +5,39 @@
 #include "sem.h"
 
 
-#define BKA_TERM(term_no)	(termreg_t *) (DEV_REG_ADDR(IL_TERMINAL, term_no))
+#define DEV_CMD_RESET	0
+#define DEV_CMD_ACK		1
+/* TODO Complete generic device command constants. */
+
 #define BKA_PRINT(print_no)	(dtpreg_t *) (DEV_REG_ADDR(IL_PRINTER, print_no))
+
+#define PRINT_ST_NOTINST	0
+#define PRINT_ST_READY		1
+#define PRINT_ST_IOCE		2
+#define PRINT_ST_BUSY		3
+#define PRINT_ST_PRINTE		4
+
+#define PRINT_CMD_RESET		0
+#define PRINT_CMD_ACK       1
+#define PRINT_CMD_PRINTC    2
+
+#define PRINT_STATUS_MASK	0xFF
+
+#define BKA_TERM(term_no)	(termreg_t *) (DEV_REG_ADDR(IL_TERMINAL, term_no))
+
+#define TERM_ST_NOTINST		0
+#define TERM_ST_READY       1
+#define TERM_ST_IOCE		2
+#define TERM_ST_BUSY        3
+#define TERM_ST_TRANSME		4
+#define TERM_ST_RECVE		4
+#define TERM_ST_TRANSMITTED	5
+#define TERM_ST_RECEIVED	5
+
+#define TERM_CMD_RESET		0
+#define TERM_CMD_ACK		1
+#define TERM_CMD_TRANSM		2
+#define TERM_CMD_RECV		2
 
 
 /**
@@ -17,7 +48,6 @@
  */
 int bka_term_puts(termreg_t *term, ...);
 #define bka_term_puts2(term_no, ...) bka_term_puts(BKA_TERM(term_no), __VA_ARGS__)
-
 /**
  * Reads a single character from @c term.
  * @return @c BKA_E_GEN if errors occurred, number of read characters
@@ -25,7 +55,6 @@ int bka_term_puts(termreg_t *term, ...);
  */
 int bka_term_recvc(termreg_t *term);
 #define bka_term_recvc2(term_no) bka_term_recvc(BKA_TERM(term_no))
-
 /**
  * Reads at most <code>length - 1</code> characters from @c term into @c
  * dest, stopping earlier if a newline character is met. A @c '\0'
@@ -55,12 +84,10 @@ int bka_print_puts(dtpreg_t *dev, char const *str);
  * Obtains a semaphore association for the given device register @c dev. If
  * one such association does not exist a new one, if possible, is created;
  * otherwise, the already existing one is returned.
- *
- * @b Note: the actual type of the device register is irrelevant. In order
- * to identify one such device, its physical memory address is sufficient.
- *
  * @param dev Device to get the associated semaphore for.
- * @param subdevice @c dev subdevice, mostly relevant for terminals only
+ * @param subdevice Relevant for terminal devices only; equals @c 0 when
+ * referring to the transmission subdevice, @c 1 when referring to the
+ * reception one.
  * @return A semaphore associated to the device @c dev, @c NULL in case the
  * free semaphore list (FSL) is empty.
  */

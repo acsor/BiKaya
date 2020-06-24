@@ -1,20 +1,5 @@
 #include "io.h"
 #include "stdarg.h"
-#include "utils.h"
-
-#define TERM_ST_NOTINST		0
-#define TERM_ST_READY       1
-#define TERM_ST_OPC			2
-#define TERM_ST_BUSY        3
-#define TERM_ST_TRANSME		4
-#define TERM_ST_RECVE		4
-#define TERM_ST_TRANSMITTED	5
-#define TERM_ST_RECEIVED	5
-
-#define TERM_CMD_RESET		0
-#define TERM_CMD_ACK		1
-#define TERM_CMD_TRANSM		2
-#define TERM_CMD_RECV		2
 
 /**
  * Generates a terminal device transmission command with argument @c c.
@@ -35,21 +20,8 @@
 #define TERM_RECV_CHAR(term)	((term->recv_status & 0xFF00) >> 8)
 
 
-#define PRINT_ST_NOTINST	0
-#define PRINT_ST_READY		1
-#define PRINT_ST_OPC		2
-#define PRINT_ST_BUSY		3
-#define PRINT_ST_PRINTE		4
-
-#define PRINT_CMD_RESET		0
-#define PRINT_CMD_ACK       1
-#define PRINT_CMD_PRINTC    2
-
-#define PRINT_STATUS_MASK	0xFF
-
-
-static int io_dev_to_sem[N_EXT_IL * N_DEV_PER_IL];
-static int io_subdev_to_sem[N_DEV_PER_IL];
+static int io_dev_to_sem[(N_EXT_IL - 1) * N_DEV_PER_IL];
+static int io_termdev_to_sem[2 * N_DEV_PER_IL];
 
 
 /**
@@ -137,6 +109,7 @@ int bka_print_puts(dtpreg_t *dev, char const *str) {
 }
 
 
+/* TODO Move auxiliary functions to the bottom of the file. */
 int bka_term_puts_aux(termreg_t *term, char const *str) {
 	int written;
 
@@ -188,10 +161,10 @@ semd_t* bka_dev_sem_get(void *dev, unsigned subdevice) {
 	unsigned line = bka_dev_line(dev), instance = bka_dev_instance(dev);
 	int *semkey;
 
-	if (line == IL_TERMINAL && subdevice)
-		semkey = io_subdev_to_sem + instance;
+	if (line == IL_TERMINAL)
+		semkey = io_termdev_to_sem + N_DEV_PER_IL * subdevice + instance;
 	else
-		semkey = io_dev_to_sem + line * N_DEV_PER_IL + instance;
+		semkey = io_dev_to_sem + N_DEV_PER_IL * EXT_IL_INDEX(line) + instance;
 
 	if (!(out = bka_sem_get(semkey)))
 		out = bka_sem_alloc(semkey);
