@@ -33,6 +33,10 @@
  */
 #define BKA_E_INVARG	-3
 
+/**
+ * Utility macro to emit an error message and panic the calling code.
+ */
+#define PANIC2(msg)	{ bka_term_puts2(0, msg, NULL); PANIC(); }
 
 /* OTHER CONSTANTS. */
 #ifndef NULL

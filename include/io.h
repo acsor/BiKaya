@@ -93,6 +93,34 @@ int bka_print_puts(dtpreg_t *dev, char const *str);
  */
 semd_t* bka_dev_sem_get(void *dev, unsigned subdevice);
 /**
+ * @return The next pending interrupted device register, in increasing order
+ * from lower interrupt lines to higher ones. Internal devices are not
+ * considered, so that only device register pointers from disks to terminals
+ * can be returned by this function.
+ * <b>Note</b>: for terminals, it is sufficient that either the transmitting
+ * side or the receiving side has a pending interrupt for the function to
+ * return the corresponding terminal register.
+ */
+void* bka_dev_next_pending();
+/**
+ * Acknowledges a pending interrupt for the device @c device on interrupt
+ * line @c line, optionally identified by @c subdevice (appropriate
+ * for terminal devices only).
+ * @param line The interrupt line
+ * @param device The device number
+ * @param subdevice The subdevice number. This parameter is only read when
+ * dealing with terminal devices; if <tt>subdevice == 0</tt>, the receive
+ * subdevice interrupt is acknowledged only, if <tt>subdevice == 1</tt> the
+ * transmission subdevice instead.
+ * @see bka_dev_ack2
+ */
+void bka_dev_ack(unsigned line, unsigned device, unsigned subdevice);
+/**
+ * An alternative way of invoking @c bka_dev_ack().
+ * @see bka_dev_ack
+ */
+#define bka_dev_ack2(dev, subdev)	bka_dev_ack(bka_dev_line(dev), bka_dev_instance(dev), subdev)
+/**
  * @return The interrupt line number the device register @c dev belongs to.
  */
 unsigned bka_dev_line(void *dev);
