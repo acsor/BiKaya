@@ -30,19 +30,19 @@ static int io_termdev_to_sem[2 * N_DEV_PER_IL];
  * @return Number of characters from @c str written to @c term.
  * @see bka_term_puts
  */
-static int bka_term_puts_aux(termreg_t *term, char const *str);
+static int term_puts_aux(termreg_t *term, char const *str);
 
 /**
  * Issues a write of character @c c to terminal @c term.
  * @return @c BKA_E_GEN in case of errors, @c BKA_E_OK otherwise.
  */
-static int bka_term_putchar(termreg_t *term, char c);
+static int term_putchar(termreg_t *term, char c);
 
 /**
  * Issues a write of character @c to printer device @c p.
  * @return @c BKA_E_GEN in case of errors, @c BKA_E_OK otherwise.
  */
-static int bka_print_putchar(dtpreg_t *p, char c);
+static int print_putchar(dtpreg_t *p, char c);
 
 
 int bka_term_puts(termreg_t *term, ...) {
@@ -53,7 +53,7 @@ int bka_term_puts(termreg_t *term, ...) {
 	va_start(ap, term);
 
 	while ((to_print = va_arg(ap, char*)) != NULL) {
-		bka_term_puts_aux(term, to_print);
+		term_puts_aux(term, to_print);
 		written++;
 	}
 
@@ -102,58 +102,11 @@ int bka_print_puts(dtpreg_t *dev, char const *str) {
 	int written;
 
 	for (written = 0; *str; written++, str++) {
-		if (bka_print_putchar(dev, *str) != BKA_E_OK)
+		if (print_putchar(dev, *str) != BKA_E_OK)
 			return BKA_E_GEN;
 	}
 
 	return written;
-}
-
-
-/* TODO Move auxiliary functions to the bottom of the file. */
-int bka_term_puts_aux(termreg_t *term, char const *str) {
-	int written;
-
-	for (written = 0; *str; written++, str++) {
-		if (bka_term_putchar(term, *str) != BKA_E_OK)
-			return BKA_E_GEN;
-	}
-
-	return written;
-}
-
-static int bka_term_putchar(termreg_t *term, char c) {
-    unsigned stat = TERM_TRANSM_STATUS(term);
-
-    if (stat != TERM_ST_READY && stat != TERM_ST_TRANSMITTED)
-        return BKA_E_GEN;
-
-    term->transm_command = TERM_TRANSM_COMMAND(c);
-
-    while ((stat = TERM_TRANSM_STATUS(term)) == TERM_ST_BUSY)
-        ;
-
-    term->transm_command = TERM_CMD_ACK;
-
-    return stat != TERM_ST_TRANSMITTED ? BKA_E_GEN: BKA_E_OK;
-}
-
-static int bka_print_putchar(dtpreg_t *p, char c) {
-	unsigned int status = p->status & PRINT_STATUS_MASK;
-
-	/* TODO Can we expand the set of allowable statuses? */
-	if (status != PRINT_ST_READY)
-		return BKA_E_GEN;
-
-	p->data0 = c;
-	p->command = PRINT_CMD_PRINTC;
-
-	while ((status = p->status & PRINT_STATUS_MASK) == PRINT_ST_BUSY)
-		;
-
-	p->command = PRINT_CMD_ACK;
-
-	return status != PRINT_ST_READY ? BKA_E_GEN: BKA_E_OK;
 }
 
 
@@ -229,4 +182,50 @@ unsigned bka_dev_instance(void *dev) {
 	dtpreg_t *first = (dtpreg_t *) DEV_REG_ADDR(line, 0);
 
 	return ((dtpreg_t *) dev) - first;
+}
+
+
+int term_puts_aux(termreg_t *term, char const *str) {
+	int written;
+
+	for (written = 0; *str; written++, str++) {
+		if (term_putchar(term, *str) != BKA_E_OK)
+			return BKA_E_GEN;
+	}
+
+	return written;
+}
+
+static int term_putchar(termreg_t *term, char c) {
+	unsigned stat = TERM_TRANSM_STATUS(term);
+
+	if (stat != TERM_ST_READY && stat != TERM_ST_TRANSMITTED)
+		return BKA_E_GEN;
+
+	term->transm_command = TERM_TRANSM_COMMAND(c);
+
+	while ((stat = TERM_TRANSM_STATUS(term)) == TERM_ST_BUSY)
+		;
+
+	term->transm_command = TERM_CMD_ACK;
+
+	return stat != TERM_ST_TRANSMITTED ? BKA_E_GEN: BKA_E_OK;
+}
+
+static int print_putchar(dtpreg_t *p, char c) {
+	unsigned int status = p->status & PRINT_STATUS_MASK;
+
+	/* TODO Can we expand the set of allowable statuses? */
+	if (status != PRINT_ST_READY)
+		return BKA_E_GEN;
+
+	p->data0 = c;
+	p->command = PRINT_CMD_PRINTC;
+
+	while ((status = p->status & PRINT_STATUS_MASK) == PRINT_ST_BUSY)
+		;
+
+	p->command = PRINT_CMD_ACK;
+
+	return status != PRINT_ST_READY ? BKA_E_GEN: BKA_E_OK;
 }
