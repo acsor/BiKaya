@@ -104,7 +104,12 @@ static void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3);
  * @return TODO Fill in.
  */
 static void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3);
-static void sys_spec_passup(unsigned arg1, unsigned arg2, unsigned arg3);
+/**
+ * @param type Exception type, taking values in <tt>BKA_SP_x</tt>
+ * @param old_area Old area, to be converted into <tt>state_t *</tt>
+ * @param new_area New area, to be converted into <tt>state_t *</tt>
+ */
+static void sys_spec_passup(unsigned type, unsigned old_area, unsigned new_area);
 /**
  * Assuming @c arg1 and @c arg2 encoding two variables @c curr and @c parent
  * of type @c pcb_t**, assigns to @c *curr the pointer to the currently
@@ -279,10 +284,8 @@ void sys_spec_passup(unsigned type, unsigned old_area, unsigned new_area) {
     pcb_t *const curr = bka_sched_curr;
 
 	/* Invalid arguments received. */
-	if (type < BKA_SP_SYSBK || 2 < BKA_SP_TRAP || !oa || !na) {
-		sys_return_stay((unsigned) -1);
-		bka_sched_resume();
-	}
+	if (type < BKA_SP_SYSBK || BKA_SP_TRAP < type || !oa || !na)
+		sys_return((unsigned) -1);
 
 	/* Syscall already once invoked. */
 	if (curr->sp_areas[type][0] || curr->sp_areas[type][1]) {
