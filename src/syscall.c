@@ -254,19 +254,18 @@ void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3) {
 }
 
 void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3) {
-	unsigned *uns_dev = (unsigned *) arg2;
+	void *dev = (void *) arg2;
 	dtpreg_t *dtp_dev = (dtpreg_t *) arg2;
 	termreg_t *term_dev = (termreg_t *) arg2;
-	unsigned *command, *status;
-	semd_t *sem = bka_dev_sem_get(uns_dev, arg3);
 
-	if (bka_dev_line(uns_dev) == IL_TERMINAL) {
+	unsigned *command;
+	semd_t *sem = bka_dev_sem_get(dev, arg3);
+	pcb_t *curr = bka_sched_curr;
+
+	if (bka_dev_line(dev) == IL_TERMINAL)
 		command = arg3 ? &term_dev->recv_command: &term_dev->transm_command;
-		status = arg3 ? &term_dev->recv_status: &term_dev->transm_command;
-	} else {
+	else
 		command = &dtp_dev->command;
-		status = &dtp_dev->status;
-	}
 
 	*command = arg1;
 
@@ -275,7 +274,9 @@ void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3) {
 
 	bka_sem_p(sem, bka_sched_curr);
 
-	sys_return_stay(*status);
+	/* The actual return value is returned once the corresponding interrupt
+	 * is raised and managed by the interrupt handler. */
+	bka_pcb_state_set(curr, (state_t *) SYSBK_OLDAREA);
 	bka_sched_resume();
 }
 
