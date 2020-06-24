@@ -233,6 +233,8 @@ void sys_verhogen(unsigned arg1, unsigned arg2, unsigned arg3) {
 	semd_t *sem = bka_sem_get(semkey);
 
 	if (!sem)
+		sem = bka_sem_alloc(semkey);
+	if (!sem)
 		PANIC2("sys_verhogen(): could not obtain requested semaphore\n");
 
 	bka_sem_v(sem);
@@ -241,15 +243,17 @@ void sys_verhogen(unsigned arg1, unsigned arg2, unsigned arg3) {
 }
 
 void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3) {
+	pcb_t *const curr = bka_sched_curr;
 	int *semkey = (int *) arg1;
 	semd_t *sem = bka_sem_get(semkey);
 
-	if (!sem) {
-		/* TODO Print out an error message */
-		PANIC();
-	}
+	if (!sem)
+		sem = bka_sem_alloc(semkey);
+	if (!sem)
+		PANIC2("sys_passeren(): could not obtain requested semaphore\n");
 
-	sys_return_stay((unsigned) bka_sem_p(sem, bka_sched_curr));
+	sys_return_stay((unsigned) bka_sem_p(sem, curr));
+	bka_pcb_state_set(curr, (state_t *) SYSBK_OLDAREA);
 	bka_sched_resume();
 }
 
