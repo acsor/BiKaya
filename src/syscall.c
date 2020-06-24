@@ -135,12 +135,10 @@ static syscall_t sys_id_to_syscall[] = {
 
 
 void bka_syscall(unsigned id, unsigned arg1, unsigned arg2, unsigned arg3) {
-    if (bka_syscall_avail(id)) {
+    if (bka_syscall_avail(id))
         sys_id_to_syscall[id](arg1, arg2, arg3);
-    } else {
-    	/* TODO Print out error message. */
-        PANIC();
-    }
+	else
+		PANIC2("bka_syscall(): unrecognized syscall id\n");
 }
 
 void bka_syscall_retval(pcb_t *p, unsigned retval) {
@@ -192,10 +190,8 @@ void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3) {
 	if (!state)
 		sys_return(-1);
 
-	if (!new) {
-		/* TODO Print out error message. */
-		PANIC();
-	}
+	if (!new)
+		PANIC2("sys_fork(): could not allocate new PCB\n");
 
 	new->state = *state;
 	new->priority = new->original_priority = priority;
@@ -228,12 +224,11 @@ void sys_kill(unsigned arg1, unsigned arg2, unsigned arg3) {
 }
 
 void sys_verhogen(unsigned arg1, unsigned arg2, unsigned arg3) {
-	semd_t *sem = bka_sem_get((int *) arg1);
+	int *semkey = (int *) arg1;
+	semd_t *sem = bka_sem_get(semkey);
 
-	if (!sem) {
-		/* TODO Print out an error message */
-		PANIC();
-	}
+	if (!sem)
+		PANIC2("sys_verhogen(): could not obtain requested semaphore\n");
 
 	bka_sem_v(sem);
 
@@ -270,10 +265,8 @@ void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3) {
 
 	*command = arg1;
 
-	if (!sem) {
-		/* TODO Print out error message. */
-		PANIC();
-	}
+	if (!sem)
+		PANIC2("sys_iocmd(): could not fetch requested semaphore\n");
 
 	bka_sem_p(sem, bka_sched_curr);
 
