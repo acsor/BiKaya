@@ -12,21 +12,22 @@ void test ();
 
 /**
 * Initializes the system-wide ready process queue to contain the test process.
-* @see pcb_test_factory
+* @see proc_factory
 */
 static void sched_queue_init();
 /**
-* @return The only viable PCB whose process will begin after the
-* initialization phase.
+* @return A PCB initialized to execute the process function @c f, set with an
+* original priority of @c original_priority.
 * @see bka_pcb_init() on how to initialize the PCB.
 */
-static pcb_t* pcb_test_factory();
+static pcb_t* proc_factory(pfun_t f, int original_priority);
 /**
  * Initializes the New Areas (fixed memory areas containing callback code to
  * be executed upon system exceptions) to execute specific callback functions.
  * @see sec_int, sec_tlb, sec_trap, sec_sysbk
  */
 static void new_areas_init();
+static void idle_proc();
 
 
 /**
@@ -68,13 +69,14 @@ int main () {
 
 
 void sched_queue_init() {
-	bka_sched_enqueue(pcb_test_factory());
+	bka_sched_enqueue(proc_factory(idle_proc, -10));
+	bka_sched_enqueue(proc_factory(test, 1));
 }
 
-pcb_t* pcb_test_factory() {
+pcb_t* proc_factory(pfun_t f, int original_priority) {
 	pcb_t * const p = bka_pcb_alloc();
 
-	bka_pcb_init(p, test, 1);
+	bka_pcb_init(p, f, original_priority);
 
 	return p;
 }
@@ -89,6 +91,10 @@ void new_areas_init() {
 
 	for (i = 0; i < n; i++)
 		bka_na_init((state_t *) new_areas[i], callbacks[i]);
+}
+
+static void idle_proc() {
+	while (1);
 }
 
 
@@ -133,7 +139,7 @@ void sec_int_handle_interrupt(void *dev) {
 }
 
 void sec_int_handle_term_int(termreg_t *dev) {
-	unsigned rs = dev->recv_status, ts = dev->transm_status;
+	unsigned const rs = dev->recv_status, ts = dev->transm_status;
 
 	if (ts == TERM_ST_IOCE || ts == TERM_ST_TRANSME || ts == TERM_ST_TRANSMITTED) {
 		semd_t *s = bka_dev_sem_get(dev, 0);
