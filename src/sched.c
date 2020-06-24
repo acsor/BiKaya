@@ -26,6 +26,7 @@ void bka_sched_resume() {
 }
 
 void bka_sched_enqueue(pcb_t *p) {
+	p->priority = p->original_priority;
 	bka_pcb_queue_ins(&bka_sched_ready, p);
 }
 
