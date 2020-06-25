@@ -9,14 +9,14 @@
  * devices is made (enough semaphore for subdevices are preallocated too).
  *
  * TODO Are these many semaphores sufficient? How to tackle their eventual
- * shortage?
+ *  shortage?
  */
-#define	MAX_SEM	(BKA_MAX_PROC + N_EXT_IL * N_DEV_PER_IL + N_DEV_PER_IL)
+#define	BKA_MAX_SEM	(BKA_MAX_PROC + (N_EXT_IL + 1) * N_DEV_PER_IL)
 
 /**
  * The semaphore table, allocating data for each one of them.
  */
-static semd_t semd_table[MAX_SEM];
+static semd_t semd_table[BKA_MAX_SEM];
 /**
  * Head of the Active Semaphore List (ASL).
  */
@@ -30,13 +30,13 @@ static list_t fsl_head;
 
 
 void bka_sem_init() {
-	int i;
+	unsigned i;
 
 	INIT_LIST_HEAD(&sem_head);
 	INIT_LIST_HEAD(&fsl_head);
 
 	/* Add all semaphores to the FSL */
-	for (i = 0; i < BKA_MAX_PROC; i++)
+	for (i = 0; i < BKA_MAX_SEM; i++)
 		list_add_tail(&semd_table[i].next, &fsl_head);
 }
 

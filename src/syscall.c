@@ -194,9 +194,8 @@ void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3) {
 
 	if (!state)
 		sys_return(-1);
-
 	if (!new)
-		PANIC2("sys_fork(): could not allocate new PCB\n");
+		PANIC2("sys_fork(): could not allocate a new PCB\n");
 
 	new->state = *state;
 	new->priority = new->original_priority = priority;
@@ -307,14 +306,10 @@ void sys_spec_passup(unsigned type, unsigned old_area, unsigned new_area) {
 void sys_get_pid(unsigned arg1, unsigned arg2, unsigned arg3) {
 	pcb_t **current = (pcb_t **) arg1, **parent = (pcb_t **) arg2;
 
-	if (current) {
+	if (current)
 		*current = bka_sched_curr;
+	if (parent)
+		*parent = bka_sched_curr->parent;
 
-		if (parent)
-            *parent = bka_sched_curr->parent;
-
-		sys_return(0);
-	}
-
-	sys_return(BKA_E_GEN);
+	sys_return(0);
 }

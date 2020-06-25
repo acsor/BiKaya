@@ -154,14 +154,14 @@ void* bka_dev_next_pending() {
 void bka_dev_ack(unsigned line, unsigned device, unsigned subdevice) {
 	if (line == IL_TERMINAL) {
 		termreg_t *dev = (termreg_t *) DEV_REG_ADDR(line, device);
-		unsigned *status = subdevice ? &dev->recv_status: &dev->transm_status;
+		unsigned *cmd = subdevice ? &dev->recv_command: &dev->transm_command;
 
-		*status = DEV_CMD_ACK;
+		*cmd = DEV_CMD_ACK;
 	} else if (IL_DISK <= line && line <= IL_PRINTER) {
 		dtpreg_t *dev = (dtpreg_t *) DEV_REG_ADDR(line, device);
 
 		/* TODO Implement for uARM too. */
-		dev->status = DEV_CMD_ACK;
+		dev->command = DEV_CMD_ACK;
 	} else {
 		PANIC2("bka_dev_ack(): incorrect line number specified\n");
 	}
@@ -213,7 +213,7 @@ static int term_putchar(termreg_t *term, char c) {
 }
 
 static int print_putchar(dtpreg_t *p, char c) {
-	unsigned int status = p->status & PRINT_STATUS_MASK;
+	unsigned int status = p->status & PRINT_ST_MASK;
 
 	/* TODO Can we expand the set of allowable statuses? */
 	if (status != PRINT_ST_READY)
@@ -222,7 +222,7 @@ static int print_putchar(dtpreg_t *p, char c) {
 	p->data0 = c;
 	p->command = PRINT_CMD_PRINTC;
 
-	while ((status = p->status & PRINT_STATUS_MASK) == PRINT_ST_BUSY)
+	while ((status = p->status & PRINT_ST_MASK) == PRINT_ST_BUSY)
 		;
 
 	p->command = PRINT_CMD_ACK;

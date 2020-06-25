@@ -66,6 +66,7 @@ int bka_sched_kill(pcb_t *to_kill) {
 		}
 
 		/* Finally free up the PCB. */
+		bka_pcb_tree_parentrm(curr);
 		bka_pcb_free(curr);
 	}
 

@@ -139,14 +139,17 @@ void sec_int_handle_interrupt(void *dev) {
 }
 
 void sec_int_handle_term_int(termreg_t *dev) {
-	unsigned const rs = dev->recv_status, ts = dev->transm_status;
+	/* Transmit Status (ts) and Receive Status (rs) fields respectively. */
+	unsigned const
+			ts = dev->transm_status & TERM_ST_MASK,
+			rs = dev->recv_status & TERM_ST_MASK;
 
 	if (ts == TERM_ST_IOCE || ts == TERM_ST_TRANSME || ts == TERM_ST_TRANSMITTED) {
 		semd_t *s = bka_dev_sem_get(dev, 0);
 		pcb_t *p;
 
 		p = bka_sem_v(s);
-		bka_syscall_retval(p, ts);
+		bka_syscall_retval(p, dev->transm_status);
 		/** TODO Is it okay to acknowledge error statuses, or should they be
 		 * dealt with the reset command? */
 		bka_dev_ack2(dev, 0);
@@ -157,7 +160,7 @@ void sec_int_handle_term_int(termreg_t *dev) {
 		pcb_t *p;
 
 		p = bka_sem_v(s);
-		bka_syscall_retval(p, rs);
+		bka_syscall_retval(p, dev->recv_status);
 		/** TODO Is it okay to acknowledge error statuses, or should they be
 		 * dealt with the reset command? */
 		bka_dev_ack2(dev, 1);

@@ -21,7 +21,10 @@
 #define PRINT_CMD_ACK       1
 #define PRINT_CMD_PRINTC    2
 
-#define PRINT_STATUS_MASK	0xFF
+/**
+ * Printer device status mask.
+ */
+#define PRINT_ST_MASK	0xFF
 
 #define BKA_TERM(term_no)	(termreg_t *) (DEV_REG_ADDR(IL_TERMINAL, term_no))
 
@@ -33,6 +36,11 @@
 #define TERM_ST_RECVE		4
 #define TERM_ST_TRANSMITTED	5
 #define TERM_ST_RECEIVED	5
+
+/**
+ * Terminal device status mask.
+ */
+#define TERM_ST_MASK		0xFF
 
 #define TERM_CMD_RESET		0
 #define TERM_CMD_ACK		1
