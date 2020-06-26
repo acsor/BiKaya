@@ -229,29 +229,17 @@ void sys_kill(unsigned arg1, unsigned arg2, unsigned arg3) {
 
 void sys_verhogen(unsigned arg1, unsigned arg2, unsigned arg3) {
 	int *semkey = (int *) arg1;
-	semd_t *sem = bka_sem_get(semkey);
 
-	if (!sem)
-		sem = bka_sem_alloc(semkey);
-	if (!sem)
-		PANIC2("sys_verhogen(): could not obtain requested semaphore\n");
+	bka_sem_v(semkey);
 
-	bka_sem_v(sem);
-
-	sys_return((unsigned) *(sem->key));
+	sys_return((unsigned) *(semkey));
 }
 
 void sys_passeren(unsigned arg1, unsigned arg2, unsigned arg3) {
 	pcb_t *const curr = bka_sched_curr;
 	int *semkey = (int *) arg1;
-	semd_t *sem = bka_sem_get(semkey);
 
-	if (!sem)
-		sem = bka_sem_alloc(semkey);
-	if (!sem)
-		PANIC2("sys_passeren(): could not obtain requested semaphore\n");
-
-	sys_return_stay((unsigned) bka_sem_p(sem, curr));
+	sys_return_stay((unsigned) bka_sem_p(semkey, curr));
 	bka_pcb_state_set(curr, (state_t *) SYSBK_OLDAREA);
 	bka_sched_resume();
 }
@@ -262,7 +250,7 @@ void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3) {
 	termreg_t *term_dev = (termreg_t *) arg2;
 
 	unsigned *command;
-	semd_t *sem = bka_dev_sem_get(dev, arg3);
+	int *semkey = bka_dev_sem_get(dev, arg3);
 	pcb_t *curr = bka_sched_curr;
 
 	if (bka_dev_line(dev) == IL_TERMINAL)
@@ -271,11 +259,7 @@ void sys_iocmd(unsigned arg1, unsigned arg2, unsigned arg3) {
 		command = &dtp_dev->command;
 
 	*command = arg1;
-
-	if (!sem)
-		PANIC2("sys_iocmd(): could not fetch requested semaphore\n");
-
-	bka_sem_p(sem, bka_sched_curr);
+	bka_sem_p(semkey, bka_sched_curr);
 
 	/* The actual return value is returned once the corresponding interrupt
 	 * is raised and managed by the interrupt handler. */

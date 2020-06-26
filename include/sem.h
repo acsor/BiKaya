@@ -4,6 +4,14 @@
 #include "list.h"
 #include "pcb.h"
 
+/**
+ * The maximum number of allowable @c semd_t (semaphore descriptor) variables.
+ * Note that this does not restrict the amount of semaphores definable (which
+ * take the @c int* type) for a @ c semd_t is used only when at least a
+ * process is pending on a given semaphore; since the number of processes
+ * cannot exceed @c BKA_MAX_PROC, so too does the number of @c semd_t variables.
+ */
+#define	BKA_MAX_SEM	BKA_MAX_PROC
 
 /**
  * Semaphore Descriptor (SEMD) data structure.
@@ -28,16 +36,17 @@ void bka_sem_init();
  * @c NULL if the FSL is empty.
  */
 semd_t* bka_sem_alloc(int *key);
-int bka_sem_p(semd_t *s, pcb_t *p);
+int bka_sem_p(int *semkey, pcb_t *p);
 /**
  * Performs a V() operation on the semaphore @c s.
- * @param s Semaphore on which to perform a Verhogen operation.
+ * @param semkey Semaphore on which to perform a Verhogen operation.
  * @return PCB that was eventually reinserted into the ready queue, @c NULL
  * if no other process was waiting on @c s.
  */
-pcb_t* bka_sem_v(semd_t *s);
+pcb_t* bka_sem_v(int *semkey);
 /**
- * @param s Pointer to a semaphore to return to the free list.
+ * Frees up the semaphore data structure pointed to by @c s.
+ * @param s Pointer to the semaphore data structure to be freed.
  */
 void bka_sem_free(semd_t *s);
 /**
@@ -58,7 +67,7 @@ int bka_sem_enqueue(int *key, pcb_t* p);
 /**
  * Removes the first element of the PCB queue associated to the semaphore whose
  * key matches @c key. If the PCB queue is emptied, the associated semaphore
- * is returned to the free list.
+ * data structure is returned to the free list.
  * @param key Key of the semaphore from which to perform the removal.
  * @return A pointer to the removed PCB element, or @c NULL if either no
  * semaphore with the given key exists or if its PCB queue is empty.

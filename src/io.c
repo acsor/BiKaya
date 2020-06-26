@@ -110,20 +110,13 @@ int bka_print_puts(dtpreg_t *dev, char const *str) {
 }
 
 
-semd_t* bka_dev_sem_get(void *dev, unsigned subdevice) {
-	semd_t *out;
+int* bka_dev_sem_get(void *dev, unsigned subdevice) {
 	unsigned line = bka_dev_line(dev), instance = bka_dev_instance(dev);
-	int *semkey;
 
 	if (line == IL_TERMINAL)
-		semkey = io_termdev_to_sem + N_DEV_PER_IL * subdevice + instance;
+		return io_termdev_to_sem + N_DEV_PER_IL * subdevice + instance;
 	else
-		semkey = io_dev_to_sem + N_DEV_PER_IL * EXT_IL_INDEX(line) + instance;
-
-	if (!(out = bka_sem_get(semkey)))
-		out = bka_sem_alloc(semkey);
-
-	return out;
+		return io_dev_to_sem + N_DEV_PER_IL * EXT_IL_INDEX(line) + instance;
 }
 
 void* bka_dev_next_pending() {
@@ -131,7 +124,7 @@ void* bka_dev_next_pending() {
 
 	/* TODO Is the following code compatible with uARM too? */
 	/* TODO How does the interrupting devices bitmap behave for terminal
-	 * devices, where subdevices are present? */
+	 *  devices, where subdevices are present? */
 	for (line = DEV_IL_START; line < N_INTERRUPT_LINES; line++) {
 		/* Non-zero if some device interrupt is pending on this line. */
 		unsigned bitmap = *((unsigned *) CDEV_BITMAP_ADDR(line)) & 0xFF;

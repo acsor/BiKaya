@@ -126,13 +126,13 @@ void sec_int_handle_interrupt(void *dev) {
 		 * delegate that duty to another function. */
 		sec_int_handle_term_int((termreg_t *) dev);
 	} else {
-		semd_t *s = bka_dev_sem_get(dev, 0);
+		int *semkey = bka_dev_sem_get(dev, 0);
 		dtpreg_t *dtpdev = (dtpreg_t *) dev;
 		pcb_t *p;
 
 		/* Perform a V() operation on the semaphore, set the device status as
 		 * the syscall return value and acknowledge the interrupt. */
-		p = bka_sem_v(s);
+		p = bka_sem_v(semkey);
 		bka_syscall_retval(p, dtpdev->status);
 		bka_dev_ack2(dev, 0);
 	}
@@ -145,10 +145,10 @@ void sec_int_handle_term_int(termreg_t *dev) {
 			rs = dev->recv_status & TERM_ST_MASK;
 
 	if (ts == TERM_ST_IOCE || ts == TERM_ST_TRANSME || ts == TERM_ST_TRANSMITTED) {
-		semd_t *s = bka_dev_sem_get(dev, 0);
+		int *semkey = bka_dev_sem_get(dev, 0);
 		pcb_t *p;
 
-		p = bka_sem_v(s);
+		p = bka_sem_v(semkey);
 		bka_syscall_retval(p, dev->transm_status);
 		/** TODO Is it okay to acknowledge error statuses, or should they be
 		 * dealt with the reset command? */
@@ -156,10 +156,10 @@ void sec_int_handle_term_int(termreg_t *dev) {
 	}
 
 	if (rs == TERM_ST_IOCE || rs == TERM_ST_RECVE || rs == TERM_ST_RECEIVED) {
-		semd_t *s = bka_dev_sem_get(dev, 1);
+		int *semkey = bka_dev_sem_get(dev, 1);
 		pcb_t *p;
 
-		p = bka_sem_v(s);
+		p = bka_sem_v(semkey);
 		bka_syscall_retval(p, dev->recv_status);
 		/** TODO Is it okay to acknowledge error statuses, or should they be
 		 * dealt with the reset command? */

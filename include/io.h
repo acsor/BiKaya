@@ -89,17 +89,16 @@ int bka_print_puts(dtpreg_t *dev, char const *str);
 
 
 /**
- * Obtains a semaphore association for the given device register @c dev. If
- * one such association does not exist a new one, if possible, is created;
- * otherwise, the already existing one is returned.
+ * Obtains a semaphore association for the given device register @c dev.
+ * Enough sempahore (integer) keys are preallocated for each device, so that
+ * cases where an insufficient supply is reached cannot be met.
  * @param dev Device to get the associated semaphore for.
  * @param subdevice Relevant for terminal devices only; equals @c 0 when
  * referring to the transmission subdevice, @c 1 when referring to the
  * reception one.
- * @return A semaphore associated to the device @c dev, @c NULL in case the
- * free semaphore list (FSL) is empty.
+ * @return The semaphore key associated to the device @c dev.
  */
-semd_t* bka_dev_sem_get(void *dev, unsigned subdevice);
+int* bka_dev_sem_get(void *dev, unsigned subdevice);
 /**
  * @return The next pending interrupted device register, in increasing order
  * from lower interrupt lines to higher ones. Internal devices are not

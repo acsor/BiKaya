@@ -1,17 +1,8 @@
 #include "arch.h"
+#include "io.h"
+#include "pcb.h"
 #include "sched.h"
 #include "sem.h"
-#include "pcb.h"
-
-/**
- * The maximum number of allowable semaphores. An attempt to preallocate enough
- * semaphores for @c BKA_MAX_PROC processes and <tt>N_EXT_IL * N_DEV_PER_IL</tt>
- * devices is made (enough semaphore for subdevices are preallocated too).
- *
- * TODO Are these many semaphores sufficient? How to tackle their eventual
- *  shortage?
- */
-#define	BKA_MAX_SEM	(BKA_MAX_PROC + (N_EXT_IL + 1) * N_DEV_PER_IL)
 
 /**
  * The semaphore table, allocating data for each one of them.
@@ -56,27 +47,28 @@ semd_t* bka_sem_alloc(int *key) {
 	return result;
 }
 
-int bka_sem_p(semd_t *s, pcb_t *p) {
-	p->semkey = s->key;
-	(*s->key)--;
+int bka_sem_p(int *semkey, pcb_t *p) {
+	(*semkey)--;
 
-	if (*(s->key) < 0) {
+	if (*semkey < 0) {
 		bka_sched_suspend(p);
-		bka_sem_enqueue(s->key, p);
+		bka_sem_enqueue(semkey, p);
 	}
 
-	return *(s->key);
+	return *semkey;
 }
 
-pcb_t* bka_sem_v(semd_t *s) {
-	(*s->key)++;
+pcb_t* bka_sem_v(int *semkey) {
+	(*semkey)++;
 
-	if (*(s->key) <= 0) {
-		pcb_t *to_restore = bka_sem_dequeue(s->key);
+	if (*semkey <= 0) {
+		pcb_t *to_restore = bka_sem_dequeue(semkey);
 
 		if (to_restore) {
 			to_restore->semkey = NULL;
 			bka_sched_enqueue(to_restore);
+		} else {
+			bka_term_puts2(1, "bka_sem_v(): warning: process removal with an empty queue\n", NULL);
 		}
 
 		return to_restore;
@@ -102,14 +94,14 @@ semd_t* bka_sem_get(int *key) {
 }
 
 int bka_sem_enqueue (int *key, pcb_t *p) {
-	/* Look for an existing semaphore with the given key */
+	/* Look for an existing semaphore descriptor with the given key */
 	semd_t *s = bka_sem_get(key);
 
-	/* If no such semaphore exists, try to allocate it */
+	/* If no such semaphore data structure exists, try to allocate it */
 	if (!s)
 		s = bka_sem_alloc(key);
 
-	/* If the semaphore is finally available */
+	/* If the semaphore descriptor is finally available */
 	if (s) {
 		list_add_tail(&p->next, &s->proc_queue);
 		p->semkey = key;
@@ -124,11 +116,12 @@ pcb_t* bka_sem_dequeue(int *key) {
 	semd_t *s = bka_sem_get(key);
 	pcb_t *p = NULL;
 
-	if (s)
+	if (s) {
 		p = bka_pcb_queue_pop(&s->proc_queue);
 
-	if (bka_pcb_queue_isempty(&s->proc_queue))
-		bka_sem_free(s);
+		if (bka_pcb_queue_isempty(&s->proc_queue))
+			bka_sem_free(s);
+	}
 
 	return p;
 }
