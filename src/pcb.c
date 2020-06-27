@@ -31,7 +31,7 @@ pcb_t* bka_pcb_alloc(void) {
 
 	/* Acquire the PCB from the free PCB list */
 	out = container_of(free_pcb_list.next, pcb_t, next);
-	list_del(&out->next);
+	list_del_init(&out->next);
 
 	/* Initialize the new PCB */
 	INIT_LIST_HEAD(&out->next);
@@ -60,6 +60,7 @@ pcb_t* bka_pcb_alloc(void) {
 }
 
 void bka_pcb_free(pcb_t *p) {
+	list_del_init(&p->next);
 	list_add_tail(&p->next, &free_pcb_list);
 }
 
@@ -143,6 +144,8 @@ void bka_pcb_queue_ins(list_t *head, pcb_t *p) {
 	list_t *curr_list = head->next;
 	pcb_t *curr_proc = container_of(curr_list, pcb_t, next);
 
+	list_del_init(&p->next);
+
 	/* Iterate until we either end the list or find a matching process with */
 	/* priority less than p */
 	while (curr_list != head && p->priority < curr_proc->priority) {
@@ -173,7 +176,7 @@ pcb_t* bka_pcb_queue_pop(list_t *head) {
 
 	if (!list_empty(head)) {
 		p = container_of(head->next, pcb_t, next);
-		list_del(head->next);
+		list_del_init(head->next);
 	}
 
 	return p;
@@ -190,7 +193,7 @@ pcb_t* bka_pcb_queue_rm(list_t *head, pcb_t *p) {
 
 	/* If we exited the loop due to finding the corresponding entry */
 	if (curr_proc == p) {
-		list_del(curr_list);
+		list_del_init(curr_list);
 
 		return p;
 	}
@@ -215,7 +218,7 @@ pcb_t* bka_pcb_tree_pop(pcb_t *p) {
 		return NULL;
 	} else {
 		to_remove = p->first_child.next;
-		list_del(to_remove);
+		list_del_init(to_remove);
 	}
 
 	return container_of(to_remove, pcb_t, siblings);
@@ -230,7 +233,7 @@ pcb_t* bka_pcb_tree_parentrm(pcb_t *p) {
 			curr_proc = container_of(to_remove, pcb_t, siblings);
 
 			if (curr_proc == p) {
-				list_del(to_remove);
+				list_del_init(to_remove);
 
 				return p;
 			}

@@ -39,7 +39,7 @@ semd_t* bka_sem_alloc(int *key) {
 
 	result = container_of(fsl_head.next, semd_t, next);
 	/* Remove the newly fetched semaphore from the FSL */
-	list_del(&result->next);
+	list_del_init(&result->next);
 	result->key = key;
 	INIT_LIST_HEAD(&result->proc_queue);
 	list_add_tail(&result->next, &sem_head);
@@ -78,7 +78,7 @@ pcb_t* bka_sem_v(int *semkey) {
 }
 
 void bka_sem_free(semd_t *s) {
-	list_del(&s->next);
+	list_del_init(&s->next);
 	list_add_tail(&s->next, &fsl_head);
 }
 
@@ -139,7 +139,7 @@ pcb_t* bka_sem_pcb_rm(pcb_t *p) {
 	if (s) {
 		list_for_each_entry(to_remove, &s->proc_queue, next) {
 			if (to_remove == p) {
-				list_del(&to_remove->next);
+				list_del_init(&to_remove->next);
 
 				if (list_empty(&s->proc_queue))
 					bka_sem_free(s);

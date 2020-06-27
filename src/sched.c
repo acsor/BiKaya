@@ -1,5 +1,6 @@
-#include "sched.h"
 #include "exc.h"
+#include "sched.h"
+#include "sem.h"
 
 #define TIME_SLICE		3
 #define	TIME_SLICE_UNIT	BKA_STU_MILLI
@@ -46,9 +47,8 @@ int bka_sched_kill(pcb_t *to_kill) {
 	if (bka_pcb_stat(to_kill))
 		return BKA_E_INVARG;
 
-	/* TODO Important! Remove processes from semaphores they wait on. */
 	INIT_LIST_HEAD(&queue);
-	bka_pcb_queue_rm(&bka_sched_ready, to_kill);
+	list_del_init(&to_kill->next);
 	list_add_tail(&to_kill->next, &queue);
 
 	/* Perform a level-wide scanning of the process tree rooted in to_kill. */
@@ -61,11 +61,14 @@ int bka_sched_kill(pcb_t *to_kill) {
 		/* Remove each child from the ready queue (if at all there) and
 		 * insert into @c queue for a recursive examination. */
 		list_for_each_entry(child, &curr->first_child, siblings) {
-			bka_pcb_queue_rm(&bka_sched_ready, child);
+			list_del_init(&child->next);
 			list_add_tail(&child->next, &queue);
 		}
 
 		/* Finally free up the PCB. */
+		if (curr->semkey)
+			bka_sem_v(curr->semkey);
+
 		bka_pcb_tree_parentrm(curr);
 		bka_pcb_free(curr);
 	}
