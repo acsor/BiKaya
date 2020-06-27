@@ -20,7 +20,7 @@
  *      Modified by Mattia Maldini, Renzo Davoli 2020
  */
 
-#ifdef BKA_ARCH_UMPS
+#ifdef TARGET_UMPS
 #include "umps/libumps.h"
 #include "umps/arch.h"
 #include "umps/types.h"
@@ -29,7 +29,6 @@
    Only the "low" part is actually used. */
 #define BUS_TODLOW  0x1000001c
 #define BUS_TODHIGH 0x10000018
-#define EXC_BUSINVFETCH	EXC_IBE
 
 #define VMON  0x07000000
 #define VMOFF (~VMON)
@@ -46,7 +45,7 @@
 
 #endif
 
-#ifdef BKA_ARCH_UARM
+#ifdef TARGET_UARM
 #include "uarm/libuarm.h"
 #include "uarm/arch.h"
 #include "uarm/uARMtypes.h"
@@ -61,25 +60,12 @@
 #define REG0(s)       s.a1
 #endif
 
-#include "arch.h"
-#include "pcb.h"
-#include "syscall.h"
+#include "const_bikaya.h"
+#include "types_bikaya.h"
 
 typedef unsigned int devregtr;
 typedef unsigned int cpu_t;
 typedef unsigned int pid_t;
-typedef memaddr_t memaddr;
-
-#define GETCPUTIME       BKA_SYS_CPU_TIME
-#define CREATEPROCESS    BKA_SYS_FORK
-#define TERMINATEPROCESS BKA_SYS_KILL
-#define VERHOGEN         BKA_SYS_VERHOGEN
-#define PASSEREN         BKA_SYS_PASSEREN
-#define WAITIO           BKA_SYS_IOCMD
-#define SPECPASSUP       BKA_SYS_SPEC_PASSUP
-#define GETPID           BKA_SYS_GETPID
-
-#define DEFAULT_PRIORITY 1
 
 /* if these are not defined */
 /* typedef U32 cpu_t; */
@@ -95,7 +81,7 @@ typedef memaddr_t memaddr;
 #define TERMCHARMASK 0xFF00
 
 #define MINLOOPTIME 1000
-#define LOOPNUM     1000
+#define LOOPNUM     10000
 
 #define BADADDR 0xFFFFFFFF /* could be 0x00000000 as well */
 
@@ -149,14 +135,14 @@ void p7root(), child1(), child2(), p7leaf();
 unsigned int set_sp_pc_status(state_t *s, state_t *copy, unsigned int pc) {
     STST(s);
 
-#ifdef BKA_ARCH_UMPS
+#ifdef TARGET_UMPS
     s->reg_sp = copy->reg_sp - FRAME_SIZE;
     s->pc_epc = pc;
     s->status = STATUS_ALL_INT_ENABLE(s->status);
     return s->reg_sp;
 #endif
 
-#ifdef BKA_ARCH_UARM
+#ifdef TARGET_UARM
     s->sp   = copy->sp - FRAME_SIZE;
     s->pc   = pc;
     s->cpsr = STATUS_ALL_INT_ENABLE(s->cpsr);
@@ -335,12 +321,9 @@ void p2() {
     now1 = getTODLO();                                                       /* time of day   */
     SYSCALL(GETCPUTIME, (int)&user_t1, (int)&kernel_t1, (int)&wallclock_t1); /* CPU time used */
 
-    int localsem = 0;
     /* delay for some time */
-    for (i = 1; i < LOOPNUM; i++) {
-        SYSCALL(VERHOGEN, (int)&localsem, 0, 0);
-        SYSCALL(PASSEREN, (int)&localsem, 0, 0);
-    }
+    for (i = 1; i < LOOPNUM; i++)
+        ;
 
     SYSCALL(GETCPUTIME, (int)&user_t2, (int)&kernel_t2, (int)&wallclock_t2); /* CPU time used */
     now2 = getTODLO();                                                       /* time of day  */
@@ -516,11 +499,11 @@ void p4a() {
 
 /* generate a TLB exception by turning on VM without setting up the
          seg tables */
-#ifdef BKA_ARCH_UMPS
+#ifdef TARGET_UMPS
     p4Status = getSTATUS();
     p4Status |= VMON;
     setSTATUS(p4Status);
-#elif defined BKA_ARCH_UARM
+#elif defined TARGET_UARM
     p4Status = getCONTROL();
     p4Status |= VMON;
     setCONTROL(p4Status);
