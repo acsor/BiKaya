@@ -35,8 +35,8 @@ static void idle_proc();
  * device and software interrupts.
  */
 static void sec_int ();
-void sec_int_handle_interrupt(void *dev);
-void sec_int_handle_term_int(termreg_t *dev);
+static void sec_int_handle_interrupt(void *dev);
+static void sec_int_handle_term_int(termreg_t *dev);
 /**
  * System Exception Callback (SEC) to be executed during TLB exceptions.
  */
@@ -93,7 +93,7 @@ void new_areas_init() {
 		bka_na_init((state_t *) new_areas[i], callbacks[i]);
 }
 
-static void idle_proc() {
+void idle_proc() {
 	while (1);
 }
 

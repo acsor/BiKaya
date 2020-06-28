@@ -146,18 +146,18 @@ pid_t leaf1pid, leaf2pid, leaf3pid, leaf4pid;
 void p2(), p3(), p4(), p4a(), p4b(), p5(), p6(), p6a();
 void p7root(), child1(), child2(), p7leaf();
 
-unsigned int set_sp_pc_status(state_t *s, state_t *copy, unsigned int pc) {
+unsigned int set_sp_pc_status(state_t *s, state_t *copy, unsigned int pc, unsigned int frames) {
     STST(s);
 
 #ifdef BKA_ARCH_UMPS
-    s->reg_sp = copy->reg_sp - FRAME_SIZE;
+    s->reg_sp = copy->reg_sp - FRAME_SIZE * frames;
     s->pc_epc = pc;
     s->status = STATUS_ALL_INT_ENABLE(s->status);
     return s->reg_sp;
 #endif
 
 #ifdef BKA_ARCH_UARM
-    s->sp   = copy->sp - FRAME_SIZE;
+    s->sp   = copy->sp - FRAME_SIZE * frames;
     s->pc   = pc;
     s->cpsr = STATUS_ALL_INT_ENABLE(s->cpsr);
     return s->sp;
@@ -214,32 +214,32 @@ void test() {
     /* set up states of the other processes */
 
     /* set up p2's state */
-    set_sp_pc_status(&p2state, &p2state, (unsigned int)p2);
+    set_sp_pc_status(&p2state, &p2state, (unsigned int)p2, 1);
 
     /* Set up p3's state */
-    set_sp_pc_status(&p3state, &p2state, (unsigned int)p3);
+    set_sp_pc_status(&p3state, &p2state, (unsigned int)p3, 1);
 
     /* Set up p4's state */
-    p4Stack = set_sp_pc_status(&p4state, &p3state, (unsigned int)p4);
+    p4Stack = set_sp_pc_status(&p4state, &p3state, (unsigned int)p4, 1);
 
     /* Set up p5's state */
-    set_sp_pc_status(&p5state, &p4state, (unsigned int)p5);
+    set_sp_pc_status(&p5state, &p4state, (unsigned int)p5, 2);
 
     /* Set up p6's state */
-    set_sp_pc_status(&p6state, &p5state, (unsigned int)p6);
+    set_sp_pc_status(&p6state, &p5state, (unsigned int)p6, 1);
 
     /* Set up p7's state */
-    set_sp_pc_status(&p7rootstate, &p6state, (unsigned int)p7root);
+    set_sp_pc_status(&p7rootstate, &p6state, (unsigned int)p7root, 1);
 
     /* Set up p7 children's state */
-    set_sp_pc_status(&child1state, &p7rootstate, (unsigned int)child1);
-    set_sp_pc_status(&child2state, &child1state, (unsigned int)child2);
+    set_sp_pc_status(&child1state, &p7rootstate, (unsigned int)child1, 1);
+    set_sp_pc_status(&child2state, &child1state, (unsigned int)child2, 1);
 
     /* Set up p7 grandchildren's state */
-    set_sp_pc_status(&gchild1state, &child2state, (unsigned int)p7leaf);
-    set_sp_pc_status(&gchild2state, &gchild1state, (unsigned int)p7leaf);
-    set_sp_pc_status(&gchild3state, &gchild2state, (unsigned int)p7leaf);
-    set_sp_pc_status(&gchild4state, &gchild3state, (unsigned int)p7leaf);
+    set_sp_pc_status(&gchild1state, &child2state, (unsigned int)p7leaf, 1);
+    set_sp_pc_status(&gchild2state, &gchild1state, (unsigned int)p7leaf, 1);
+    set_sp_pc_status(&gchild3state, &gchild2state, (unsigned int)p7leaf, 1);
+    set_sp_pc_status(&gchild4state, &gchild3state, (unsigned int)p7leaf, 1);
 
     /* create process p2 */
     SYSCALL(CREATEPROCESS, (int)&p2state, DEFAULT_PRIORITY, 0); /* start p2     */
@@ -302,6 +302,8 @@ void test() {
     PANIC(); /* PANIC !!!     */
 }
 
+unsigned int variable = 0;
+
 
 /* p2 -- semaphore and cputime-SYS test process */
 void p2() {
@@ -342,6 +344,7 @@ void p2() {
     SYSCALL(GETCPUTIME, (int)&user_t2, (int)&kernel_t2, (int)&wallclock_t2); /* CPU time used */
     now2 = getTODLO();                                                       /* time of day  */
 
+    variable = user_t2 - user_t1;
     if (((user_t2 - user_t1) >= (kernel_t2 - kernel_t1)) && ((wallclock_t2 - wallclock_t1) >= (user_t2 - user_t1)) &&
         ((now2 - now1) >= (wallclock_t2 - wallclock_t1)) && ((user_t2 - user_t1) >= MINLOOPTIME)) {
         print("p2 (semaphores and time check) is OK\n");
@@ -559,9 +562,12 @@ void p5() {
     PANIC();
 }
 
+void accidenti(){}
+
 /*p6 -- program trap without initializing passup vector*/
 void p6() {
     print("p6 starts (and hopefully dies)\n");
+    accidenti();
 
     *((memaddr *)BADADDR) = 0;
 
