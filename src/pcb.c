@@ -225,19 +225,11 @@ pcb_t* bka_pcb_tree_pop(pcb_t *p) {
 }
 
 pcb_t* bka_pcb_tree_parentrm(pcb_t *p) {
-	list_t *to_remove = NULL;
-	pcb_t *curr_proc = NULL;
+	if (p->parent) {
+		p->parent = NULL;
+		list_del_init(&p->siblings);
 
-	if (p->parent != NULL) {
-		list_for_each(to_remove, &p->parent->first_child) {
-			curr_proc = container_of(to_remove, pcb_t, siblings);
-
-			if (curr_proc == p) {
-				list_del_init(to_remove);
-
-				return p;
-			}
-		}
+		return p;
 	}
 
 	return NULL;

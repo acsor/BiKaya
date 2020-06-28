@@ -199,7 +199,6 @@ void sys_fork(unsigned arg1, unsigned arg2, unsigned arg3) {
 
 	new->state = *state;
 	new->priority = new->original_priority = priority;
-	new->parent = bka_sched_curr;
 	bka_pcb_tree_push(bka_sched_curr, new);
 	bka_sched_enqueue(new);
 
