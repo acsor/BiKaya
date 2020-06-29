@@ -176,9 +176,6 @@ void sys_cpu_time(unsigned arg1, unsigned arg2, unsigned arg3) {
 			 *kernel = (time_t *) arg2,
 			 *total = (time_t *) arg3;
 
-	if (bka_sched_curr)
-		sys_return(BKA_E_GEN);
-
 	*kernel = bka_sched_curr->timers[0] + (bka_time_now() - bka_sched_curr->timer_bk);
 	*user = bka_sched_curr->timers[1];
 	*total = *user + *kernel;
