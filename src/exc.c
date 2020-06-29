@@ -32,8 +32,7 @@ void bk_na_enter(unsigned new_area) {
 			oa->pc_epc += WS;
 	}
 #elif defined(BK_ARCH_UARM)
-	/* TODO Decrementing the old area word for uARM might be unnecessary. */
-	if (new_area == INT_NEWAREA || new_area == SYSBK_NEWAREA) {
+	if (new_area == INT_NEWAREA) {
 		state_t *old_area = (state_t *) (new_area - STATE_T_SIZE);
 
 		old_area->pc -= WS;
