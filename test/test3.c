@@ -69,7 +69,7 @@ int main () {
 
 
 void sched_queue_init() {
-	bka_sched_enqueue(proc_factory(idle_proc, -10));
+	bka_sched_enqueue(proc_factory(idle_proc, -1000000));
 	bka_sched_enqueue(proc_factory(test, 1));
 }
 
@@ -162,7 +162,7 @@ void sec_int_handle_term_int(termreg_t *dev) {
 		p = bka_sem_v(semkey);
 		bka_syscall_retval(p, dev->recv_status);
 		/** TODO Is it okay to acknowledge error statuses, or should they be
-		 * dealt with the reset command? */
+		 *   dealt with the reset command? */
 		bka_dev_ack2(dev, 1);
 	}
 }
@@ -170,9 +170,6 @@ void sec_int_handle_term_int(termreg_t *dev) {
 void sec_tlb () {
 	bka_na_enter(TLB_NEWAREA);
 
-	/* TODO How do we know when we are exiting out of a spec passup new area?
-	 *  Until this is not sorted out, we'll consider time spent in the spec
-	 *  passup new area as user time. */
 	if (bka_sched_curr->sp_areas[BKA_SP_TLB][1]) {
 		bka_sp_enter(BKA_SP_TLB);
 		bka_kernel_on_exit();
