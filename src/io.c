@@ -26,26 +26,26 @@ static int io_termdev_to_sem[2 * N_DEV_PER_IL];
 
 
 /**
- * Auxiliary function for @c bka_term_puts.
+ * Auxiliary function for @c bk_term_puts.
  * @return Number of characters from @c str written to @c term.
- * @see bka_term_puts
+ * @see bk_term_puts
  */
 static int term_puts_aux(termreg_t *term, char const *str);
 
 /**
  * Issues a write of character @c c to terminal @c term.
- * @return @c BKA_E_GEN in case of errors, @c BKA_E_OK otherwise.
+ * @return @c BK_E_GEN in case of errors, @c BK_E_OK otherwise.
  */
 static int term_putchar(termreg_t *term, char c);
 
 /**
  * Issues a write of character @c to printer device @c p.
- * @return @c BKA_E_GEN in case of errors, @c BKA_E_OK otherwise.
+ * @return @c BK_E_GEN in case of errors, @c BK_E_OK otherwise.
  */
 static int print_putchar(dtpreg_t *p, char c);
 
 
-int bka_term_puts(termreg_t *term, ...) {
+int bk_term_puts(termreg_t *term, ...) {
 	int written = 0;
 	char *to_print = NULL;
 	va_list ap;
@@ -62,12 +62,12 @@ int bka_term_puts(termreg_t *term, ...) {
 	return written;
 }
 
-int bka_term_recvc(termreg_t *term) {
+int bk_term_recvc(termreg_t *term) {
 	unsigned status = TERM_RECV_STATUS(term);
 	char read;
 
 	if (status != TERM_ST_READY && status != TERM_ST_RECEIVED)
-		return BKA_E_GEN;
+		return BK_E_GEN;
 
 	term->recv_command = TERM_CMD_RECV;
 
@@ -77,15 +77,15 @@ int bka_term_recvc(termreg_t *term) {
 	read = TERM_RECV_CHAR(term);
 	term->recv_command = TERM_CMD_ACK;
 
-	return status == TERM_ST_RECEIVED ? read: BKA_E_GEN;
+	return status == TERM_ST_RECEIVED ? read: BK_E_GEN;
 }
 
-int bka_term_recvs(termreg_t *term, char *dest, unsigned length) {
+int bk_term_recvs(termreg_t *term, char *dest, unsigned length) {
 	int in = -1;
 
 	while (length > 1 && in != '\n') {
-		if ((in = bka_term_recvc(term)) == BKA_E_GEN)
-			return BKA_E_GEN;
+		if ((in = bk_term_recvc(term)) == BK_E_GEN)
+			return BK_E_GEN;
 
 		*dest = in;
 		dest++;
@@ -94,24 +94,24 @@ int bka_term_recvs(termreg_t *term, char *dest, unsigned length) {
 
 	*dest = '\0';
 
-	return BKA_E_OK;
+	return BK_E_OK;
 }
 
 
-int bka_print_puts(dtpreg_t *dev, char const *str) {
+int bk_print_puts(dtpreg_t *dev, char const *str) {
 	int written;
 
 	for (written = 0; *str; written++, str++) {
-		if (print_putchar(dev, *str) != BKA_E_OK)
-			return BKA_E_GEN;
+		if (print_putchar(dev, *str) != BK_E_OK)
+			return BK_E_GEN;
 	}
 
 	return written;
 }
 
 
-int* bka_dev_sem_get(void *dev, unsigned subdevice) {
-	unsigned line = bka_dev_line(dev), instance = bka_dev_instance(dev);
+int* bk_dev_sem_get(void *dev, unsigned subdevice) {
+	unsigned line = bk_dev_line(dev), instance = bk_dev_instance(dev);
 
 	if (line == IL_TERMINAL)
 		return io_termdev_to_sem + N_DEV_PER_IL * subdevice + instance;
@@ -119,7 +119,7 @@ int* bka_dev_sem_get(void *dev, unsigned subdevice) {
 		return io_dev_to_sem + N_DEV_PER_IL * EXT_IL_INDEX(line) + instance;
 }
 
-void* bka_dev_next_pending() {
+void* bk_dev_next_pending() {
 	unsigned line;
 
 	/* TODO Is the following code compatible with uARM too? */
@@ -144,7 +144,7 @@ void* bka_dev_next_pending() {
 	return NULL;
 }
 
-void bka_dev_ack(unsigned line, unsigned device, unsigned subdevice) {
+void bk_dev_ack(unsigned line, unsigned device, unsigned subdevice) {
 	if (line == IL_TERMINAL) {
 		termreg_t *dev = (termreg_t *) DEV_REG_ADDR(line, device);
 		unsigned *cmd = subdevice ? &dev->recv_command: &dev->transm_command;
@@ -156,11 +156,11 @@ void bka_dev_ack(unsigned line, unsigned device, unsigned subdevice) {
 		/* TODO Implement for uARM too. */
 		dev->command = DEV_CMD_ACK;
 	} else {
-		PANIC2("bka_dev_ack(): incorrect line number specified\n");
+		PANIC2("bk_dev_ack(): incorrect line number specified\n");
 	}
 }
 
-unsigned bka_dev_line(void *dev) {
+unsigned bk_dev_line(void *dev) {
 	/* TODO Implement for uARM too. */
 	/* TODO Turn this into a macro. */
 	dtpreg_t *first = (dtpreg_t *) DEV_REG_ADDR(IL_DISK, 0);
@@ -168,10 +168,10 @@ unsigned bka_dev_line(void *dev) {
 	return (((dtpreg_t *) dev) - first) / N_DEV_PER_IL + DEV_IL_START;
 }
 
-unsigned bka_dev_instance(void *dev) {
+unsigned bk_dev_instance(void *dev) {
 	/* TODO Implement for uARM too. */
 	/* TODO Turn this into a macro. */
-	unsigned line = bka_dev_line(dev);
+	unsigned line = bk_dev_line(dev);
 	dtpreg_t *first = (dtpreg_t *) DEV_REG_ADDR(line, 0);
 
 	return ((dtpreg_t *) dev) - first;
@@ -182,8 +182,8 @@ int term_puts_aux(termreg_t *term, char const *str) {
 	int written;
 
 	for (written = 0; *str; written++, str++) {
-		if (term_putchar(term, *str) != BKA_E_OK)
-			return BKA_E_GEN;
+		if (term_putchar(term, *str) != BK_E_OK)
+			return BK_E_GEN;
 	}
 
 	return written;
@@ -193,7 +193,7 @@ static int term_putchar(termreg_t *term, char c) {
 	unsigned stat = TERM_TRANSM_STATUS(term);
 
 	if (stat != TERM_ST_READY && stat != TERM_ST_TRANSMITTED)
-		return BKA_E_GEN;
+		return BK_E_GEN;
 
 	term->transm_command = TERM_TRANSM_COMMAND(c);
 
@@ -202,7 +202,7 @@ static int term_putchar(termreg_t *term, char c) {
 
 	term->transm_command = TERM_CMD_ACK;
 
-	return stat != TERM_ST_TRANSMITTED ? BKA_E_GEN: BKA_E_OK;
+	return stat != TERM_ST_TRANSMITTED ? BK_E_GEN: BK_E_OK;
 }
 
 static int print_putchar(dtpreg_t *p, char c) {
@@ -210,7 +210,7 @@ static int print_putchar(dtpreg_t *p, char c) {
 
 	/* TODO Can we expand the set of allowable statuses? */
 	if (status != PRINT_ST_READY)
-		return BKA_E_GEN;
+		return BK_E_GEN;
 
 	p->data0 = c;
 	p->command = PRINT_CMD_PRINTC;
@@ -220,5 +220,5 @@ static int print_putchar(dtpreg_t *p, char c) {
 
 	p->command = PRINT_CMD_ACK;
 
-	return status != PRINT_ST_READY ? BKA_E_GEN: BKA_E_OK;
+	return status != PRINT_ST_READY ? BK_E_GEN: BK_E_OK;
 }

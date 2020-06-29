@@ -27,11 +27,11 @@
  */
 #include "list.h"
 
-#ifdef BKA_ARCH_UMPS
+#ifdef BK_ARCH_UMPS
 #include "umps/libumps.h"
 #include "umps/arch.h"
 #endif
-#ifdef BKA_ARCH_UARM
+#ifdef BK_ARCH_UARM
 #include "uarm/libuarm.h"
 #include "uarm/arch.h"
 #endif
@@ -154,38 +154,38 @@ void adderrbuf(char *strp) {
 int main() {
     int i;
 
-	bka_pcbs_init();
+	bk_pcbs_init();
     addokbuf("Initialized Process Control Blocks   \n");
 
-    /* Check bka_pcb_alloc */
+    /* Check bk_pcb_alloc */
     for (i = 0; i < MAXPROC; i++) {
-        if ((procp[i] = bka_pcb_alloc()) == NULL)
-            adderrbuf("bka_pcb_alloc(): unexpected NULL   ");
+        if ((procp[i] = bk_pcb_alloc()) == NULL)
+            adderrbuf("bk_pcb_alloc(): unexpected NULL   ");
     }
 
-    if (bka_pcb_alloc() != NULL) {
-        adderrbuf(" ERROR: bka_pcb_alloc(): allocated more than MAXPROC entries   ");
+    if (bk_pcb_alloc() != NULL) {
+        adderrbuf(" ERROR: bk_pcb_alloc(): allocated more than MAXPROC entries   ");
     }
-    addokbuf(" bka_pcb_alloc test OK   \n");
+    addokbuf(" bk_pcb_alloc test OK   \n");
 
 
     /* Return the last 10 entries back to free list */
     for (i = 10; i < MAXPROC; i++)
-		bka_pcb_free(procp[i]);
+		bk_pcb_free(procp[i]);
 
     addokbuf(" Added 10 entries to the free PCB list   \n");
 
     /* Create a 10-element process queue */
     INIT_LIST_HEAD(&qa);
 
-    if (!bka_pcb_queue_isempty(&qa))
-        adderrbuf("ERROR: bka_pcb_queue_isempty(qa): unexpected FALSE   ");
+    if (!bk_pcb_queue_isempty(&qa))
+        adderrbuf("ERROR: bk_pcb_queue_isempty(qa): unexpected FALSE   ");
 
-    addokbuf("Testing bka_pcb_queue_ins ...   \n");
+    addokbuf("Testing bk_pcb_queue_ins ...   \n");
 
     for (i = 0; i < 10; i++) {
-        if ((q = bka_pcb_alloc()) == NULL)
-            adderrbuf("ERROR: bka_pcb_alloc(): unexpected NULL while insert   ");
+        if ((q = bk_pcb_alloc()) == NULL)
+            adderrbuf("ERROR: bk_pcb_alloc(): unexpected NULL while insert   ");
         switch (i) {
             case 3:
                 q->priority = DEFAULT_PCB_PRIORITY;
@@ -203,206 +203,206 @@ int main() {
                 q->priority = DEFAULT_PCB_PRIORITY;
                 break;
         }
-		bka_pcb_queue_ins(&qa, q);
+		bk_pcb_queue_ins(&qa, q);
     }
 
-    addokbuf("Test bka_pcb_queue_ins: OK. Inserted 10 elements \n");
+    addokbuf("Test bk_pcb_queue_ins: OK. Inserted 10 elements \n");
 
-    if (bka_pcb_queue_isempty(&qa))
-        adderrbuf("ERROR: bka_pcb_queue_isempty(qa): unexpected TRUE");
+    if (bk_pcb_queue_isempty(&qa))
+        adderrbuf("ERROR: bk_pcb_queue_isempty(qa): unexpected TRUE");
 
-    /* Check bka_pcb_queue_rm and bka_pcb_queue_head */
-    if (bka_pcb_queue_head(&qa) != maxproc)
-        adderrbuf("ERROR: bka_pcb_queue_head(qa) failed   ");
+    /* Check bk_pcb_queue_rm and bk_pcb_queue_head */
+    if (bk_pcb_queue_head(&qa) != maxproc)
+        adderrbuf("ERROR: bk_pcb_queue_head(qa) failed   ");
 
     /* Removing an element from ProcQ */
-    q = bka_pcb_queue_rm(&qa, proc);
+    q = bk_pcb_queue_rm(&qa, proc);
 
     if ((q == NULL) || (q != proc)) {
-		adderrbuf("ERROR: bka_pcb_queue_rm(&qa, proc) failed to remove the entry   ");
+		adderrbuf("ERROR: bk_pcb_queue_rm(&qa, proc) failed to remove the entry   ");
 	}
 
-	bka_pcb_free(q);
+	bk_pcb_free(q);
 
     /* Removing the first element from ProcQ */
-    q = bka_pcb_queue_pop(&qa);
+    q = bk_pcb_queue_pop(&qa);
     if (q == NULL || q != maxproc) {
-		adderrbuf("ERROR: bka_pcb_queue_pop(&qa, midproc) failed to remove the elements in the right order   ");
+		adderrbuf("ERROR: bk_pcb_queue_pop(&qa, midproc) failed to remove the elements in the right order   ");
 	}
-	bka_pcb_free(q);
+	bk_pcb_free(q);
 
     /* Removing other 7 elements  */
-    addokbuf(" Testing bka_pcb_queue_pop ...   \n");
+    addokbuf(" Testing bk_pcb_queue_pop ...   \n");
     for (i = 0; i < 7; i++) {
-        if ((q = bka_pcb_queue_pop(&qa)) == NULL)
-            adderrbuf("bka_pcb_queue_pop(&qa): unexpected NULL   ");
-		bka_pcb_free(q);
+        if ((q = bk_pcb_queue_pop(&qa)) == NULL)
+            adderrbuf("bk_pcb_queue_pop(&qa): unexpected NULL   ");
+		bk_pcb_free(q);
     }
 
     /* Removing the last element */
-    q = bka_pcb_queue_pop(&qa);
+    q = bk_pcb_queue_pop(&qa);
     if (q != minproc) {
-		adderrbuf("ERROR: bka_pcb_queue_pop(): failed on last entry   ");
+		adderrbuf("ERROR: bk_pcb_queue_pop(): failed on last entry   ");
 	}
-	bka_pcb_free(q);
+	bk_pcb_free(q);
 
-    if (bka_pcb_queue_pop(&qa) != NULL)
-        adderrbuf("ERROR: bka_pcb_queue_pop(&qa): removes too many entries   ");
+    if (bk_pcb_queue_pop(&qa) != NULL)
+        adderrbuf("ERROR: bk_pcb_queue_pop(&qa): removes too many entries   ");
 
-    if (!bka_pcb_queue_isempty(&qa))
-        adderrbuf("ERROR: bka_pcb_queue_isempty(qa): unexpected FALSE   ");
+    if (!bk_pcb_queue_isempty(&qa))
+        adderrbuf("ERROR: bk_pcb_queue_isempty(qa): unexpected FALSE   ");
 
-    addokbuf(" Test bka_pcb_queue_ins(), bka_pcb_queue_pop() and bka_pcb_queue_isempty(): OK   \n");
+    addokbuf(" Test bk_pcb_queue_ins(), bk_pcb_queue_pop() and bk_pcb_queue_isempty(): OK   \n");
     addokbuf(" Test process queues module: OK      \n");
 
     addokbuf(" Testing process trees...\n");
 
-    if (!bka_pcb_tree_isempty(procp[2]))
-        adderrbuf("ERROR: bka_pcb_tree_isempty: unexpected FALSE   ");
+    if (!bk_pcb_tree_isempty(procp[2]))
+        adderrbuf("ERROR: bk_pcb_tree_isempty: unexpected FALSE   ");
 
     /* make procp[1],procp[2],procp[3], procp[7] children of procp[0] */
     addokbuf("Inserting...   \n");
-    bka_pcb_tree_push(procp[0], procp[1]);
-    bka_pcb_tree_push(procp[0], procp[2]);
-    bka_pcb_tree_push(procp[0], procp[3]);
-    bka_pcb_tree_push(procp[0], procp[7]);
+    bk_pcb_tree_push(procp[0], procp[1]);
+    bk_pcb_tree_push(procp[0], procp[2]);
+    bk_pcb_tree_push(procp[0], procp[3]);
+    bk_pcb_tree_push(procp[0], procp[7]);
     addokbuf("Inserted 2 children of pcb0  \n");
 
     /* make procp[8],procp[9] children of procp[7] */
-    bka_pcb_tree_push(procp[7], procp[8]);
-    bka_pcb_tree_push(procp[7], procp[9]);
+    bk_pcb_tree_push(procp[7], procp[8]);
+    bk_pcb_tree_push(procp[7], procp[9]);
     addokbuf("Inserted 2 children of pcb7  \n");
 
-    if (bka_pcb_tree_isempty(procp[0]))
-        adderrbuf("ERROR: bka_pcb_tree_isempty(procp[0]): unexpected TRUE   ");
+    if (bk_pcb_tree_isempty(procp[0]))
+        adderrbuf("ERROR: bk_pcb_tree_isempty(procp[0]): unexpected TRUE   ");
 
-    if (bka_pcb_tree_isempty(procp[7]))
-        adderrbuf("ERROR: bka_pcb_tree_isempty(procp[0]): unexpected TRUE   ");
+    if (bk_pcb_tree_isempty(procp[7]))
+        adderrbuf("ERROR: bk_pcb_tree_isempty(procp[0]): unexpected TRUE   ");
 
-    /* Check bka_pcb_tree_parentrm */
-    q = bka_pcb_tree_parentrm(procp[1]);
+    /* Check bk_pcb_tree_parentrm */
+    q = bk_pcb_tree_parentrm(procp[1]);
     if (q == NULL || q != procp[1])
-        adderrbuf("ERROR: bka_pcb_tree_parentrm(procp[1]) failed ");
+        adderrbuf("ERROR: bk_pcb_tree_parentrm(procp[1]) failed ");
 
-    q = bka_pcb_tree_parentrm(procp[8]);
+    q = bk_pcb_tree_parentrm(procp[8]);
     if (q == NULL || q != procp[8])
-        adderrbuf("ERROR: bka_pcb_tree_parentrm(procp[8]) failed ");
+        adderrbuf("ERROR: bk_pcb_tree_parentrm(procp[8]) failed ");
 
-    /* Check bka_pcb_tree_pop */
-    q = bka_pcb_tree_pop(procp[0]);
+    /* Check bk_pcb_tree_pop */
+    q = bk_pcb_tree_pop(procp[0]);
     if (q == NULL || q != procp[2])
-        adderrbuf("ERROR: bka_pcb_tree_pop(procp[0]) failed ");
+        adderrbuf("ERROR: bk_pcb_tree_pop(procp[0]) failed ");
 
-    q = bka_pcb_tree_pop(procp[7]);
+    q = bk_pcb_tree_pop(procp[7]);
     if (q == NULL || q != procp[9])
-        adderrbuf("ERROR: bka_pcb_tree_pop(procp[7]) failed ");
+        adderrbuf("ERROR: bk_pcb_tree_pop(procp[7]) failed ");
 
-    q = bka_pcb_tree_pop(procp[0]);
+    q = bk_pcb_tree_pop(procp[0]);
     if (q == NULL || q != procp[3])
-        adderrbuf("ERROR: bka_pcb_tree_pop(procp[0]) failed ");
+        adderrbuf("ERROR: bk_pcb_tree_pop(procp[0]) failed ");
 
-    q = bka_pcb_tree_pop(procp[0]);
+    q = bk_pcb_tree_pop(procp[0]);
     if (q == NULL || q != procp[7])
-        adderrbuf("ERROR: bka_pcb_tree_pop(procp[0]) failed ");
+        adderrbuf("ERROR: bk_pcb_tree_pop(procp[0]) failed ");
 
 
-    if (bka_pcb_tree_pop(procp[0]) != NULL)
-        adderrbuf("ERROR: bka_pcb_tree_pop(): removes too many children   ");
+    if (bk_pcb_tree_pop(procp[0]) != NULL)
+        adderrbuf("ERROR: bk_pcb_tree_pop(): removes too many children   ");
 
-    if (!bka_pcb_tree_isempty(procp[0]))
-        adderrbuf("ERROR: bka_pcb_tree_isempty(procp[0]): unexpected FALSE   ");
+    if (!bk_pcb_tree_isempty(procp[0]))
+        adderrbuf("ERROR: bk_pcb_tree_isempty(procp[0]): unexpected FALSE   ");
 
-    addokbuf("Test: bka_pcb_tree_push(), bka_pcb_tree_pop() and bka_pcb_tree_isempty() OK   \n");
+    addokbuf("Test: bk_pcb_tree_push(), bk_pcb_tree_pop() and bk_pcb_tree_isempty() OK   \n");
     addokbuf("Testing process tree module OK      \n");
 
 
-	bka_pcb_free(procp[0]);
-	bka_pcb_free(procp[1]);
-	bka_pcb_free(procp[2]);
-	bka_pcb_free(procp[3]);
-	bka_pcb_free(procp[4]);
-	bka_pcb_free(procp[5]);
-	bka_pcb_free(procp[6]);
-	bka_pcb_free(procp[7]);
-	bka_pcb_free(procp[8]);
-	bka_pcb_free(procp[9]);
+	bk_pcb_free(procp[0]);
+	bk_pcb_free(procp[1]);
+	bk_pcb_free(procp[2]);
+	bk_pcb_free(procp[3]);
+	bk_pcb_free(procp[4]);
+	bk_pcb_free(procp[5]);
+	bk_pcb_free(procp[6]);
+	bk_pcb_free(procp[7]);
+	bk_pcb_free(procp[8]);
+	bk_pcb_free(procp[9]);
 
 
     /* check sem */
-	bka_sem_init();
+	bk_sem_init();
     addokbuf("Initializing active semaphore list   \n");
 
-    /* check bka_sem_dequeue and bka_sem_enqueue */
-    addokbuf(" Test bka_sem_enqueue(): test #1 started  \n");
+    /* check bk_sem_dequeue and bk_sem_enqueue */
+    addokbuf(" Test bk_sem_enqueue(): test #1 started  \n");
     for (i = 10; i < MAXPROC; i++) {
-        procp[i] = bka_pcb_alloc();
-        if (bka_sem_enqueue(&sem[i], procp[i]))
-            adderrbuf("ERROR: bka_sem_enqueue() test#1: unexpected TRUE   ");
+        procp[i] = bk_pcb_alloc();
+        if (bk_sem_enqueue(&sem[i], procp[i]))
+            adderrbuf("ERROR: bk_sem_enqueue() test#1: unexpected TRUE   ");
     }
 
-    addokbuf("Test bka_sem_enqueue(): test #2 started  \n");
+    addokbuf("Test bk_sem_enqueue(): test #2 started  \n");
     for (i = 0; i < 10; i++) {
-        procp[i] = bka_pcb_alloc();
-        if (bka_sem_enqueue(&sem[i], procp[i]))
-            adderrbuf("ERROR:bka_sem_enqueue() test #2: unexpected TRUE   ");
+        procp[i] = bk_pcb_alloc();
+        if (bk_sem_enqueue(&sem[i], procp[i]))
+            adderrbuf("ERROR:bk_sem_enqueue() test #2: unexpected TRUE   ");
     }
 
     /* check if semaphore descriptors are returned to the free list */
-    p = bka_sem_dequeue(&sem[11]);
-    if (bka_sem_enqueue(&sem[11], p))
-        adderrbuf("ERROR: bka_sem_dequeue(): fails to return to free list   ");
+    p = bk_sem_dequeue(&sem[11]);
+    if (bk_sem_enqueue(&sem[11], p))
+        adderrbuf("ERROR: bk_sem_dequeue(): fails to return to free list   ");
 
-    if (bka_sem_enqueue(&sem[MAXSEM], procp[9]) == FALSE)
-        adderrbuf("ERROR: bka_sem_enqueue(): inserted more than MAXPROC   ");
+    if (bk_sem_enqueue(&sem[MAXSEM], procp[9]) == FALSE)
+        adderrbuf("ERROR: bk_sem_enqueue(): inserted more than MAXPROC   ");
 
-    addokbuf("Test bka_sem_dequeue(): test started   \n");
+    addokbuf("Test bk_sem_dequeue(): test started   \n");
     for (i = 10; i < MAXPROC; i++) {
-        q = bka_sem_dequeue(&sem[i]);
+        q = bk_sem_dequeue(&sem[i]);
         if (q == NULL)
-            adderrbuf("ERROR: bka_sem_dequeue(): wouldn't remove   ");
+            adderrbuf("ERROR: bk_sem_dequeue(): wouldn't remove   ");
         if (q != procp[i])
-            adderrbuf("ERROR: bka_sem_dequeue(): removed wrong element   ");
+            adderrbuf("ERROR: bk_sem_dequeue(): removed wrong element   ");
     }
 
-    if (bka_sem_dequeue(&sem[11]) != NULL)
-        adderrbuf("ERROR: bka_sem_dequeue(): removed nonexistent blocked proc   ");
+    if (bk_sem_dequeue(&sem[11]) != NULL)
+        adderrbuf("ERROR: bk_sem_dequeue(): removed nonexistent blocked proc   ");
 
-    addokbuf("Test bka_sem_enqueue() and bka_sem_dequeue() ok   \n");
+    addokbuf("Test bk_sem_enqueue() and bk_sem_dequeue() ok   \n");
 
-    if (bka_sem_head(&sem[11]) != NULL)
-        adderrbuf("ERROR: bka_sem_head(): nonNULL for a nonexistent queue   ");
+    if (bk_sem_head(&sem[11]) != NULL)
+        adderrbuf("ERROR: bk_sem_head(): nonNULL for a nonexistent queue   ");
 
-    if ((q = bka_sem_head(&sem[9])) == NULL)
-        adderrbuf("ERROR: bka_sem_head(1): NULL for an existent queue   ");
+    if ((q = bk_sem_head(&sem[9])) == NULL)
+        adderrbuf("ERROR: bk_sem_head(1): NULL for an existent queue   ");
     if (q != procp[9])
-        adderrbuf("ERROR: bka_sem_head(1): wrong process returned   ");
-    p = bka_sem_pcb_rm(q);
+        adderrbuf("ERROR: bk_sem_head(1): wrong process returned   ");
+    p = bk_sem_pcb_rm(q);
     if (p != q)
-        adderrbuf("ERROR: bka_sem_pcb_rm(1): couldn't remove from valid queue   ");
+        adderrbuf("ERROR: bk_sem_pcb_rm(1): couldn't remove from valid queue   ");
 
     /* Creating a 2-layer tree */
-    bka_pcb_tree_push(procp[0], procp[1]);
-    bka_pcb_tree_push(procp[0], procp[2]);
-    bka_pcb_tree_push(procp[0], procp[3]);
-    bka_pcb_tree_push(procp[3], procp[4]);
+    bk_pcb_tree_push(procp[0], procp[1]);
+    bk_pcb_tree_push(procp[0], procp[2]);
+    bk_pcb_tree_push(procp[0], procp[3]);
+    bk_pcb_tree_push(procp[3], procp[4]);
 
-    /* Testing bka_sem_pcb_rm_desc */
-	bka_sem_pcb_rm_desc(procp[0]);
+    /* Testing bk_sem_pcb_rm_desc */
+	bk_sem_pcb_rm_desc(procp[0]);
 
-    if (bka_sem_head(&sem[0]) != NULL)
-        adderrbuf("ERROR: bka_sem_pcb_rm_desc(): nonNULL for a nonexistent queue (0)  ");
-    if (bka_sem_head(&sem[1]) != NULL)
-        adderrbuf("ERROR: bka_sem_pcb_rm_desc(): nonNULL for a nonexistent queue (1)  ");
-    if (bka_sem_head(&sem[2]) != NULL)
-        adderrbuf("ERROR: bka_sem_pcb_rm_desc(): nonNULL for a nonexistent queue  (2) ");
-    if (bka_sem_head(&sem[3]) != NULL)
-        adderrbuf("ERROR: bka_sem_pcb_rm_desc(): nonNULL for a nonexistent queue (3)  ");
-    if (bka_sem_head(&sem[4]) != NULL)
-        adderrbuf("ERROR: bka_sem_pcb_rm_desc(): nonNULL for a nonexistent queue (4)  ");
-    if (bka_sem_head(&sem[5]) == NULL)
-        adderrbuf("ERROR: bka_sem_pcb_rm_desc(): NULL for an existent queue  (5) ");
+    if (bk_sem_head(&sem[0]) != NULL)
+        adderrbuf("ERROR: bk_sem_pcb_rm_desc(): nonNULL for a nonexistent queue (0)  ");
+    if (bk_sem_head(&sem[1]) != NULL)
+        adderrbuf("ERROR: bk_sem_pcb_rm_desc(): nonNULL for a nonexistent queue (1)  ");
+    if (bk_sem_head(&sem[2]) != NULL)
+        adderrbuf("ERROR: bk_sem_pcb_rm_desc(): nonNULL for a nonexistent queue  (2) ");
+    if (bk_sem_head(&sem[3]) != NULL)
+        adderrbuf("ERROR: bk_sem_pcb_rm_desc(): nonNULL for a nonexistent queue (3)  ");
+    if (bk_sem_head(&sem[4]) != NULL)
+        adderrbuf("ERROR: bk_sem_pcb_rm_desc(): nonNULL for a nonexistent queue (4)  ");
+    if (bk_sem_head(&sem[5]) == NULL)
+        adderrbuf("ERROR: bk_sem_pcb_rm_desc(): NULL for an existent queue  (5) ");
 
-    addokbuf("Test bka_sem_head() and bka_sem_pcb_rm(): OK   \n");
+    addokbuf("Test bk_sem_head() and bk_sem_pcb_rm(): OK   \n");
 
     addokbuf("sem module OK   \n");
     addokbuf("So Long and Thanks for All the Fish\n");

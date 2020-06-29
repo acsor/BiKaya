@@ -1,28 +1,28 @@
 cmake_minimum_required(VERSION 3.3)
 project(BiKaya VERSION 0.2.0 LANGUAGES C ASM)
 
-# All the variables defined in this project start with a BKA_ prefix
-set(BKA_INC ${PROJECT_SOURCE_DIR}/include)
-set(BKA_BIN_INC ${PROJECT_BINARY_DIR}/include)
-set(BKA_SRC ${PROJECT_SOURCE_DIR}/src)
-set(BKA_TEST ${PROJECT_SOURCE_DIR}/test)
+# All the variables defined in this project start with a BK_ prefix
+set(BK_INC ${PROJECT_SOURCE_DIR}/include)
+set(BK_BIN_INC ${PROJECT_BINARY_DIR}/include)
+set(BK_SRC ${PROJECT_SOURCE_DIR}/src)
+set(BK_TEST ${PROJECT_SOURCE_DIR}/test)
 
 set(CMAKE_C_STANDARD 90)
-set(BKA_CFLAGS_LANG -ffreestanding -ansi -Wall)
+set(BK_CFLAGS_LANG -ffreestanding -ansi -Wall)
 
 # TODO Should we rather use target_include_directories()?
-include_directories(${BKA_INC})
-include_directories(${BKA_BIN_INC})
+include_directories(${BK_INC})
+include_directories(${BK_BIN_INC})
 
-add_compile_options(${BKA_CFLAGS_LANG})
+add_compile_options(${BK_CFLAGS_LANG})
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
 # Include targets according to the cross-compiling setup
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
-	add_definitions(-D BKA_ARCH_UARM)
+	add_definitions(-D BK_ARCH_UARM)
 	include(cmake/uarm.cmake)
 elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL mips)
-	add_definitions(-D BKA_ARCH_UMPS)
+	add_definitions(-D BK_ARCH_UMPS)
 	include(cmake/umps.cmake)
 else()
 	message(FATAL_ERROR "You need to specify a toolchain file with either -D
@@ -31,16 +31,16 @@ else()
 endif()
 
 # Architecture-independent libraries
-add_library(exc ${BKA_SRC}/exc.c)
-add_library(io ${BKA_SRC}/io.c)
-add_library(math ${BKA_SRC}/math.c)
-add_library(pcb ${BKA_SRC}/pcb.c)
-add_library(sched ${BKA_SRC}/sched.c)
-add_library(sem ${BKA_SRC}/sem.c)
-add_library(string ${BKA_SRC}/string.c)
-add_library(syscall ${BKA_SRC}/syscall.c)
-add_library(time ${BKA_SRC}/time.c)
-add_library(utils ${BKA_SRC}/utils.c)
+add_library(exc ${BK_SRC}/exc.c)
+add_library(io ${BK_SRC}/io.c)
+add_library(math ${BK_SRC}/math.c)
+add_library(pcb ${BK_SRC}/pcb.c)
+add_library(sched ${BK_SRC}/sched.c)
+add_library(sem ${BK_SRC}/sem.c)
+add_library(string ${BK_SRC}/string.c)
+add_library(syscall ${BK_SRC}/syscall.c)
+add_library(time ${BK_SRC}/time.c)
+add_library(utils ${BK_SRC}/utils.c)
 
 # Libraries dependecies
 target_link_libraries(io PRIVATE sem)

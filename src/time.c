@@ -4,10 +4,10 @@
 static time_t tick_start;
 
 
-void bka_time_tick() {
-	tick_start = bka_time_now();
+void bk_time_tick() {
+	tick_start = bk_time_now();
 }
 
-time_t bka_time_tock() {
-	return bka_time_now() - tick_start;
+time_t bk_time_tock() {
+	return bk_time_now() - tick_start;
 }

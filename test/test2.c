@@ -21,7 +21,7 @@ static void sched_queue_init();
  * value(s).
  * @param test_no Test type to pick
  * @return A properly initialized PCB whose priority equals @c test_no.
- * @see bka_pcb_init() on how to initialize the PCB.
+ * @see bk_pcb_init() on how to initialize the PCB.
  */
 static pcb_t* pcb_test_factory(unsigned test_no);
 /**
@@ -82,12 +82,12 @@ static char *to_print[] = {
  * penguin ASCII-art image.
  */
 int main () {
-	bka_sched_init();
-	bka_pcbs_init();
+	bk_sched_init();
+	bk_pcbs_init();
 	sched_queue_init();
 	new_areas_init();
 
-	bka_sched_switch_top();
+	bk_sched_switch_top();
 
 	return 0;
 }
@@ -97,15 +97,15 @@ void sched_queue_init() {
 	int test_no;
 
 	for (test_no = 0; test_no < 3; test_no++)
-		bka_sched_enqueue(pcb_test_factory(test_no));
+		bk_sched_enqueue(pcb_test_factory(test_no));
 }
 
 pcb_t* pcb_test_factory(unsigned test_no) {
-	pcb_t *p = bka_pcb_alloc();
+	pcb_t *p = bk_pcb_alloc();
 	pfun_t tests[] = {proc_test1, proc_test2, proc_test3};
 
 	if (p) {
-		bka_pcb_init(p, tests[test_no], test_no);
+		bk_pcb_init(p, tests[test_no], test_no);
 
 		return p;
 	}
@@ -119,63 +119,63 @@ void new_areas_init() {
 	};
 	sec_t callbacks[] = {sec_int, sec_tlb, sec_trap, sec_sysbk};
 	unsigned i;
-	unsigned const n = BKA_LENGTH(new_areas, unsigned);
+	unsigned const n = BK_LENGTH(new_areas, unsigned);
 
 	for (i = 0; i < n; i++)
-		bka_na_init((state_t *) new_areas[i], callbacks[i]);
+		bk_na_init((state_t *) new_areas[i], callbacks[i]);
 }
 
 
 void sec_int () {
 	state_t *oa = (state_t *) INT_OLDAREA;
 
-	bka_na_enter(INT_NEWAREA);
+	bk_na_enter(INT_NEWAREA);
 
 	/* If an interrupt is pending on interrupt line 2, i.e. the interval timer: */
-	if (BKA_STATE_CAUSE(oa) & CAUSE_IP(2)) {
+	if (BK_STATE_CAUSE(oa) & CAUSE_IP(2)) {
 		/* Save the current process state and switch to the next one. */
-		bka_pcb_state_set(bka_sched_curr, oa);
-		bka_sched_switch_top();
+		bk_pcb_state_set(bk_sched_curr, oa);
+		bk_sched_switch_top();
 	} else {
-		bka_na_exit(INT_NEWAREA);
+		bk_na_exit(INT_NEWAREA);
 	}
 }
 
 void sec_tlb () {
-	bka_na_enter(TLB_NEWAREA);
-	bka_na_exit(TLB_NEWAREA);
+	bk_na_enter(TLB_NEWAREA);
+	bk_na_exit(TLB_NEWAREA);
 }
 
 void sec_trap () {
-	bka_na_enter(PGMTRAP_NEWAREA);
-	bka_na_exit(PGMTRAP_NEWAREA);
+	bk_na_enter(PGMTRAP_NEWAREA);
+	bk_na_exit(PGMTRAP_NEWAREA);
 }
 
 void sec_sysbk () {
 	state_t *oa = (state_t *) SYSBK_OLDAREA;
 
-	bka_na_enter(SYSBK_NEWAREA);
+	bk_na_enter(SYSBK_NEWAREA);
 
 	/* Check what type of interrupt occurred (syscall, breakpoint or other) */
-	switch(CAUSE_GET_EXCCODE(BKA_STATE_CAUSE(oa))) {
+	switch(CAUSE_GET_EXCCODE(BK_STATE_CAUSE(oa))) {
 		case EXC_SYS:
 
-#ifdef BKA_ARCH_UARM
-			bka_syscall(oa->a1, oa->a2, oa->a3, oa->a4);
-#elif defined(BKA_ARCH_UMPS)
-			bka_syscall(oa->reg_a0, oa->reg_a1, oa->reg_a2, oa->reg_a3);
+#ifdef BK_ARCH_UARM
+			bk_syscall(oa->a1, oa->a2, oa->a3, oa->a4);
+#elif defined(BK_ARCH_UMPS)
+			bk_syscall(oa->reg_a0, oa->reg_a1, oa->reg_a2, oa->reg_a3);
 #endif
 
 			break;
 		case EXC_BP:
 		default:
-			bka_na_exit(SYSBK_NEWAREA);
+			bk_na_exit(SYSBK_NEWAREA);
 	}
 }
 
 
 static unsigned get_microseconds() {
-	return BKA_TOD_LO / BKA_TIME_SCALE;
+	return BK_TOD_LO / BK_TIME_SCALE;
 }
 
 static void delay_ms(unsigned ms) {
@@ -187,13 +187,13 @@ static void delay_ms(unsigned ms) {
 void proc_test1() {
 	int i = 0;
 
-	bka_term_puts2(0, "Entering test1!\n", NULL);
+	bk_term_puts2(0, "Entering test1!\n", NULL);
 
 	for (i = 0; i < TEST_STEPS; i++) {
 		while (test3_baton[i] == 0)
 			;
 
-		bka_term_puts2(0, to_print[i * 3], NULL);
+		bk_term_puts2(0, to_print[i * 3], NULL);
 		delay_ms(100);
 		test1_baton[i] = 1;
 	}
@@ -201,21 +201,21 @@ void proc_test1() {
 	while (test3_baton[TEST_STEPS] == 0)
 		;
 
-	bka_term_puts2(0, "Good job from test1\n", NULL);
+	bk_term_puts2(0, "Good job from test1\n", NULL);
 	test1_baton[TEST_STEPS] = 1;
-	SYSCALL(BKA_SYS_KILL, (unsigned) NULL, 0, 0);
+	SYSCALL(BK_SYS_KILL, (unsigned) NULL, 0, 0);
 }
 
 void proc_test2() {
 	int i = 0;
 
-	bka_term_puts2(0, "Entering test2!\n", NULL);
+	bk_term_puts2(0, "Entering test2!\n", NULL);
 
 	for (i = 0; i < TEST_STEPS; i++) {
 		while (test1_baton[i] == 0)
 			;
 
-		bka_term_puts2(0, to_print[i * 3 + 1], NULL);
+		bk_term_puts2(0, to_print[i * 3 + 1], NULL);
 		delay_ms(100);
 		test2_baton[i] = 1;
 	}
@@ -223,22 +223,22 @@ void proc_test2() {
 	while (test1_baton[TEST_STEPS] == 0)
 		;
 
-	bka_term_puts2(0, "Good job from test2\n", NULL);
+	bk_term_puts2(0, "Good job from test2\n", NULL);
 	test2_baton[TEST_STEPS] = 1;
-	SYSCALL(BKA_SYS_KILL, (unsigned) NULL, 0, 0);
+	SYSCALL(BK_SYS_KILL, (unsigned) NULL, 0, 0);
 }
 
 void proc_test3() {
 	int i = 0;
 
-	bka_term_puts2(0, "Entering test3!\n", NULL);
+	bk_term_puts2(0, "Entering test3!\n", NULL);
 	test3_baton[0] = 1;
 
 	for (i = 0; i < TEST_STEPS; i++) {
 		while (test2_baton[i] == 0)
 			;
 
-		bka_term_puts2(0, to_print[i * 3 + 2], NULL);
+		bk_term_puts2(0, to_print[i * 3 + 2], NULL);
 		delay_ms(100);
 		test3_baton[i + 1] = 1;
 	}
@@ -246,6 +246,6 @@ void proc_test3() {
 	while (test2_baton[TEST_STEPS] == 0)
 		;
 
-	bka_term_puts2(0, "Good job from test3\n", NULL);
-	SYSCALL(BKA_SYS_KILL, (unsigned) NULL, 0, 0);
+	bk_term_puts2(0, "Good job from test3\n", NULL);
+	SYSCALL(BK_SYS_KILL, (unsigned) NULL, 0, 0);
 }

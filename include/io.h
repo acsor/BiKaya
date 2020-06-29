@@ -1,5 +1,5 @@
-#ifndef BKA_IO
-#define BKA_IO
+#ifndef BK_IO
+#define BK_IO
 
 #include "arch.h"
 #include "sem.h"
@@ -9,7 +9,7 @@
 #define DEV_CMD_ACK		1
 /* TODO Complete generic device command constants. */
 
-#define BKA_PRINT(print_no)	(dtpreg_t *) (DEV_REG_ADDR(IL_PRINTER, print_no))
+#define BK_PRINT(print_no)	(dtpreg_t *) (DEV_REG_ADDR(IL_PRINTER, print_no))
 
 #define PRINT_ST_NOTINST	0
 #define PRINT_ST_READY		1
@@ -26,7 +26,7 @@
  */
 #define PRINT_ST_MASK	0xFF
 
-#define BKA_TERM(term_no)	(termreg_t *) (DEV_REG_ADDR(IL_TERMINAL, term_no))
+#define BK_TERM(term_no)	(termreg_t *) (DEV_REG_ADDR(IL_TERMINAL, term_no))
 
 #define TERM_ST_NOTINST		0
 #define TERM_ST_READY       1
@@ -52,17 +52,17 @@
  * Print to the terminal device @c term until a @c NULL is met in the
  * variable-argument list of strings.
  * @param term Terminal register to write to
- * @return @c BKA_E_GEN if errors occurred, count of written strings otherwise.
+ * @return @c BK_E_GEN if errors occurred, count of written strings otherwise.
  */
-int bka_term_puts(termreg_t *term, ...);
-#define bka_term_puts2(term_no, ...) bka_term_puts(BKA_TERM(term_no), __VA_ARGS__)
+int bk_term_puts(termreg_t *term, ...);
+#define bk_term_puts2(term_no, ...) bk_term_puts(BK_TERM(term_no), __VA_ARGS__)
 /**
  * Reads a single character from @c term.
- * @return @c BKA_E_GEN if errors occurred, number of read characters
+ * @return @c BK_E_GEN if errors occurred, number of read characters
  * otherwise.
  */
-int bka_term_recvc(termreg_t *term);
-#define bka_term_recvc2(term_no) bka_term_recvc(BKA_TERM(term_no))
+int bk_term_recvc(termreg_t *term);
+#define bk_term_recvc2(term_no) bk_term_recvc(BK_TERM(term_no))
 /**
  * Reads at most <code>length - 1</code> characters from @c term into @c
  * dest, stopping earlier if a newline character is met. A @c '\0'
@@ -71,21 +71,21 @@ int bka_term_recvc(termreg_t *term);
  * @param term Terminal device to read from
  * @param dest Destination string to write to
  * @param length Maximum number of characters to read, @c '\0' included
- * @return @c BKA_E_GEN in case of errors, @c BKA_E_OK otherwise.
+ * @return @c BK_E_GEN in case of errors, @c BK_E_OK otherwise.
  */
-int bka_term_recvs(termreg_t *term, char *dest, unsigned length);
-#define bka_term_recvs2(term_no, dest, length) bka_term_recvs(BKA_TERM (term_no), dest, length)
+int bk_term_recvs(termreg_t *term, char *dest, unsigned length);
+#define bk_term_recvs2(term_no, dest, length) bk_term_recvs(BK_TERM (term_no), dest, length)
 
 
 /**
  * @param dev
  * @param str Null-terminated string to write into @c dev
- * @return @c BKA_E_GEN if errors occurred, count of written characters
+ * @return @c BK_E_GEN if errors occurred, count of written characters
  * otherwise.
  */
  /* TODO Turn this function into variadic. */
-int bka_print_puts(dtpreg_t *dev, char const *str);
-#define bka_print_puts2(dev_no, str) bka_print_puts(BKA_PRINT(dev_no), str)
+int bk_print_puts(dtpreg_t *dev, char const *str);
+#define bk_print_puts2(dev_no, str) bk_print_puts(BK_PRINT(dev_no), str)
 
 
 /**
@@ -98,7 +98,7 @@ int bka_print_puts(dtpreg_t *dev, char const *str);
  * reception one.
  * @return The semaphore key associated to the device @c dev.
  */
-int* bka_dev_sem_get(void *dev, unsigned subdevice);
+int* bk_dev_sem_get(void *dev, unsigned subdevice);
 /**
  * @return The next pending interrupted device register, in increasing order
  * from lower interrupt lines to higher ones. Internal devices are not
@@ -108,7 +108,7 @@ int* bka_dev_sem_get(void *dev, unsigned subdevice);
  * side or the receiving side has a pending interrupt for the function to
  * return the corresponding terminal register.
  */
-void* bka_dev_next_pending();
+void* bk_dev_next_pending();
 /**
  * Acknowledges a pending interrupt for the device @c device on interrupt
  * line @c line, optionally identified by @c subdevice (appropriate
@@ -119,23 +119,23 @@ void* bka_dev_next_pending();
  * dealing with terminal devices; if <tt>subdevice == 0</tt>, the receive
  * subdevice interrupt is acknowledged only, if <tt>subdevice == 1</tt> the
  * transmission subdevice instead.
- * @see bka_dev_ack2
+ * @see bk_dev_ack2
  */
-void bka_dev_ack(unsigned line, unsigned device, unsigned subdevice);
+void bk_dev_ack(unsigned line, unsigned device, unsigned subdevice);
 /**
- * An alternative way of invoking @c bka_dev_ack().
- * @see bka_dev_ack
+ * An alternative way of invoking @c bk_dev_ack().
+ * @see bk_dev_ack
  */
-#define bka_dev_ack2(dev, subdev)	bka_dev_ack(bka_dev_line(dev), bka_dev_instance(dev), subdev)
+#define bk_dev_ack2(dev, subdev)	bk_dev_ack(bk_dev_line(dev), bk_dev_instance(dev), subdev)
 /**
  * @return The interrupt line number the device register @c dev belongs to.
  */
-unsigned bka_dev_line(void *dev);
+unsigned bk_dev_line(void *dev);
 /**
  * @return The "instance" number within the appropriate interrupt line the
  * device register @c dev belongs to.
  */
-unsigned bka_dev_instance(void *dev);
+unsigned bk_dev_instance(void *dev);
 
 
 #endif

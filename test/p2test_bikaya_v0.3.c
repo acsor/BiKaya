@@ -20,7 +20,7 @@
  *      Modified by Mattia Maldini, Renzo Davoli 2020
  */
 
-#ifdef BKA_ARCH_UMPS
+#ifdef BK_ARCH_UMPS
 #include "umps/libumps.h"
 #include "umps/arch.h"
 #include "umps/types.h"
@@ -46,7 +46,7 @@
 
 #endif
 
-#ifdef BKA_ARCH_UARM
+#ifdef BK_ARCH_UARM
 #include "uarm/libuarm.h"
 #include "uarm/arch.h"
 #include "uarm/uARMtypes.h"
@@ -70,14 +70,14 @@ typedef unsigned int cpu_t;
 typedef unsigned int pid_t;
 typedef memaddr_t memaddr;
 
-#define GETCPUTIME       BKA_SYS_CPU_TIME
-#define CREATEPROCESS    BKA_SYS_FORK
-#define TERMINATEPROCESS BKA_SYS_KILL
-#define VERHOGEN         BKA_SYS_VERHOGEN
-#define PASSEREN         BKA_SYS_PASSEREN
-#define WAITIO           BKA_SYS_IOCMD
-#define SPECPASSUP       BKA_SYS_SPEC_PASSUP
-#define GETPID           BKA_SYS_GETPID
+#define GETCPUTIME       BK_SYS_CPU_TIME
+#define CREATEPROCESS    BK_SYS_FORK
+#define TERMINATEPROCESS BK_SYS_KILL
+#define VERHOGEN         BK_SYS_VERHOGEN
+#define PASSEREN         BK_SYS_PASSEREN
+#define WAITIO           BK_SYS_IOCMD
+#define SPECPASSUP       BK_SYS_SPEC_PASSUP
+#define GETPID           BK_SYS_GETPID
 
 #define DEFAULT_PRIORITY 1
 
@@ -149,14 +149,14 @@ void p7root(), child1(), child2(), p7leaf();
 unsigned int set_sp_pc_status(state_t *s, state_t *copy, unsigned int pc, unsigned int frames) {
     STST(s);
 
-#ifdef BKA_ARCH_UMPS
+#ifdef BK_ARCH_UMPS
     s->reg_sp = copy->reg_sp - FRAME_SIZE * frames;
     s->pc_epc = pc;
     s->status = STATUS_ALL_INT_ENABLE(s->status);
     return s->reg_sp;
 #endif
 
-#ifdef BKA_ARCH_UARM
+#ifdef BK_ARCH_UARM
     s->sp   = copy->sp - FRAME_SIZE * frames;
     s->pc   = pc;
     s->cpsr = STATUS_ALL_INT_ENABLE(s->cpsr);
@@ -516,11 +516,11 @@ void p4a() {
 
 /* generate a TLB exception by turning on VM without setting up the
          seg tables */
-#ifdef BKA_ARCH_UMPS
+#ifdef BK_ARCH_UMPS
     p4Status = getSTATUS();
     p4Status |= VMON;
     setSTATUS(p4Status);
-#elif defined BKA_ARCH_UARM
+#elif defined BK_ARCH_UARM
     p4Status = getCONTROL();
     p4Status |= VMON;
     setCONTROL(p4Status);

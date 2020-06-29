@@ -7,7 +7,7 @@
 /**
  * The semaphore table, allocating data for each one of them.
  */
-static semd_t semd_table[BKA_MAX_SEM];
+static semd_t semd_table[BK_MAX_SEM];
 /**
  * Head of the Active Semaphore List (ASL).
  */
@@ -20,18 +20,18 @@ static list_t sem_head;
 static list_t fsl_head;
 
 
-void bka_sem_init() {
+void bk_sem_init() {
 	unsigned i;
 
 	INIT_LIST_HEAD(&sem_head);
 	INIT_LIST_HEAD(&fsl_head);
 
 	/* Add all semaphores to the FSL */
-	for (i = 0; i < BKA_MAX_SEM; i++)
+	for (i = 0; i < BK_MAX_SEM; i++)
 		list_add_tail(&semd_table[i].next, &fsl_head);
 }
 
-semd_t* bka_sem_alloc(int *key) {
+semd_t* bk_sem_alloc(int *key) {
 	semd_t *result;
 
 	if (list_empty(&fsl_head))
@@ -47,28 +47,28 @@ semd_t* bka_sem_alloc(int *key) {
 	return result;
 }
 
-int bka_sem_p(int *semkey, pcb_t *p) {
+int bk_sem_p(int *semkey, pcb_t *p) {
 	(*semkey)--;
 
 	if (*semkey < 0) {
-		bka_sched_suspend(p);
-		bka_sem_enqueue(semkey, p);
+		bk_sched_suspend(p);
+		bk_sem_enqueue(semkey, p);
 	}
 
 	return *semkey;
 }
 
-pcb_t* bka_sem_v(int *semkey) {
+pcb_t* bk_sem_v(int *semkey) {
 	(*semkey)++;
 
 	if (*semkey <= 0) {
-		pcb_t *to_restore = bka_sem_dequeue(semkey);
+		pcb_t *to_restore = bk_sem_dequeue(semkey);
 
 		if (to_restore) {
 			to_restore->semkey = NULL;
-			bka_sched_enqueue(to_restore);
+			bk_sched_enqueue(to_restore);
 		} else {
-			bka_term_puts2(1, "bka_sem_v(): warning: process removal with an empty queue\n", NULL);
+			bk_term_puts2(1, "bk_sem_v(): warning: process removal with an empty queue\n", NULL);
 		}
 
 		return to_restore;
@@ -77,12 +77,12 @@ pcb_t* bka_sem_v(int *semkey) {
 	return NULL;
 }
 
-void bka_sem_free(semd_t *s) {
+void bk_sem_free(semd_t *s) {
 	list_del_init(&s->next);
 	list_add_tail(&s->next, &fsl_head);
 }
 
-semd_t* bka_sem_get(int *key) {
+semd_t* bk_sem_get(int *key) {
 	semd_t *s;
 
 	list_for_each_entry(s, &sem_head, next) {
@@ -93,13 +93,13 @@ semd_t* bka_sem_get(int *key) {
 	return NULL;
 }
 
-int bka_sem_enqueue (int *key, pcb_t *p) {
+int bk_sem_enqueue (int *key, pcb_t *p) {
 	/* Look for an existing semaphore descriptor with the given key */
-	semd_t *s = bka_sem_get(key);
+	semd_t *s = bk_sem_get(key);
 
 	/* If no such semaphore data structure exists, try to allocate it */
 	if (!s)
-		s = bka_sem_alloc(key);
+		s = bk_sem_alloc(key);
 
 	/* If the semaphore descriptor is finally available */
 	if (s) {
@@ -112,28 +112,28 @@ int bka_sem_enqueue (int *key, pcb_t *p) {
 	}
 }
 
-pcb_t* bka_sem_dequeue(int *key) {
-	semd_t *s = bka_sem_get(key);
+pcb_t* bk_sem_dequeue(int *key) {
+	semd_t *s = bk_sem_get(key);
 	pcb_t *p = NULL;
 
 	if (s) {
-		p = bka_pcb_queue_pop(&s->proc_queue);
+		p = bk_pcb_queue_pop(&s->proc_queue);
 
-		if (bka_pcb_queue_isempty(&s->proc_queue))
-			bka_sem_free(s);
+		if (bk_pcb_queue_isempty(&s->proc_queue))
+			bk_sem_free(s);
 	}
 
 	return p;
 }
 
-pcb_t* bka_sem_head(int *key) {
-	semd_t *s = bka_sem_get(key);
+pcb_t* bk_sem_head(int *key) {
+	semd_t *s = bk_sem_get(key);
 
-	return s != NULL ? bka_pcb_queue_head(&s->proc_queue) : NULL;
+	return s != NULL ? bk_pcb_queue_head(&s->proc_queue) : NULL;
 }
 
-pcb_t* bka_sem_pcb_rm(pcb_t *p) {
-	semd_t *s = bka_sem_get(p->semkey);
+pcb_t* bk_sem_pcb_rm(pcb_t *p) {
+	semd_t *s = bk_sem_get(p->semkey);
 	pcb_t *to_remove;
 
 	if (s) {
@@ -142,7 +142,7 @@ pcb_t* bka_sem_pcb_rm(pcb_t *p) {
 				list_del_init(&to_remove->next);
 
 				if (list_empty(&s->proc_queue))
-					bka_sem_free(s);
+					bk_sem_free(s);
 
 				return to_remove;
 			}
@@ -152,12 +152,12 @@ pcb_t* bka_sem_pcb_rm(pcb_t *p) {
 	return NULL;
 }
 
-void bka_sem_pcb_rm_desc(pcb_t *p) {
-	pcb_t *removed = bka_sem_pcb_rm(p);
+void bk_sem_pcb_rm_desc(pcb_t *p) {
+	pcb_t *removed = bk_sem_pcb_rm(p);
 	pcb_t *child;
 
 	if (removed) {
-		list_for_each_entry(child, &removed->first_child, siblings) bka_sem_pcb_rm_desc(
+		list_for_each_entry(child, &removed->first_child, siblings) bk_sem_pcb_rm_desc(
 					child);
 	}
 }
