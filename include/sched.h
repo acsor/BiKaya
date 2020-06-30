@@ -12,7 +12,10 @@
 #define BK_STU_MILLI	1000
 #define BK_STU_SEC		1000000
 
-/* The Killed Running flag. */
+/**
+ * The Killed Running flag.
+ * @see bk_sched_kill()
+ */
 #define BK_SCHED_KR	1
 
 
@@ -70,23 +73,12 @@ void bk_sched_suspend(pcb_t *to_suspend);
  */
 int bk_sched_kill(pcb_t *to_kill);
 /**
- * A wrapper for @c bk_sched_switch(), selecting the most prioritized
- * process as the one to switch into.
- * @see bk_sched_switch
+ * Performs a context switch into the most prioritized process, reinserting
+ * the currently running process @c bk_sched_curr into the ready queue @c
+ * bk_sched_ready. Leads the system to an @c HALT() state if @c
+ * bk_sched_ready is empty and <tt>bk_sched_curr == NULL</tt>.
  */
 void bk_sched_switch_top();
-/**
- * Performs a context switch into the process associated to the @c to_switch
- * PCB. @c to_switch will be removed from the corresponding ready queue, and
- * the current process reinserted into it.
- *
- * @b Note: it is the caller's responsibility to save the current process
- * state before switching out of it.
- *
- * @param to_switch PCB of the process to switch into.
- * @see bk_sched_switch_top
- */
-void bk_sched_switch(pcb_t *const to_switch);
 
 /**
  * Sets the system-wide interval timer.

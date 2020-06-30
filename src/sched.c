@@ -10,6 +10,21 @@ list_t	bk_sched_ready;
 pcb_t	*bk_sched_curr;
 
 
+/**
+ * Performs a context switch into the process associated to the @c to_switch
+ * PCB. @c to_switch will be removed from the corresponding ready queue, and
+ * the current process @c bk_sched_curr reinserted into it.
+ *
+ * @b Note: it is the caller's responsibility to save the current process
+ * state before switching out of it.
+ *
+ * @param to_switch PCB of the process to switch into. It is the caller's
+ * responsibility to check that <tt>to_switch != NULL</tt>.
+ * @see bk_sched_switch_top, bk_pbc_state_set
+ */
+void sched_switch(pcb_t *const to_switch);
+
+
 void bk_sched_init() {
 	bk_pcb_queue_init(&bk_sched_ready);
 	bk_sched_curr = NULL;
@@ -88,14 +103,24 @@ int bk_sched_kill(pcb_t *to_kill) {
 }
 
 void bk_sched_switch_top() {
-	if (list_empty(&bk_sched_ready)) {
-		bk_sched_switch(bk_sched_curr);
-	} else {
-		bk_sched_switch(bk_pcb_queue_head(&bk_sched_ready));
-	}
+	if (!list_empty(&bk_sched_ready))
+		sched_switch(bk_pcb_queue_head(&bk_sched_ready));
+	else if (bk_sched_curr)
+		bk_sched_resume();
+	else
+		HALT();
 }
 
-void bk_sched_switch(pcb_t *const to_switch) {
+
+void bk_sched_it_set(unsigned time, unsigned unit) {
+	time_t *interval_timer = (unsigned*) BUS_REG_TIMER;
+	time_t const time_scale = *((unsigned*) BUS_REG_TIME_SCALE);
+
+	*interval_timer = time * time_scale * unit;
+}
+
+
+void sched_switch(pcb_t *const to_switch) {
 	pcb_t *queued_pcb;
 
 	/* Update priorities of old processes to avoid starvation. */
@@ -114,19 +139,10 @@ void bk_sched_switch(pcb_t *const to_switch) {
 
 	/* Renew the running process and extract if from the queue. */
 	bk_sched_curr = to_switch;
+	/* bk_shed_curr now points to a PCB just extracted form bk_sched_ready,
+	 * but its time breakpoint timer_bk is set to an old value. */
 	bk_sched_curr->timer_bk = bk_time_now();
-	bk_pcb_queue_rm(&bk_sched_ready, to_switch);
+	list_del_init(&bk_sched_curr->next);
 
-	bk_kernel_on_exit();
-	bk_sched_it_set(TIME_SLICE, TIME_SLICE_UNIT);
-
-	LDST(&to_switch->state);
-}
-
-
-void bk_sched_it_set(unsigned time, unsigned unit) {
-	unsigned *interval_timer = (unsigned*) BUS_REG_TIMER;
-	unsigned const time_scale = *((unsigned*) BUS_REG_TIME_SCALE);
-
-	*interval_timer = time * time_scale * unit;
+	bk_sched_resume();
 }
