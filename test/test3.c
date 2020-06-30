@@ -35,8 +35,8 @@ static void idle_proc();
  * device and software interrupts.
  */
 static void sec_int ();
-static void sec_int_handle_interrupt(void *dev);
-static void sec_int_handle_term_int(termreg_t *dev);
+static void sec_int_handle(void *dev);
+static void sec_int_handle_term(termreg_t *dev);
 /**
  * System Exception Callback (SEC) to be executed during TLB exceptions.
  */
@@ -106,7 +106,7 @@ void sec_int () {
 
 	/* As long as there are pending device interrupts, handle them. */
 	while ((dev = bk_dev_next_pending()))
-		sec_int_handle_interrupt(dev);
+		sec_int_handle(dev);
 
 	/* If an interrupt is pending on interrupt line 2, i.e. the interval timer: */
 	if (BK_STATE_CAUSE(oa) & CAUSE_IP(2)) {
@@ -118,13 +118,13 @@ void sec_int () {
 	bk_na_exit(INT_NEWAREA);
 }
 
-void sec_int_handle_interrupt(void *dev) {
+void sec_int_handle(void *dev) {
 	unsigned line = bk_dev_line(dev);
 
 	if (line == IL_TERMINAL) {
 		/* Since handling terminal interrupts is a bit more complex, we
 		 * delegate that duty to another function. */
-		sec_int_handle_term_int((termreg_t *) dev);
+		sec_int_handle_term((termreg_t *) dev);
 	} else {
 		int *semkey = bk_dev_sem_get(dev, 0);
 		dtpreg_t *dtpdev = (dtpreg_t *) dev;
@@ -138,7 +138,7 @@ void sec_int_handle_interrupt(void *dev) {
 	}
 }
 
-void sec_int_handle_term_int(termreg_t *dev) {
+void sec_int_handle_term(termreg_t *dev) {
 	/* Transmit Status (ts) and Receive Status (rs) fields respectively. */
 	unsigned const
 			ts = dev->transm_status & TERM_ST_MASK,
