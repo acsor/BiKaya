@@ -46,12 +46,19 @@ void bk_sched_enqueue(pcb_t *p) {
 	bk_pcb_queue_ins(&bk_sched_ready, p);
 }
 
+pcb_t* bk_sched_dequeue() {
+	pcb_t *out = bk_pcb_queue_pop(&bk_sched_ready);
+
+	out->timer_bk = bk_time_now();
+
+	return out;
+}
+
 void bk_sched_suspend(pcb_t *to_suspend) {
-	if (to_suspend == bk_sched_curr) {
+	if (to_suspend == bk_sched_curr)
 		bk_sched_curr = bk_pcb_queue_pop(&bk_sched_ready);
-	} else {
+	else
 		bk_pcb_queue_rm(&bk_sched_ready, to_suspend);
-	}
 }
 
 int bk_sched_kill(pcb_t *to_kill) {
@@ -93,8 +100,7 @@ int bk_sched_kill(pcb_t *to_kill) {
 	}
 
 	if (killed_running) {
-		bk_sched_curr = bk_pcb_queue_pop(&bk_sched_ready);
-		bk_sched_curr->timer_bk = bk_time_now();
+		bk_sched_curr = bk_sched_dequeue();
 
 		return BK_SCHED_KR;
 	} else {

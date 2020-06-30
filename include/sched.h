@@ -48,6 +48,13 @@ void bk_sched_resume();
  */
 void bk_sched_enqueue(pcb_t *p);
 /**
+ * Deletes the topmost process from @c bk_sched_ready returning it to the
+ * caller, while performing additional operations such as time updating.
+ * @return The most prioritized process, or @c NULL if the ready queue
+ * bk_sched_ready is empty.
+ */
+pcb_t* bk_sched_dequeue();
+/**
  * @param to_suspend
  */
 void bk_sched_suspend(pcb_t *to_suspend);
