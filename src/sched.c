@@ -65,9 +65,13 @@ int bk_sched_kill(pcb_t *to_kill) {
 			list_add_tail(&child->next, &queue);
 		}
 
-		/* Finally free up the PCB. */
-		if (curr->semkey)
-			bk_sem_v(curr->semkey);
+		/* Finally free up the PCB: remove it from the semaphore queue it is
+		 * pending on (if need to), from its parent and put it back into the
+		 * FPL (Free PCB List). */
+		if (curr->semkey) {
+			(*curr->semkey)++;
+			bk_sem_pcb_rm(curr);
+		}
 
 		bk_pcb_tree_parentrm(curr);
 		bk_pcb_free(curr);
