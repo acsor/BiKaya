@@ -1,3 +1,4 @@
 # Name, email
 Oscar Barreca, oscar.barreca@studio.unibo.it
 Daniele Morotti, daniele.morotti@studio.unibo.it
+Andrea Ricciardelli, andrea.ricciardelli2@studio.unibo.it
