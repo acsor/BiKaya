@@ -1,81 +1,100 @@
-#ifndef BKA_SCHED_H
-#define BKA_SCHED_H
+#ifndef BK_SCHED_H
+#define BK_SCHED_H
 
+#include "arch.h"
 #include "list.h"
 #include "pcb.h"
 
 /**
  * Scheduling Time Units (STU) constants.
  */
-#define BKA_STU_MICRO	1
-#define BKA_STU_MILLI	1000
-#define BKA_STU_SEC		1000000
+#define BK_STU_MICRO	1
+#define BK_STU_MILLI	1000
+#define BK_STU_SEC		1000000
 
-#define TIME_SLICE		3
-#define	TIME_SLICE_UNIT	BKA_STU_MILLI
+/**
+ * The Killed Running flag.
+ * @see bk_sched_kill()
+ */
+#define BK_SCHED_KR	1
+
 
 /**
  * The scheduler ready queue.
  */
-extern list_t	bka_sched_ready;
+extern list_t	bk_sched_ready;
 /**
  * Currently running PCB.
  */
-extern pcb_t	*bka_sched_curr;
+extern pcb_t	*bk_sched_curr;
 
 
 /**
  * Initializes variables for the correct functioning of the scheduler module.
+ * To be called once and only once per program execution before starting to
+ * access this module.
  */
-void bka_sched_init();
+void bk_sched_init();
+/**
+ * Resumes the currently running process with a renewed time slice. No
+ * changes are performed on the ready queue.
+ */
+void bk_sched_resume();
 /**
  * Enqueues @c p into the ready process queue according to its process
  * priority. Undefined behavior might occur if this function is called
  * consecutively twice (or more) with the same argument.
  * @param p PCB corresponding to the enqueued process.
  */
-void bka_sched_ready_enqueue(pcb_t *p);
+void bk_sched_enqueue(pcb_t *p);
 /**
- * Like @c bka_sched_switch_top(), but performs no state backup of the
- * running process and does not reinsert it into the ready queue (nor does it
- * actually presume the presence of a running process). Hence, the running
- * process is effectively discarded.
+ * Deletes the topmost process from @c bk_sched_ready returning it to the
+ * caller, while performing additional operations such as time updating.
+ * @return The most prioritized process, or @c NULL if the ready queue
+ * bk_sched_ready is empty.
+ */
+pcb_t* bk_sched_dequeue();
+/**
+ * @param to_suspend
+ */
+void bk_sched_suspend(pcb_t *to_suspend);
+/**
+ * Figuratively "kills" the @c to_kill process. In particular, this has the
+ * effect to
  *
- * This function is ideal when booting up the very first process or switching
- * to a new process disregarding the running one (e.g. killing the current
- * process and switching to the other).
+ * <ul>
+ * 	<li>"Kill" all the other descendant processes of @c to_kill</li>
+ * 	<li>Remove all killed processes from semaphores they may be pending on</li>
+ * 	<li>Return the corresponding PCBs to the free PCB list</li>
+ * </ul>
  *
- * The function behavior upon a call with one remaining process only is to halt
- * the processor.
- * @see bka_sched_switch, bka_sched_switch_top, bka_sys_kill
+ * @c Note: this function might have the (intended) effect to kill the
+ * currently running process. When that happens, @c bk_sched_curr is
+ * assigned the next process from the ready queue (or @c NULL if none is
+ * available). It will be the caller's responsibility to perform a context
+ * switch.
+ *
+ * @param to_kill
+ * @return @c BK_E_INVARG if @c to_kill was invalid, BK_SCHED_KR if the
+ * currently running process was killed or @c 0 otherwise.
  */
-void bka_sched_switch_top_hard();
+int bk_sched_kill(pcb_t *to_kill);
 /**
- * A wrapper for @c bka_sched_switch(), selecting the most prioritized
- * process as the one to switch into.
- * @param curr_proc_status Memory area where the current process status is
- * stored.
- * @see bka_sched_switch
+ * Performs a context switch into the most prioritized process, reinserting
+ * the currently running process @c bk_sched_curr into the ready queue @c
+ * bk_sched_ready. Leads the system to an @c HALT() state if @c
+ * bk_sched_ready is empty and <tt>bk_sched_curr == NULL</tt>.
  */
-void bka_sched_switch_top(state_t *curr_proc_status);
-/**
- * Performs a context switch into the process associated to the @c to_switch
- * PCB. @c to_switch will be removed from the corresponding ready queue, and
- * the current process reinserted into it.
- * @param to_switch PCB of the process to switch into.
- * @param curr_proc_status Memory area where the current process status is
- * stored.
- */
-void bka_sched_switch(pcb_t *const to_switch, state_t *curr_proc_status);
+void bk_sched_switch_top();
 
 /**
  * Sets the system-wide interval timer.
  * @param time Time (in the given unit) to elapse before the interval timer
  * interrupt.
- * @param unit Time unit, to be chosen among @c BKA_STU_MICRO, @c
- * BKA_STU_MILLI or @c BKA_STU_SEC.
+ * @param unit Time unit, to be chosen among @c BK_STU_MICRO, @c
+ * BK_STU_MILLI or @c BK_STU_SEC.
  */
-void bka_sched_it_set(unsigned time, unsigned unit);
+void bk_sched_it_set(unsigned time, unsigned unit);
 
 
 #endif

@@ -12,8 +12,8 @@ function(apply_elf2umps)
 endfunction()
 
 # Project include and source dirs for umps-related files
-set(UMPS_INC ${BKA_INC}/umps)
-set(UMPS_SRC ${BKA_SRC}/umps)
+set(UMPS_INC ${BK_INC}/umps)
+set(UMPS_SRC ${BK_SRC}/umps)
 
 # Flags to be passed to gcc
 set(
@@ -29,27 +29,24 @@ add_compile_options(${CFLAGS_UMPS})
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LDFLAGS_UMPS}")
 # set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
+# uMPS libraries
 add_library(libumps ${UMPS_SRC}/libumps.S)
 add_library(crtso ${UMPS_SRC}/crtso.S)
 
-# Add test0 executable
-add_executable(test0 ${BKA_TEST}/test0.c)
+# uMPS executables
+add_executable(test0 ${BK_TEST}/test0.c)
 target_link_libraries(test0 crtso libumps io)
 
-# Add test1 executable
-add_executable(test1 ${BKA_TEST}/test1.c)
-target_link_libraries(test1 crtso libumps io string utils asl)
+add_executable(test1 ${BK_TEST}/test1.c)
+target_link_libraries(test1 crtso libumps io sem string utils)
 
-# Add test2 executable
-add_executable(test2 ${BKA_TEST}/test2.c ${BKA_SRC}/p1.5test_bikaya_v0.c)
-target_link_libraries(test2 exc crtso io libumps pcb string syscall)
+add_executable(test2 ${BK_TEST}/test2.c)
+target_link_libraries(test2 exc crtso io libumps pcb syscall)
 
-# Add test2 executable
-add_executable(test3 ${BKA_TEST}/test3.c)
-target_link_libraries(test3 exc crtso io libumps pcb sched string)
+add_executable(test3 ${BK_TEST}/test3.c ${BK_TEST}/p2test_bikaya_v0.3.c)
+target_link_libraries(test3 crtso exc io libumps pcb sched string syscall)
 
-# Add unit_test executable
-add_executable(unit_test ${BKA_TEST}/unit_test.c)
+add_executable(unit_test ${BK_TEST}/unit_test.c)
 target_link_libraries(unit_test crtso io libumps string utils)
 
 # To each target listed, apply the umps2-elf2umps final step to it

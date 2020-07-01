@@ -6,20 +6,16 @@ int main () {
 	unsigned const buffsize = 256;
 	char buff[buffsize];
 
-	termreg_t *term0 = (termreg_t*) DEV_REG_ADDR(IL_TERMINAL, 0);
-	dtpreg_t *print0 = (dtpreg_t*) DEV_REG_ADDR(IL_PRINTER, 0);
-
 	*buff = '\0';
-	bka_term_puts(
-		term0,
-		"Please, enter some text to redirect to the printer 0\n> ", NULL
+	bk_term_puts2(
+		0, "Please, enter some text to redirect to the printer 0\n> ", NULL
 	);
 
-	if (bka_term_recvs(term0, buff, buffsize) == BKA_E_GEN) {
-		bka_term_puts(term0, "Errors occurred", NULL);
+	if (bk_term_recvs2(0, buff, buffsize) == BK_E_GEN) {
+		bk_term_puts2(0, "Errors occurred", NULL);
 	} else {
-		bka_print_puts(print0, buff);
-		bka_term_puts(term0, "Printed successfully to printer 0", NULL);
+		bk_print_puts2(0, buff);
+		bk_term_puts2(0, "Printed successfully to printer 0", NULL);
 	}
 
     /* Go to sleep indefinitely */

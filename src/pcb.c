@@ -1,36 +1,37 @@
 #include "pcb.h"
 #include "string.h"
-#include "arch.h"
+#include "utils.h"
 
 
 /**
  * The PCB table, allocating memory for all the available PCBs.
  */
-static pcb_t pcb_table[BKA_MAX_PROC];
+static pcb_t pcb_table[BK_MAX_PROC];
 /**
  * The free PCB list.
  */
 static list_t free_pcb_list;
 
 
-void bka_pcbs_init(void) {
+void bk_pcbs_init(void) {
 	int i;
 
 	INIT_LIST_HEAD(&free_pcb_list);
 
-	for (i = 0; i < BKA_MAX_PROC; i++)
+	for (i = 0; i < BK_MAX_PROC; i++)
 		list_add_tail(&pcb_table[i].next, &free_pcb_list);
 }
 
-pcb_t* bka_pcb_alloc(void) {
+pcb_t* bk_pcb_alloc(void) {
 	pcb_t *out;
+	unsigned i;
 
 	if (list_empty(&free_pcb_list))
 		return NULL;
 
 	/* Acquire the PCB from the free PCB list */
 	out = container_of(free_pcb_list.next, pcb_t, next);
-	list_del(&out->next);
+	list_del_init(&out->next);
 
 	/* Initialize the new PCB */
 	INIT_LIST_HEAD(&out->next);
@@ -38,64 +39,115 @@ pcb_t* bka_pcb_alloc(void) {
 	INIT_LIST_HEAD(&out->first_child);
 	INIT_LIST_HEAD(&out->siblings);
 	/* Initialize the out->state field to all 0s */
-	bka_memset(&out->state, 0, sizeof(state_t));
-	out->priority = 0;
-	out->original_priority = 0;
+	bk_memset(&out->state, 0, sizeof(state_t));
+	out->priority = out->original_priority = 0;
 	out->semkey = NULL;
+
+	/* Initialize time fields to appropriate values */
+	out->timer_curr = out->timers + 0;
+	out->timer_prev = out->timers + 1;
+	out->timer_bk = bk_time_now();
+
+	for (i = 0; i < BK_LENGTH(out->timers, time_t); i++)
+		out->timers[i] = 0;
+
+	/* Initialize all spec passup areas to NULL */
+	out->sp_areas[0][0] = out->sp_areas[0][1] = NULL;
+	out->sp_areas[1][0] = out->sp_areas[1][1] = NULL;
+	out->sp_areas[2][0] = out->sp_areas[2][1] = NULL;
 
 	return out;
 }
 
-void bka_pcb_free(pcb_t *p) {
+void bk_pcb_free(pcb_t *p) {
+	list_del_init(&p->next);
 	list_add_tail(&p->next, &free_pcb_list);
 }
 
-void bka_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
+void bk_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
 	p->priority = p->original_priority = original_priority;
-	bka_memset(&p->state, 0, sizeof(state_t));
+	bk_memset(&p->state, 0, sizeof(state_t));
 
-#ifdef BKA_ARCH_UMPS
+#ifdef BK_ARCH_UMPS
 	p->state.pc_epc = (unsigned) f;
 	/* Enable interrupts */
 	p->state.status |= STATUS_IEp;
 	/* Enable interval timer */
 	p->state.status |= STATUS_IM(2);
 	/* Set stack pointer */
-	p->state.reg_sp = BKA_RAMTOP - FRAMESIZE * (bka_pcb_to_pid(p) + 1);
-#elif defined(BKA_ARCH_UARM)
+	p->state.reg_sp = BK_RAMTOP - FRAMESIZE * (bk_pcb_to_pid(p) + 1);
+#elif defined(BK_ARCH_UARM)
 	p->state.pc = (unsigned) f;
 	/* Enable kernel mode */
 	p->state.cpsr  = STATUS_SYS_MODE;
 	/* Enable regular interrupt handling and interval timer */
+	/* TODO We are all very well aware that the macro below should be
+	 *  STATUS_ALL_INT_ENABLE(), but by inserting it test2.uarm won't work
+	 *  (while quite surprisingly, test3.uarm does). Why? Fix this. */
 	p->state.cpsr = STATUS_ALL_INT_DISABLE(p->state.cpsr);
 	p->state.cpsr = STATUS_ENABLE_TIMER(p->state.cpsr);
 	/* Set virtual memory off */
 	p->state.CP15_Control = CP15_DISABLE_VM(p->state.CP15_Control);
 	/* Set stack pointer */
-	p->state.sp = BKA_RAMTOP - FRAMESIZE * (bka_pcb_to_pid(p) + 1);
+	p->state.sp = BK_RAMTOP - FRAMESIZE * (bk_pcb_to_pid(p) + 1);
 #endif
 }
 
-int bka_pcb_to_pid (pcb_t const * const p) {
+int bk_pcb_stat(pcb_t const *p) {
+	if (p < pcb_table || (pcb_table + BK_MAX_PROC - 1) < p)
+		return BK_PCB_STAT_INV;
+	else if (bk_pcb_queue_contains(&free_pcb_list, p))
+		return BK_PCB_STAT_FREED;
+
+	return 0;
+}
+
+int bk_pcb_to_pid (pcb_t const * const p) {
 	return p - pcb_table;
 }
 
-pcb_t* bka_pid_to_pcb (unsigned pid) {
-	return (0 <= pid && pid < BKA_MAX_PROC) ? pcb_table + pid: NULL;
+pcb_t* bk_pid_to_pcb (unsigned pid) {
+	return (0 <= pid && pid < BK_MAX_PROC) ? pcb_table + pid: NULL;
 }
 
 
-void bka_pcb_queue_init(list_t *head) {
+void bk_pcb_time_save(pcb_t *p) {
+	*p->timer_curr += bk_time_now() - p->timer_bk;
+}
+
+void bk_pcb_time_push(pcb_t *p, unsigned type) {
+	*p->timer_curr += bk_time_now() - p->timer_bk;
+	p->timer_prev = p->timer_curr;
+
+	p->timer_curr = p->timers + type;
+	p->timer_bk = bk_time_now();
+}
+
+time_t* bk_pcb_time_pop(pcb_t *p) {
+	time_t *out = p->timer_curr;
+
+	*p->timer_curr += bk_time_now() - p->timer_bk;
+	p->timer_curr = p->timer_prev;
+	p->timer_prev = NULL;
+	p->timer_bk = bk_time_now();
+
+	return out;
+}
+
+
+void bk_pcb_queue_init(list_t *head) {
 	INIT_LIST_HEAD(head);
 }
 
-int bka_pcb_queue_isempty(list_t *head) {
+int bk_pcb_queue_isempty(list_t *head) {
 	return head->next == head && head->prev == head;
 }
 
-void bka_pcb_queue_ins(list_t *head, pcb_t *p) {
+void bk_pcb_queue_ins(list_t *head, pcb_t *p) {
 	list_t *curr_list = head->next;
 	pcb_t *curr_proc = container_of(curr_list, pcb_t, next);
+
+	list_del_init(&p->next);
 
 	/* Iterate until we either end the list or find a matching process with */
 	/* priority less than p */
@@ -107,22 +159,33 @@ void bka_pcb_queue_ins(list_t *head, pcb_t *p) {
 	__list_add(&p->next, curr_list->prev, curr_list);
 }
 
-pcb_t* bka_pcb_queue_head(list_t *head) {
+pcb_t* bk_pcb_queue_head(list_t *head) {
 	return list_empty(head) ? NULL: container_of(head->next, pcb_t, next);
 }
 
-pcb_t* bka_pcb_queue_pop(list_t *head) {
+int bk_pcb_queue_contains(list_t *head, pcb_t const *p) {
+	pcb_t *curr;
+
+	list_for_each_entry(curr, head, next) {
+		if (curr == p)
+			return 1;
+	}
+
+	return 0;
+}
+
+pcb_t* bk_pcb_queue_pop(list_t *head) {
 	pcb_t *p = NULL;
 
 	if (!list_empty(head)) {
 		p = container_of(head->next, pcb_t, next);
-		list_del(head->next);
+		list_del_init(head->next);
 	}
 
 	return p;
 }
 
-pcb_t* bka_pcb_queue_rm(list_t *head, pcb_t *p) {
+pcb_t* bk_pcb_queue_rm(list_t *head, pcb_t *p) {
 	list_t *curr_list = head;
 	pcb_t *curr_proc;
 
@@ -133,7 +196,7 @@ pcb_t* bka_pcb_queue_rm(list_t *head, pcb_t *p) {
 
 	/* If we exited the loop due to finding the corresponding entry */
 	if (curr_proc == p) {
-		list_del(curr_list);
+		list_del_init(curr_list);
 
 		return p;
 	}
@@ -142,42 +205,34 @@ pcb_t* bka_pcb_queue_rm(list_t *head, pcb_t *p) {
 }
 
 
-int bka_pcb_tree_isempty(pcb_t *this) {
+int bk_pcb_tree_isempty(pcb_t *this) {
 	return list_empty(&this->first_child);
 }
 
-void bka_pcb_tree_push(pcb_t *parent, pcb_t *child) {
+void bk_pcb_tree_push(pcb_t *parent, pcb_t *child) {
 	list_add_tail(&child->siblings, &parent->first_child);
 	child->parent = parent;
 }
 
-pcb_t* bka_pcb_tree_pop(pcb_t *p) {
+pcb_t* bk_pcb_tree_pop(pcb_t *p) {
 	list_t *to_remove;
 
 	if (list_empty(&p->first_child)) {
 		return NULL;
 	} else {
 		to_remove = p->first_child.next;
-		list_del(to_remove);
+		list_del_init(to_remove);
 	}
 
 	return container_of(to_remove, pcb_t, siblings);
 }
 
-pcb_t* bka_pcb_tree_parentrm(pcb_t *p) {
-	list_t *to_remove = NULL;
-	pcb_t *curr_proc = NULL;
+pcb_t* bk_pcb_tree_parentrm(pcb_t *p) {
+	if (p->parent) {
+		p->parent = NULL;
+		list_del_init(&p->siblings);
 
-	if (p->parent != NULL) {
-		list_for_each(to_remove, &p->parent->first_child) {
-			curr_proc = container_of(to_remove, pcb_t, siblings);
-
-			if (curr_proc == p) {
-				list_del(to_remove);
-
-				return p;
-			}
-		}
+		return p;
 	}
 
 	return NULL;
