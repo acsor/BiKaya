@@ -122,9 +122,6 @@ int* bk_dev_sem_get(void *dev, unsigned subdevice) {
 void* bk_dev_next_pending() {
 	unsigned line;
 
-	/* TODO Is the following code compatible with uARM too? */
-	/* TODO How does the interrupting devices bitmap behave for terminal
-	 *  devices, where subdevices are present? */
 	for (line = DEV_IL_START; line < N_INTERRUPT_LINES; line++) {
 		/* Non-zero if some device interrupt is pending on this line. */
 		unsigned bitmap = *((unsigned *) CDEV_BITMAP_ADDR(line)) & 0xFF;
@@ -153,7 +150,6 @@ void bk_dev_ack(unsigned line, unsigned device, unsigned subdevice) {
 	} else if (IL_DISK <= line && line <= IL_PRINTER) {
 		dtpreg_t *dev = (dtpreg_t *) DEV_REG_ADDR(line, device);
 
-		/* TODO Implement for uARM too. */
 		dev->command = DEV_CMD_ACK;
 	} else {
 		PANIC2("bk_dev_ack(): incorrect line number specified\n");
@@ -161,7 +157,6 @@ void bk_dev_ack(unsigned line, unsigned device, unsigned subdevice) {
 }
 
 unsigned bk_dev_line(void *dev) {
-	/* TODO Implement for uARM too. */
 	/* TODO Turn this into a macro. */
 	dtpreg_t *first = (dtpreg_t *) DEV_REG_ADDR(IL_DISK, 0);
 
@@ -169,7 +164,6 @@ unsigned bk_dev_line(void *dev) {
 }
 
 unsigned bk_dev_instance(void *dev) {
-	/* TODO Implement for uARM too. */
 	/* TODO Turn this into a macro. */
 	unsigned line = bk_dev_line(dev);
 	dtpreg_t *first = (dtpreg_t *) DEV_REG_ADDR(line, 0);

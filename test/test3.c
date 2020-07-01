@@ -151,7 +151,7 @@ void sec_int_handle_term(termreg_t *dev) {
 		p = bk_sem_v(semkey);
 		bk_syscall_retval(p, dev->transm_status);
 		/** TODO Is it okay to acknowledge error statuses, or should they be
-		 * dealt with the reset command? */
+		 *   dealt with the reset command? */
 		bk_dev_ack2(dev, 0);
 	}
 

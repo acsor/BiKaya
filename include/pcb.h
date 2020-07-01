@@ -34,8 +34,10 @@ typedef struct pcb_t {
 		/* Key of the semaphore which the process is eventually blocked on */
 		int *semkey;
 
-		/* A general-purpose timer, used as a counting mechanism for
-		 * kernel and user time. */
+		/**
+		 * A general-purpose timer breakpoint (_bk), specifically used as a
+		 * counting mechanism for cumulative kernel and user time.
+		 */
 		time_t timer_bk;
 		time_t *timer_prev, *timer_curr;
 		/* Cumulative time spent on kernel-level code (timers[0]) and user-level

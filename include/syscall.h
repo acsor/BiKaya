@@ -1,19 +1,19 @@
 #ifndef BK_SYSCALL
 #define BK_SYSCALL
 
-#define BK_SYS_CPU_TIME	0
-#define BK_SYS_FORK		1
-#define BK_SYS_KILL		2
-#define BK_SYS_VERHOGEN	3
-#define BK_SYS_PASSEREN	4
+#define BK_SYS_CPU_TIME		0
+#define BK_SYS_FORK			1
+#define BK_SYS_KILL			2
+#define BK_SYS_VERHOGEN		3
+#define BK_SYS_PASSEREN		4
 #define BK_SYS_IOCMD		5
 #define BK_SYS_SPEC_PASSUP	6
 #define BK_SYS_GETPID		7
 
 #define BK_SYS_FIRST	BK_SYS_CPU_TIME
-#define BK_SYS_LAST	BK_SYS_GETPID
+#define BK_SYS_LAST		BK_SYS_GETPID
 
-#define BK_SP_SYSBK	0
+#define BK_SP_SYSBK		0
 #define BK_SP_TLB		1
 #define BK_SP_TRAP		2
 

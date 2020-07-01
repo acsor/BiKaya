@@ -57,7 +57,20 @@ void bk_na_enter(unsigned new_area);
  */
 void bk_na_exit(unsigned new_area);
 
+/**
+ * Sets up internal state for higher-level exception handling, whose
+ * new area callback was registered through the Spec Passup (hence the
+ * @c sp prefix) system call.
+ * @param type The type of exception to be handled. Can only take values from
+ * @c BK_SP_SYSBK, @c BK_SP_TLB or @c BK_SP_TRAP.
+ */
 void bk_sp_enter(unsigned type);
+/**
+ * The complementary operation of @c bk_sp_enter(). To be invoked after an
+ * exception of type @c type has been handled.
+ * @param type The type of exception to be handled. Can only take values from
+ * @c BK_SP_SYSBK, @c BK_SP_TLB or @c BK_SP_TRAP.
+ */
 void bk_sp_exit(unsigned type);
 
 /**
