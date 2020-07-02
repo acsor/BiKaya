@@ -81,10 +81,7 @@ void bk_pcb_init(pcb_t *p, pfun_t f, int original_priority) {
 	/* Enable kernel mode */
 	p->state.cpsr  = STATUS_SYS_MODE;
 	/* Enable regular interrupt handling and interval timer */
-	/* TODO We are all very well aware that the macro below should be
-	 *  STATUS_ALL_INT_ENABLE(), but by inserting it test2.uarm won't work
-	 *  (while quite surprisingly, test3.uarm does). Why? Fix this. */
-	p->state.cpsr = STATUS_ALL_INT_DISABLE(p->state.cpsr);
+	p->state.cpsr = STATUS_ALL_INT_ENABLE(p->state.cpsr);
 	p->state.cpsr = STATUS_ENABLE_TIMER(p->state.cpsr);
 	/* Set virtual memory off */
 	p->state.CP15_Control = CP15_DISABLE_VM(p->state.CP15_Control);

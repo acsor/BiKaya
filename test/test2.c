@@ -187,6 +187,11 @@ static void delay_ms(unsigned ms) {
 void proc_test1() {
 	int i = 0;
 
+#ifdef BK_ARCH_UARM
+	setSTATUS(STATUS_ALL_INT_DISABLE(getSTATUS()));
+	setSTATUS(STATUS_ENABLE_TIMER(getSTATUS()));
+#endif
+
 	bk_term_puts2(0, "Entering test1!\n", NULL);
 
 	for (i = 0; i < TEST_STEPS; i++) {
@@ -209,6 +214,11 @@ void proc_test1() {
 void proc_test2() {
 	int i = 0;
 
+#ifdef BK_ARCH_UARM
+	setSTATUS(STATUS_ALL_INT_DISABLE(getSTATUS()));
+	setSTATUS(STATUS_ENABLE_TIMER(getSTATUS()));
+#endif
+
 	bk_term_puts2(0, "Entering test2!\n", NULL);
 
 	for (i = 0; i < TEST_STEPS; i++) {
@@ -230,6 +240,11 @@ void proc_test2() {
 
 void proc_test3() {
 	int i = 0;
+
+#ifdef BK_ARCH_UARM
+	setSTATUS(STATUS_ALL_INT_DISABLE(getSTATUS()));
+	setSTATUS(STATUS_ENABLE_TIMER(getSTATUS()));
+#endif
 
 	bk_term_puts2(0, "Entering test3!\n", NULL);
 	test3_baton[0] = 1;
