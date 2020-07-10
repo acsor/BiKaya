@@ -94,7 +94,8 @@ void new_areas_init() {
 }
 
 void idle_proc() {
-	while (1);
+	while (1)
+		WAIT();
 }
 
 
